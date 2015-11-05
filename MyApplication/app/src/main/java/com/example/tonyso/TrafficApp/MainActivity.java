@@ -35,7 +35,7 @@ import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.Interface.OnFragmentInteractionListener;
 import com.example.tonyso.TrafficApp.Interface.WeatherRefreshHandler;
-import com.example.tonyso.TrafficApp.RSSReader.RssReader;
+import com.example.tonyso.TrafficApp.utility.RssReader;
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
 import com.example.tonyso.TrafficApp.location.GPSLocationFinder;
 import com.example.tonyso.TrafficApp.utility.CommonUtils;
@@ -316,7 +316,19 @@ public class MainActivity extends BaseActivity
 
         if (id == R.id.nav_home) {
             tabLayout.setVisibility(View.VISIBLE);
-            fragmentManager.beginTransaction().replace(R.id.flcontent,tab_mainFragment ).commit();
+            fab.setVisibility(View.VISIBLE);
+            fragmentClass = Tab_MainFragment.class;
+            try{
+                fragment = (Fragment) fragmentClass.newInstance();
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.flcontent, fragment).commit();
+            item.setChecked(true);
+            setTitle(getString(R.string.app_name));
+            //fragmentManager.beginTransaction().replace(R.id.flcontent,tab_mainFragment ).commit();
         } else if (id == R.id.nav_traffic) {
             tabLayout.setVisibility(View.GONE);
             fragmentClass = Nav_TrafficFragment.class;
@@ -342,6 +354,7 @@ public class MainActivity extends BaseActivity
 
         }else if (id == R.id.nav_map){
             tabLayout.setVisibility(View.GONE);
+            fab.setVisibility(View.GONE);
             fragmentClass = Nav_MapTestFragment.class;
             try{
                 fragment = (Fragment) fragmentClass.newInstance();

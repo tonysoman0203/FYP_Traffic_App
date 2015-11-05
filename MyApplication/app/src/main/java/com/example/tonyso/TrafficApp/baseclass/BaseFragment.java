@@ -11,7 +11,7 @@ public class BaseFragment extends Fragment {
     private String title = "";
     private int indicatorColor = Color.BLUE;
     private int dividerColor = Color.GRAY;
-
+    private int icon = -1;
 
     public String getTitle() {
         return title;
@@ -33,4 +33,11 @@ public class BaseFragment extends Fragment {
     }
 
 
+    public int getIcon() {
+        return icon;
+    }
+
+    public void setIcon(int icon) {
+        this.icon = icon;
+    }
 }

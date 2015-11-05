@@ -1,4 +1,4 @@
-package com.example.tonyso.TrafficApp.RSSReader;
+package com.example.tonyso.TrafficApp.utility;
 
 import android.app.ProgressDialog;
 import android.util.Log;
@@ -7,7 +7,6 @@ import com.example.tonyso.TrafficApp.Interface.WeatherRefreshHandler;
 import com.example.tonyso.TrafficApp.Interface.Rss_Listener;
 import com.example.tonyso.TrafficApp.MainActivity;
 import com.example.tonyso.TrafficApp.model.Weather;
-import com.example.tonyso.TrafficApp.utility.ErrorDialog;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -50,11 +49,12 @@ public class RssReader implements Rss_Listener {
         th.start();
     }
 
-    public void ParsedWeatherRssInfo(final List<Weather> weatherList) {
+    public void ParsedInfo(final List weatherList) {
         context.rss_Handler.post(new Runnable() {
             public void run() {
-                weatherRefreshHandler.onRefreshWeather(weatherList.get(0).getDegree());
-                weatherRefreshHandler.onRefreshIcon(weatherList.get(0).getWeatherIcon());
+                List<Weather>weathers = weatherList;
+                weatherRefreshHandler.onRefreshWeather(weathers.get(0).getDegree());
+                weatherRefreshHandler.onRefreshIcon(weathers.get(0).getWeatherIcon());
                 return;
             }
         });

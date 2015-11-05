@@ -3,14 +3,17 @@ package com.example.tonyso.TrafficApp;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.tonyso.TrafficApp.Interface.XMLFetchInterface;
+import com.example.tonyso.TrafficApp.Interface.Rss_Listener;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.utility.LanguageSelector;
@@ -33,7 +36,7 @@ import it.sephiroth.android.library.picasso.Picasso;
  * A simple {@link Fragment} subclass.
  */
 public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallback,
-        GoogleMap.OnMapClickListener,XMLFetchInterface,GoogleMap.OnMarkerClickListener{
+        GoogleMap.OnMapClickListener,Rss_Listener,GoogleMap.OnMarkerClickListener{
 
     private SupportMapFragment mapFragment;
     private GoogleMap mMap;
@@ -73,11 +76,7 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
         return v;
     }
 
-    @Override
-    public void onXMLFetch(List<RouteCCTV> r) {
-        routeList = r;
-        roadCCTVMap = new HashMap<>();
-    }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -117,6 +116,13 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
         return false;
     }
 
+    @Override
+    public void ParsedInfo(List list) {
+        routeList = list;
+        roadCCTVMap = new HashMap<>();
+
+    }
+
     public class MapInfoAdapter implements GoogleMap.InfoWindowAdapter{
 
         @Override
@@ -127,16 +133,44 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
         @Override
         public View getInfoContents(Marker marker) {
 
-            View view = getLayoutInflater(savedInstanceState).inflate(R.layout.popup_map_snapshot, null, false);
+            View view = null;
+            ViewHolder viewHolder = null;
+            if (view == null){
+                view = getLayoutInflater(savedInstanceState).
+                        inflate(R.layout.popup_map_snapshot, null, false);
+                viewHolder = new ViewHolder(view);
+                view.setTag(viewHolder);
+            }else
+                viewHolder = (ViewHolder)view.getTag();
+
+            //Operations
             String key = marker.getTitle();
-            ImageView imageView = (ImageView)view.findViewById(R.id.map_snapshot);
-            TextView tv = (TextView)view.findViewById(R.id.map_snapshot_title);
             String roadkey = roadCCTVMap.get(key);
+
             String URL = TRAFFIC_URL.concat(roadkey).concat(JPG);
             Log.e(getTag(), URL);
-            Picasso.with(getContext()).load(URL).into(imageView);
-            tv.setText(key);
+            Picasso.with(getContext()).load(URL).into(viewHolder.imgRoutecctv);
+            viewHolder.cctvtitle.setText(key);
+            viewHolder.imgAddBK.setImageResource(R.drawable.ic_bookmark);
+            viewHolder.btnMore.setText("More");
+            //Picasso.with(getContext()).load(R.drawable.ic_bookmark).into(viewHolder.imgAddBK);
+
             return view;
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder{
+            ImageView imgRoutecctv;
+            ImageButton imgAddBK;
+            Button btnMore;
+            TextView cctvtitle;
+
+            public ViewHolder(View itemView) {
+                super(itemView);
+                cctvtitle = (TextView)itemView.findViewById(R.id.map_snapshot_title);
+                imgRoutecctv = (ImageView)itemView.findViewById(R.id.map_snapshot);
+                imgAddBK = (ImageButton)itemView.findViewById(R.id.imgAddBookMark);
+                btnMore = (Button)itemView.findViewById(R.id.btnBKMore);
+            }
         }
     }
 }

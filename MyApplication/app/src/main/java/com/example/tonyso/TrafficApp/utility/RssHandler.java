@@ -1,4 +1,4 @@
-package com.example.tonyso.TrafficApp.RSSReader;
+package com.example.tonyso.TrafficApp.utility;
 
 //import java.io.BufferedReader;
 
@@ -10,8 +10,6 @@ import com.example.tonyso.TrafficApp.Interface.Rss_Listener;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.model.Weather;
-import com.example.tonyso.TrafficApp.utility.ErrorDialog;
-import com.example.tonyso.TrafficApp.utility.LanguageSelector;
 
 import org.xml.sax.helpers.DefaultHandler;
 import org.xmlpull.v1.XmlPullParser;
@@ -146,7 +144,7 @@ public class RssHandler extends DefaultHandler {
                 }
                 event = xmlPullParser.next();
                 if (event == XmlPullParser.END_DOCUMENT){
-                    listener.ParsedWeatherRssInfo(weathers);
+                    listener.ParsedInfo(weathers);
                 }
             }
 

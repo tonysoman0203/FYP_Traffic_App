@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.util.Log;
 
-import com.example.tonyso.TrafficApp.Interface.XMLFetchInterface;
+import com.example.tonyso.TrafficApp.Interface.Rss_Listener;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 
@@ -31,16 +31,16 @@ public class XMLReader {
     private static final String IMAGE_CHI_DESC = "chinese-description";
     private static final String IMAGE_COORDINATE = "coordinate";
 
-    private XMLFetchInterface xmlFetchInterface;
+    private Rss_Listener xmlFetchInterface;
     private static final String ns = null;
 
-    public XMLReader(Context context,XMLFetchInterface xmlFetchInterface) {
+    public XMLReader(Context context,Rss_Listener xmlFetchInterface) {
         this.context = context;
         this.xmlFetchInterface = xmlFetchInterface;
     }
 
     public void feedImageXml(){
-        xmlFetchInterface.onXMLFetch(fetchImageXML());
+        xmlFetchInterface.ParsedInfo(fetchImageXML());
     }
 
     private  List fetchImageXML(){

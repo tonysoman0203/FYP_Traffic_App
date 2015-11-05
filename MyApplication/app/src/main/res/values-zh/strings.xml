@@ -31,6 +31,7 @@
     <string name="pref_title_Language">語言</string>
     <string name="alert_box_title_language_choice">語言</string>
     <string name="title_activity_settings">設定</string>
+    <string name="bookMark_More">更多</string>
 
 
 </resources>
