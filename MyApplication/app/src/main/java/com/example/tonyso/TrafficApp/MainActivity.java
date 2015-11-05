@@ -331,6 +331,7 @@ public class MainActivity extends BaseActivity
             //fragmentManager.beginTransaction().replace(R.id.flcontent,tab_mainFragment ).commit();
         } else if (id == R.id.nav_traffic) {
             tabLayout.setVisibility(View.GONE);
+            fab.setVisibility(View.GONE);
             fragmentClass = Nav_TrafficFragment.class;
             try{
                 fragment = (Fragment) fragmentClass.newInstance();
