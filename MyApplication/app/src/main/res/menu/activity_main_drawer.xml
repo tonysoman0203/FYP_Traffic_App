@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home_black_48dp"
+            android:title="@string/nav_home" />
+        <item android:id="@+id/nav_traffic"
+            android:icon="@drawable/ic_traffic_black_48dp"
+            android:title="@string/nav_real_traffic" />
+        <item android:id="@+id/nav_suggestion"
+
+            android:icon="@drawable/ic_directions_black_48dp"
+            android:title="@string/nav_suggestion" />
+        <item android:id="@+id/nav_map"
+
+            android:icon="@android:drawable/ic_dialog_map"
+            android:title="Map Test" />
+        <!--<item android:id="@+id/nav_manage" android:icon="@android:drawable/ic_menu_manage"
+            android:title="Tools" />
+    -->
+    </group>
+
+    <item android:title="@string/nav_header_Miscellaneous">
+        <menu>
+            <item android:id="@+id/nav_setting"
+
+                android:icon="@drawable/ic_settings_black_48dp"
+                android:title="@string/action_settings" />
+            <item android:id="@+id/nav_about"
+                android:icon="@drawable/ic_info_black_48dp"
+                android:title="@string/nav_about_us" />
+            <item android:id="@+id/nav_feedback"
+
+                android:icon="@drawable/ic_comment_black_48dp"
+                android:title="@string/nav_feedback" />
+        </menu>
+    </item>
+
+</menu>

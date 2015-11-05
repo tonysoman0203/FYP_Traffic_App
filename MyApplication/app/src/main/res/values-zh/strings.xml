@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">交通實時通</string>
+
+    <string name="Refresh">重新下載／更新</string>
+    <string name="WEATHER_TAG_ZH">氣 溫 ：</string>
+    <string name="Degree_ZH"> 度</string>
+    <string name="action_settings">我的設定</string>
+    <string name="date">日期 ：</string>
+    <string name="rss_Location">現時位置： </string>
+    <string name="rss_Temperature">現時氣溫：</string>
+    <string name="rss_Weather">現時天氣： </string>
+    <string name="search">搜尋：</string>
+    <string name="rss_CurrTime">現在時間： </string>
+
+    <string name="OK_BUTTON">確定</string>
+    <string name="Language">語言</string>
+    <string name="title_activity_my_preference">設定</string>
+    <string name="nav_header_Miscellaneous">雜項</string>
+    <string name="nav_about_us">關於交通實時通</string>
+    <string name="nav_feedback">意見回饋</string>
+    <string name="tab_BookMarks">收藏路線</string>
+    <string name="tab_History">過往路線</string>
+    <string name="tab_Home">主頁</string>
+    <string name="nav_home">主頁</string>
+    <string name="nav_real_traffic">交通實況</string>
+    <string name="nav_suggestion">路線建議</string>
+    <string name="language_choice">語言</string>
+    <string name="DegreeSign">\u2103</string>
+    <string name="English">English</string>
+    <string name="pref_title_Language">語言</string>
+    <string name="alert_box_title_language_choice">語言</string>
+    <string name="title_activity_settings">設定</string>
+
+
+</resources>

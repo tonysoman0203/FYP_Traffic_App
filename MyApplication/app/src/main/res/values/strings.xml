@@ -1,0 +1,77 @@
+<resources>
+    <string name="app_name">RealTimeTraffic</string>
+
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="search">Search</string>
+    <string name="Refresh">Refresh</string>
+
+    <string-array name="Tabs_Titles">
+        <item>Real-Time Traffic</item>
+        <item>BookMarks</item>
+        <item>Notification</item>
+    </string-array>
+
+    <string name="rss_Weather">Weather</string>
+    <string name="rss_Location">Location：</string>
+    <string name="rss_Temperature">Temperature</string>
+    <string name="rss_CurrTime">Current Time:</string>
+
+    <string name="tab_Home">Home</string>
+    <string name="tab_BookMarks">BookMarks</string>
+    <string name="tab_History">History</string>
+
+    <!--My Preference !-->
+    <string name="alert_box_title_language_choice">Language</string>
+    <string name="language_alert">You have already chosen %s. Please choose again.</string>
+    <string name="language_alert_zh">你已經選擇 繁體中文 了. 請重新選擇。</string>
+
+    <string-array name="language_options">
+        <item>English</item>
+        <item>繁體中文</item>
+    </string-array>
+
+    <string-array name="language_value_options">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string name="TrandionalChinese" translatable="false">繁體中文</string>
+    <string name="English">English</string>
+    <string name="pref_title_Language">Language</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="date">Date : </string>
+
+    <string name="HUMIDITY_TAG" translatable="false">Relative Humidity :</string>
+    <string name="WEATHER_TAG">Air temperature : </string>
+    <string name="Degree"> degrees Celsius</string>
+    <string name="DegreeSign">\u2103</string>
+    <string name="WEATHER_TAG_ZH">氣 溫 ：</string>
+    <string name="HUMIDITY_TAG_ZH" translatable="false">相 對 濕 度 ：</string>
+    <string name="Degree_ZH"> 度</string>
+
+    <string name="OK_BUTTON">OK</string>
+
+    <string name="nav_feedback">FeedBack</string>
+    <string name="nav_header_Miscellaneous">Miscellaneous</string>
+    <string name="nav_about_us">About Real-Traffic App</string>
+    <string name="nav_real_traffic">Traffic Monitoring</string>
+    <string name="nav_suggestion">Route Suggestion</string>
+    <string name="nav_home">Home</string>
+    <string name="title_activity_my_preference">Setting</string>
+    <string name="language_choice">language</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_maps">Map</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="item_tab_bk_detail">More</string>
+    <string name="title_activity_nav__traffic_maps">Map</string>
+
+    <!-- Strings related to Settings -->
+
+</resources>
