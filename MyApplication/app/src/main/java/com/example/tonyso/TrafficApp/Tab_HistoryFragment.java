@@ -45,14 +45,14 @@ public class Tab_HistoryFragment extends BaseFragment implements
     public Tab_HistoryFragment() {
     }
 
-    public static Tab_HistoryFragment newInstance(String title,int indicatorColor,int dividerColor){
-        Tab_HistoryFragment f = new Tab_HistoryFragment();
-        f.setTitle(title);
-        f.setIndicatorColor(indicatorColor);
-        f.setDividerColor(dividerColor);
-        return f;
+    public static Tab_HistoryFragment newInstance(String title, int indicatorColor, int dividerColor,int icon){
+        Tab_HistoryFragment baseFragment = new Tab_HistoryFragment();
+        baseFragment.setTitle(title);
+        baseFragment.setDividerColor(dividerColor);
+        baseFragment.setIcon(icon);
+        baseFragment.setIndicatorColor(indicatorColor);
+        return baseFragment;
     }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -31,11 +31,12 @@ public class Tab_BookMarkFragment extends BaseFragment {
         // Required empty public constructor
     }
 
-    public static Tab_BookMarkFragment newInstance(String title,int indicatorColor,int dividerColor){
+    public static Tab_BookMarkFragment newInstance(String title,int indicatorColor,int dividerColor,int icon){
         Tab_BookMarkFragment f = new Tab_BookMarkFragment();
         f.setTitle(title);
         f.setIndicatorColor(indicatorColor);
         f.setDividerColor(dividerColor);
+        f.setIcon(icon);
         return f;
     }
 

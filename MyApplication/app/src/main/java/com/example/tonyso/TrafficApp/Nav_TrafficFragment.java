@@ -31,6 +31,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -40,9 +41,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import it.sephiroth.android.library.picasso.Picasso;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -138,20 +136,14 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
     public void ParsedInfo(List list) {
         routeList = list;
         roadCCTVMap = new HashMap<>();
-        final List<String>regionslist = getDropdownlist();
-        Collections.sort(regionslist, new Comparator<String>() {
-            @Override
-            public int compare(String lhs, String rhs) {
-                return rhs.compareToIgnoreCase(lhs);
-            }
-        });
-        ArrayAdapter<String> dataadpater = new ArrayAdapter(getContext(),android.R.layout.simple_spinner_item,regionslist);
+        final String []arr = getResources().getStringArray(R.array.regions);
+        ArrayAdapter<String> dataadpater = new ArrayAdapter(getContext(),android.R.layout.simple_spinner_item,arr);
         dataadpater.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(dataadpater);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Snackbar.make(getActivity().findViewById(R.id.coordinateLayoutMain), regionslist.get(position), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(getActivity().findViewById(R.id.coordinateLayoutMain),arr[position] , Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
@@ -161,36 +153,36 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
         });
     }
 
-    private List<String> getDropdownlist() {
-        List<String> sortedRegions = new ArrayList<>();
-        String pref = languageSelector.getLanguage();
-        String curr,region="";
-        int j = 0;
-        for (int i = 0; i < routeList.size(); i++) {
-            j = i + 1;
-            if (j>=routeList.size()) break;
-            String[] currRegions = routeList.get(i).getRegion(); //Get regions first from each RouteCCTV Object //current
-            String[] r = routeList.get(j).getRegion();
-
-            if (!Arrays.equals(currRegions,r)){
-                Log.e(getTag(), "i 's value:" + currRegions[1] + " j's value:" + r[1]);
-                if (pref.equals(MyApplication.Language.ENGLISH)){
-                    curr = currRegions[0];
-                    region = r[0];
-                }else{
-                    curr = currRegions[1];
-                    region = r[1];
-                }
-                sortedRegions.add(region);
-            }else{
-                 continue;
-            }
-
-        }
-
-
-        return sortedRegions;
-    }
+//    private List<String> getDropdownlist() {
+//        List<String> sortedRegions = new ArrayList<>();
+//        String pref = languageSelector.getLanguage();
+//        String curr,region="";
+//        int j = 0;
+//        for (int i = 0; i < routeList.size(); i++) {
+//            j = i + 1;
+//            if (j>=routeList.size()) break;
+//            String[] currRegions = routeList.get(i).getRegion(); //Get regions first from each RouteCCTV Object //current
+//            String[] r = routeList.get(j).getRegion();
+//
+//            if (!Arrays.equals(currRegions,r)){
+//                Log.e(getTag(), "i 's value:" + currRegions[1] + " j's value:" + r[1]);
+//                if (pref.equals(MyApplication.Language.ENGLISH)){
+//                    curr = currRegions[0];
+//                    region = r[0];
+//                }else{
+//                    curr = currRegions[1];
+//                    region = r[1];
+//                }
+//                sortedRegions.add(region);
+//            }else{
+//                continue;
+//            }
+//
+//        }
+//
+//
+//        return sortedRegions;
+//    }
 
 
     public class MapInfoAdapter implements GoogleMap.InfoWindowAdapter{

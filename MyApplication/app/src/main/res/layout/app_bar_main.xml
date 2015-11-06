@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:id="@+id/appbar"
         android:fitsSystemWindows="true"
+        app:expanded="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <android.support.v7.widget.Toolbar
@@ -29,12 +30,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             style="@style/MyTabLayout"
-            app:tabTextColor="@android:color/darker_gray"
-            android:scrollbars="horizontal"
             app:tabMaxWidth="0dp"
             app:tabGravity="fill"
-            app:tabMode="fixed"
-            app:tabIndicatorColor="@android:color/white"
             android:id="@+id/tablayout" />
 
     </android.support.design.widget.AppBarLayout>

@@ -12,10 +12,9 @@ import android.widget.TextView;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.Tab_BookMarkFragment;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
-
-import it.sephiroth.android.library.picasso.Picasso;
 
 /**
  * Created by TonySo on 28/10/15.

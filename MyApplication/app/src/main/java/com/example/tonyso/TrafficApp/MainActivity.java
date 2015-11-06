@@ -45,11 +45,9 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.squareup.picasso.Picasso;
 
 import java.util.Locale;
-
-import it.sephiroth.android.library.picasso.Callback;
-import it.sephiroth.android.library.picasso.Picasso;
 
 
 public class MainActivity extends BaseActivity
@@ -464,17 +462,7 @@ public class MainActivity extends BaseActivity
     @Override
     public void onRefreshIcon(String URL) {
         ImageView imageView = (ImageView)headerLayout.findViewById(R.id.bgHeader);
-        Picasso.with(this).load(URL).into(imageView, new Callback() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onError() {
-
-            }
-        });
+        Picasso.with(this).load(URL).into(imageView);
     }
 
     @Override

@@ -33,5 +33,14 @@
     <string name="title_activity_settings">設定</string>
     <string name="bookMark_More">更多</string>
 
+    <string-array name="regions">
+        <item>香港島</item>
+        <item>九龍</item>
+        <item>荃灣</item>
+        <item>屯門及天水圍</item>
+        <item>大埔，北區及元朗</item>
+        <item>沙田及馬鞍山</item>
+        <item>大嶼山</item>
+    </string-array>
 
 </resources>

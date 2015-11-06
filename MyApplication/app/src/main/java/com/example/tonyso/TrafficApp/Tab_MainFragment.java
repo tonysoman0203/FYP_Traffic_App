@@ -24,7 +24,8 @@ public class Tab_MainFragment extends BaseFragment {
     private String mParam1;
     private String mParam2;
 
-    public static TabLayout tablay;
+    public static TabLayout tabLayout;
+    ViewPager viewPager;
 
     /**
      * Use this factory method to create a new instance of
@@ -49,7 +50,7 @@ public class Tab_MainFragment extends BaseFragment {
         f.setTitle(title);
         f.setIndicatorColor(indicatorColor);
         f.setDividerColor(dividerColor);
-        tablay = tabLayout;
+        Tab_MainFragment.tabLayout = tabLayout;
 
         return f;
     }
@@ -72,44 +73,50 @@ public class Tab_MainFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_tab__main, container, false);
-        initTabLayoutViewPager(view);
         return view;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initTabLayoutViewPager(view);
 
     }
 
     //    Tempartory Coding:
     private void initTabLayoutViewPager(View v){
-//        TabLayout tabLayout = (TabLayout)v.findViewById(R.id.tablayout);
-//        tabLayout.setFocusable(true );
         final LinkedList<BaseFragment> fragments = getFragments();
-
-        for (BaseFragment j : fragments){
-            tablay.addTab(tablay.newTab().setText(j.getTitle()));
-        }
-        TabFragmentPagerAdapter adapter = new TabFragmentPagerAdapter(getChildFragmentManager(), fragments);
-        ViewPager viewPager = (ViewPager)v.findViewById(R.id.viewpager);
+        TabFragmentPagerAdapter adapter = new TabFragmentPagerAdapter(getActivity().getSupportFragmentManager(), fragments);
+        viewPager = (ViewPager)v.findViewById(R.id.viewpager);
         viewPager.setAdapter(adapter);
-        tablay.setupWithViewPager(viewPager);
-        tablay.setTabsFromPagerAdapter(adapter);
-        tablay.setTabMode(TabLayout.MODE_FIXED);
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                tabLayout.setupWithViewPager(viewPager);
+            }
+        });
+        tabLayout.setTabsFromPagerAdapter(adapter);
+        for (int i = 0;i<fragments.size();i++)
+        tabLayout.getTabAt(0).setIcon(fragments.get(0).getIcon());
+
     }
 
     private LinkedList<BaseFragment> getFragments(){
         int indicatorColor = this.getResources().getColor(R.color.colorAccent);
         int dividerColor = Color.WHITE;
 
-        LinkedList<BaseFragment> fragments = new LinkedList<BaseFragment>();
+        int ic_home = R.drawable.ic_home_black_48dp;
+        int ic_bookmark = (R.drawable.ic_bookmark);
+        int ic_history = R.drawable.ic_history_black_48dp;
+
+        LinkedList<BaseFragment> fragments = new LinkedList<>();
         String home = getString(R.string.tab_Home);
         String bookmark = getString(R.string.tab_BookMarks);
         String history = getString(R.string.tab_History);
-        fragments.add(Tab_HomeFragment.newInstance(home, indicatorColor, dividerColor));
-        fragments.add(Tab_BookMarkFragment.newInstance(bookmark, indicatorColor, dividerColor));
-        fragments.add(Tab_HistoryFragment.newInstance(history, indicatorColor, dividerColor));
+        fragments.add(Tab_HomeFragment.newInstance(home, indicatorColor, dividerColor,ic_home));
+        fragments.add(Tab_BookMarkFragment.newInstance(bookmark, indicatorColor, dividerColor,ic_bookmark));
+        fragments.add(Tab_HistoryFragment.newInstance(history, indicatorColor, dividerColor,ic_history));
         return fragments;
     }
 

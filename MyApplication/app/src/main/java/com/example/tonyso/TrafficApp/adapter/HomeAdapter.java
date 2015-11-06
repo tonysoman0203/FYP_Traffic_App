@@ -9,10 +9,9 @@ import android.widget.ImageView;
 
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.model.Route;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-
-import it.sephiroth.android.library.picasso.Picasso;
 
 /**
  * Created by TonySo on 18/9/2015.

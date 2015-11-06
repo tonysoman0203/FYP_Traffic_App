@@ -40,10 +40,11 @@ public class Tab_HomeFragment extends BaseFragment{
         return fragment;
     }
 
-    public static Tab_HomeFragment newInstance(String title, int indicatorColor, int dividerColor){
+    public static Tab_HomeFragment newInstance(String title, int indicatorColor, int dividerColor,int icon){
         Tab_HomeFragment baseFragment = new Tab_HomeFragment();
         baseFragment.setTitle(title);
         baseFragment.setDividerColor(dividerColor);
+        baseFragment.setIcon(icon);
         baseFragment.setIndicatorColor(indicatorColor);
         return baseFragment;
     }

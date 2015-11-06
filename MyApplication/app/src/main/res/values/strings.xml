@@ -9,6 +9,16 @@
     <string name="search">Search</string>
     <string name="Refresh">Refresh</string>
 
+    <string-array name="regions">
+        <item>Hong Kong Island</item>
+        <item>Kowloon</item>
+        <item>Tsuen Wan</item>
+        <item>Tuen Mun &amp; Tin Shui Wai</item>
+        <item>Tai Po  North &amp; Yuen Long</item>
+        <item>Shatin &amp; Ma On Shan</item>
+        <item>Lantau</item>
+    </string-array>
+
     <string-array name="Tabs_Titles">
         <item>Real-Time Traffic</item>
         <item>BookMarks</item>
@@ -24,7 +34,7 @@
     <string name="tab_BookMarks">BookMarks</string>
     <string name="tab_History">History</string>
 
-    <!--My Preference !-->
+    <!--Setting Start !-->
     <string name="alert_box_title_language_choice">Language</string>
     <string name="language_alert">You have already chosen %s. Please choose again.</string>
     <string name="language_alert_zh">你已經選擇 繁體中文 了. 請重新選擇。</string>
@@ -42,6 +52,8 @@
     <string name="TrandionalChinese" translatable="false">繁體中文</string>
     <string name="English">English</string>
     <string name="pref_title_Language">Language</string>
+
+    <!-- Setting End-->
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="date">Date : </string>
@@ -69,10 +81,8 @@
 
     <string name="bookMark_More">More</string>
 <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="item_tab_bk_detail">More</string>
     <string name="title_activity_nav__traffic_maps">Map</string>
 
-    <!-- Strings related to Settings -->
 
 </resources>
