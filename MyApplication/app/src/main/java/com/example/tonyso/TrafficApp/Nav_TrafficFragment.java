@@ -5,10 +5,10 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -16,15 +16,16 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.tonyso.TrafficApp.Interface.ImageProcessCallback;
 import com.example.tonyso.TrafficApp.Interface.Rss_Listener;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
-import com.example.tonyso.TrafficApp.model.Route;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.utility.LanguageSelector;
-import com.example.tonyso.TrafficApp.utility.XMLReader;
+import com.example.tonyso.TrafficApp.rss.XMLReader;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -33,11 +34,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +41,7 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  */
+
 public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallback,
         GoogleMap.OnMapClickListener,Rss_Listener,GoogleMap.OnMarkerClickListener{
 
@@ -52,7 +49,7 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
     private GoogleMap mMap;
     private List<RouteCCTV> routeList;
     private LanguageSelector languageSelector;
-    Map<String,String> roadCCTVMap ;
+    Map<String,RouteCCTV> roadCCTVMap = new HashMap<>();
 
     private static String TRAFFIC_URL = "http://tdcctv.data.one.gov.hk/";
     private static String JPG = ".JPG";
@@ -80,44 +77,58 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_traffic_monitoring,container,false);
+        mapFragment = (SupportMapFragment)getChildFragmentManager().findFragmentById(R.id.map);
+        setHasOptionsMenu(true);
         this.savedInstanceState = savedInstanceState;
-        spinner = (Spinner)v.findViewById(R.id.spinner);
-        mapFragment = (SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.map);
+        this.coordinatorLayout = (CoordinatorLayout)getActivity().findViewById(R.id.coordinateLayoutMain);
+
+        spinner = (Spinner) v.findViewById(R.id.spinner);
         languageSelector = new LanguageSelector(getContext());
         XMLReader xmlReader = new XMLReader(this.getContext(),this);
         xmlReader.feedImageXml();
+
         mapFragment.getMapAsync(this);
 
         return v;
     }
 
-
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        String key,desc = "";
+        RouteCCTV routeCCTV;
+        setGoogleMapProperty();
+        String desc ;
         if (routeList.size()!=0){
             for (int count = 0;count<routeList.size();count++){
-                key = routeList.get(count).getKey();
+                routeCCTV = routeList.get(count);
+//                key = routeList .get(count).getKey();
                 double[] latlng = routeList.get(count).getLatLngs();
                 LatLng sydney = new LatLng(latlng[0],latlng[1]);
                 if (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH)){
-                    desc = routeList.get(count).getDescription()[0];
-                    roadCCTVMap.put(desc,key);
+                    desc = routeCCTV.getDescription()[0];
+                    roadCCTVMap.put(desc,routeCCTV);
                 }else{
-                    desc = routeList.get(count).getDescription()[1];
-                    roadCCTVMap.put(desc,key);
+                    desc = routeCCTV.getDescription()[1];
+                    roadCCTVMap.put(desc,routeCCTV);
                 }
 
-                mMap.addMarker(new MarkerOptions().
-                        position(sydney).
-                        title(desc));
+                mMap.addMarker(new MarkerOptions().position(sydney).title(desc));
             }
             mMap.setOnMarkerClickListener(this);
             mMap.setInfoWindowAdapter(new MapInfoAdapter());
         }
+    }
+
+
+    /*Set Google Map property*/
+    private void setGoogleMapProperty(){
+        mMap.setMyLocationEnabled(true);
     }
 
     @Override
@@ -135,7 +146,6 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
     @Override
     public void ParsedInfo(List list) {
         routeList = list;
-        roadCCTVMap = new HashMap<>();
         final String []arr = getResources().getStringArray(R.array.regions);
         ArrayAdapter<String> dataadpater = new ArrayAdapter(getContext(),android.R.layout.simple_spinner_item,arr);
         dataadpater.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -143,7 +153,7 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Snackbar.make(getActivity().findViewById(R.id.coordinateLayoutMain),arr[position] , Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(coordinatorLayout,arr[position] , Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
@@ -196,7 +206,7 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
         public View getInfoContents(Marker marker) {
 
             View view = null;
-            ViewHolder viewHolder = null;
+            ViewHolder viewHolder;
             if (view == null){
                 view = getLayoutInflater(savedInstanceState).
                         inflate(R.layout.popup_map_snapshot, null, false);
@@ -206,13 +216,26 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
                 viewHolder = (ViewHolder)view.getTag();
 
             //Operations
-            String key = marker.getTitle();
-            String roadkey = roadCCTVMap.get(key);
+            String title = marker.getTitle();
+            RouteCCTV routeCCTV = roadCCTVMap.get(title);
+            String imgKey = routeCCTV.getKey();
+            String URL = TRAFFIC_URL.concat(imgKey).concat(JPG);
+            //Log.e(getTag(), URL);
+            final ViewHolder finalViewHolder = viewHolder;
+            Picasso.with(getContext()).load(URL).into(viewHolder.imgRoutecctv
+                    , new ImageProcessCallback(finalViewHolder.progressBar) {
+                @Override
+                public void onSuccess() {
 
-            String URL = TRAFFIC_URL.concat(roadkey).concat(JPG);
-            Log.e(getTag(), URL);
-            Picasso.with(getContext()).load(URL).into(viewHolder.imgRoutecctv);
-            viewHolder.cctvtitle.setText(key);
+                }
+
+                @Override
+                public void onError() {
+
+                }
+            });
+
+            viewHolder.cctvtitle.setText(title);
             viewHolder.imgAddBK.setImageResource(R.drawable.ic_bookmark);
             viewHolder.btnMore.setText("More");
             //Picasso.with(getContext()).load(R.drawable.ic_bookmark).into(viewHolder.imgAddBK);
@@ -225,6 +248,7 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
             ImageButton imgAddBK;
             Button btnMore;
             TextView cctvtitle;
+            ProgressBar progressBar;
 
             public ViewHolder(View itemView) {
                 super(itemView);
@@ -232,6 +256,7 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
                 imgRoutecctv = (ImageView)itemView.findViewById(R.id.map_snapshot);
                 imgAddBK = (ImageButton)itemView.findViewById(R.id.imgAddBookMark);
                 btnMore = (Button)itemView.findViewById(R.id.btnBKMore);
+                progressBar = (ProgressBar)itemView.findViewById(R.id.progressBar);
             }
         }
     }

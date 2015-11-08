@@ -83,6 +83,10 @@
 <!-- TODO: Remove or change this placeholder text -->
     <string name="item_tab_bk_detail">More</string>
     <string name="title_activity_nav__traffic_maps">Map</string>
-
+    <string name="terrain">Terrain</string>
+    <string name="nav_traffic_satelite">Satelite</string>
+    <string name="map_mode">Map Mode</string>
+    <string name="nav_traffic_traffic">Traffic</string>
+    <!-- Menu Nav Traffic-->
 
 </resources>

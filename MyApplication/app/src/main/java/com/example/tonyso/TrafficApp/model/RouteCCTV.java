@@ -3,7 +3,7 @@ package com.example.tonyso.TrafficApp.model;
 /**
  * Created by TonySo on 31/10/15.
  */
-public class RouteCCTV {
+public class RouteCCTV extends Route{
     private int id;
     private String key;
     private String[] description;

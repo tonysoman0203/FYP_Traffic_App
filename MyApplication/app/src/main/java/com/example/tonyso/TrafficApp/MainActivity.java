@@ -35,7 +35,7 @@ import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.Interface.OnFragmentInteractionListener;
 import com.example.tonyso.TrafficApp.Interface.WeatherRefreshHandler;
-import com.example.tonyso.TrafficApp.utility.RssReader;
+import com.example.tonyso.TrafficApp.rss.RssReader;
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
 import com.example.tonyso.TrafficApp.location.GPSLocationFinder;
 import com.example.tonyso.TrafficApp.utility.CommonUtils;
@@ -94,10 +94,7 @@ public class MainActivity extends BaseActivity
 
     TextView txtCurrDate, txtCurrTime, lbllocation, lblWeather, lblDate, lblTime;
 
-    FragmentManager fragmentManager;
-    Tab_MainFragment tab_mainFragment;
     TabLayout tabLayout;
-
     View headerLayout;
 
     @Override
@@ -110,13 +107,12 @@ public class MainActivity extends BaseActivity
             LabelFindViewById();
             initRSSReader();
             setUpCountDownService();
-        if (savedInstanceState == null) {
-            fragmentManager = getSupportFragmentManager();
-            int indicatorColor = this.getResources().getColor(R.color.colorAccent);
-            int dividerColor = Color.WHITE;
-            tab_mainFragment = Tab_MainFragment.newInstance(getString(R.string.app_name),indicatorColor,dividerColor,tabLayout);
-            fragmentManager.beginTransaction().replace(R.id.flcontent, tab_mainFragment).commit();
-        }
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        int indicatorColor = this.getResources().getColor(R.color.colorAccent);
+        int dividerColor = Color.WHITE;
+        fragmentManager.beginTransaction().replace(R.id.flcontent, Tab_MainFragment.newInstance(getString(R.string.app_name),indicatorColor,dividerColor,tabLayout)).commit();
+
     }
 
     private void init() {
@@ -139,6 +135,7 @@ public class MainActivity extends BaseActivity
                         .setAction("Action", null).show();
             }
         });
+        //initTabLayoutViewPager();
     }
 
 
@@ -204,6 +201,7 @@ public class MainActivity extends BaseActivity
         }
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -222,8 +220,6 @@ public class MainActivity extends BaseActivity
         }else{
             txtCurrDate.setText(CommonUtils.initDate(ENG));
         }
-
-
 
         rssReader.FeedRss();
 
@@ -507,4 +503,6 @@ public class MainActivity extends BaseActivity
             }
         }
     }
+
+
 }
