@@ -20,11 +20,10 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.tonyso.TrafficApp.Interface.ImageProcessCallback;
 import com.example.tonyso.TrafficApp.Interface.Rss_Listener;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
-import com.example.tonyso.TrafficApp.utility.LanguageSelector;
+import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.rss.XMLReader;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -32,6 +31,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
@@ -83,7 +83,7 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
         this.coordinatorLayout = (CoordinatorLayout)getActivity().findViewById(R.id.coordinateLayoutMain);
 
         spinner = (Spinner) v.findViewById(R.id.spinner);
-        languageSelector = new LanguageSelector(getContext());
+        languageSelector = LanguageSelector.getInstance(getContext());
         XMLReader xmlReader = new XMLReader(this.getContext(),this);
         xmlReader.feedImageXml();
 
@@ -206,7 +206,7 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
         public View getInfoContents(Marker marker) {
 
             View view = null;
-            ViewHolder viewHolder;
+            final ViewHolder viewHolder;
             if (view == null){
                 view = getLayoutInflater(savedInstanceState).
                         inflate(R.layout.popup_map_snapshot, null, false);
@@ -221,12 +221,11 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
             String imgKey = routeCCTV.getKey();
             String URL = TRAFFIC_URL.concat(imgKey).concat(JPG);
             //Log.e(getTag(), URL);
-            final ViewHolder finalViewHolder = viewHolder;
             Picasso.with(getContext()).load(URL).into(viewHolder.imgRoutecctv
-                    , new ImageProcessCallback(finalViewHolder.progressBar) {
+                    , new Callback() {
                 @Override
                 public void onSuccess() {
-
+                    viewHolder.progressBar.setVisibility(View.GONE);
                 }
 
                 @Override
@@ -256,7 +255,7 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
                 imgRoutecctv = (ImageView)itemView.findViewById(R.id.map_snapshot);
                 imgAddBK = (ImageButton)itemView.findViewById(R.id.imgAddBookMark);
                 btnMore = (Button)itemView.findViewById(R.id.btnBKMore);
-                progressBar = (ProgressBar)itemView.findViewById(R.id.progressBar);
+                progressBar = (ProgressBar)itemView.findViewById(R.id.progressbar);
             }
         }
     }

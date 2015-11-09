@@ -39,7 +39,7 @@ import com.example.tonyso.TrafficApp.rss.RssReader;
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
 import com.example.tonyso.TrafficApp.location.GPSLocationFinder;
 import com.example.tonyso.TrafficApp.utility.CommonUtils;
-import com.example.tonyso.TrafficApp.utility.LanguageSelector;
+import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -118,7 +118,7 @@ public class MainActivity extends BaseActivity
     private void init() {
         tabLayout = (TabLayout)findViewById(R.id.tablayout);
         broadcastReceiver = myBroadCastReceiver;
-        languageSelector = new LanguageSelector(this);
+        languageSelector = LanguageSelector.getInstance(this);
         rss_Handler = new Handler();
         gpsLocationFinder = new GPSLocationFinder(this,this);
         coordinatorLayout = (CoordinatorLayout)findViewById(R.id.coordinateLayoutMain);

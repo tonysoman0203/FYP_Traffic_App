@@ -12,13 +12,16 @@
         android:layout_height="300dp">
 
         <ProgressBar
-            android:id="@+id/progressBar"
-
-            android:layout_width="match_parent"
-            android:layout_height="225dp"
+            android:id="@+id/progressbar"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:layout_gravity="center"
-            android:visibility="visible"
-            android:indeterminate="false" />
+            android:visibility="gone"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp" />
 
         <ImageView
             android:layout_width="match_parent"

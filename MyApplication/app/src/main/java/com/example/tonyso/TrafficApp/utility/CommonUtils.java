@@ -21,7 +21,6 @@ import java.util.Locale;
  */
 public class CommonUtils {
 
-    ConnectivityManager conmgr;
     Context context;
     static Boolean isConnectingNetwork = false;
     static Boolean isConnectingMobileNetwork = false;
@@ -97,7 +96,7 @@ public class CommonUtils {
         if (isMobileNetwork!=null) {
             if (isWIFINetwork == NetworkInfo.State.CONNECTED || (isMobileNetwork == NetworkInfo.State.CONNECTED)) {
                 isConnectingNetwork = true;
-                return isConnectingNetwork;
+               // return isConnectingNetwork;
 
             } else if (conmgr.getNetworkInfo(0).getState() == NetworkInfo.State.DISCONNECTED
                     || conmgr.getNetworkInfo(1).getState() == NetworkInfo.State.DISCONNECTING
@@ -112,12 +111,12 @@ public class CommonUtils {
         }else {
             if (isWIFINetwork == NetworkInfo.State.CONNECTED){
                 isConnectingNetwork = true;
-                return isConnectingNetwork;
+               // return isConnectingNetwork;
             }else{
                 isConnectingNetwork = false;
-                return isConnectingNetwork;
+                //return isConnectingNetwork;
             }
+            return isConnectingNetwork;
         }
     }
-
 }

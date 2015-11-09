@@ -7,11 +7,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.Tab_BookMarkFragment;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -34,7 +36,7 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         ImageView imageView;
         TextView time,roadName,remainTime,district;
         Button btnDetail;
-
+        ProgressBar progressBar;
         public ViewHolder(View itemView) {
             super(itemView);
             imageView = (ImageView)itemView.findViewById(R.id.bkImage);
@@ -44,6 +46,8 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
             //satLevel = (TextView)itemView.findViewById(R.id.txtSatLevel);
             btnDetail = (Button)itemView.findViewById(R.id.btnDetail);
             district = (TextView)itemView.findViewById(R.id.txtDistrict);
+            progressBar = (ProgressBar)itemView.findViewById(R.id.bkprogressbar);
+            progressBar.setVisibility(View.VISIBLE);
         }
     }
 
@@ -55,7 +59,7 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(BookMarkAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(final BookMarkAdapter.ViewHolder holder, int position) {
         holder.time.setText(myDatasets.get(position).getTimestamp().toString());
         holder.roadName.setText(myDatasets.get(position).getBkRouteName());
         //holder.satLevel.setText(myDatasets.get(position).getSatuationLevel());
@@ -63,7 +67,17 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         Picasso.with(context).load(
                 TRAFFIC_URL.concat(
                         myDatasets.get(position).getRouteImageKey()).concat(JPG))
-                .into(holder.imageView);
+                .into(holder.imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        holder.progressBar.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
 
     }
 

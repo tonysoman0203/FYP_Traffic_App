@@ -22,7 +22,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.tonyso.TrafficApp.utility.LanguageSelector;
+import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.utility.encryption.ShareStorage;
 import com.example.tonyso.TrafficApp.utility.encryption.StoreObject;
 
@@ -32,6 +32,7 @@ import java.util.Locale;
 public class SettingsActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
     FloatingActionButton fab;
+    static LanguageSelector languageSelector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +40,7 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_my_preference);
         setupActionBar();
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.pref_layout);
+        languageSelector = LanguageSelector.getInstance(this);
         fab = (FloatingActionButton) findViewById(R.id.testing_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,14 +91,13 @@ public class SettingsActivity extends AppCompatActivity {
         Resources rs;
         ListPreference listPreference;
         String user_lang_pref;
-        LanguageSelector languageSelector;
 
         @Override
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.mypreference);
             rs = getResources();
-            languageSelector = new LanguageSelector(getActivity());
+
             user_lang_pref = languageSelector.getLanguage();
             listPreference = (ListPreference) findPreference("LanguageList");
             //  optOutPref.setTitle((String)ShareStorage.retrieveData("Optout", ShareStorage.DataType.STRING).getValue());
@@ -110,7 +111,7 @@ public class SettingsActivity extends AppCompatActivity {
             listPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    String key = preference.getKey();
+//                    String key = preference.getKey();
                     int valueIndex = Integer.parseInt((String) newValue);
                     // if (listPreference.getEntry().toString().equals("English") || listPreference.getEntry().toString().equals(getString(R.string.English_In_Chinese))) {
                     changeLanguage(valueIndex, preference);

@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.util.Base64;
 
 import com.example.tonyso.TrafficApp.MyApplication;
-import com.example.tonyso.TrafficApp.utility.LanguageSelector;
+import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -17,7 +17,9 @@ import java.util.regex.Pattern;
  * Created by NCH575 on 11/08/2015.
  */
 public class ShareStorage {
+
     public ShareStorage() {
+
     }
 
     public static void saveData(int storageType, StoreObject<?> storeObject, String sp, Context context) {
@@ -93,7 +95,8 @@ public class ShareStorage {
     public static ArrayList<StoreObject<?>> retrieveDataArray(String Regexpattern, int datatype, String sp, Context context) {
         if (sp != null) {
             if (sp.equals(SP.Locale)) {
-                String lang_pref = new LanguageSelector(context).getUserLanguage();
+                LanguageSelector languageSelector = LanguageSelector.getInstance(context);
+                String lang_pref = languageSelector.getUserLanguage();
                 if (lang_pref != null) {
                     if (lang_pref.equals("en")) {
                         sp = PrivateSP.Locale_EN;
@@ -144,7 +147,8 @@ public class ShareStorage {
         sp = Normalizer.normalize(sp, Normalizer.Form.NFKC);
         if (sp != null) {
             if (sp.equals(SP.Locale)) {
-                String lang_pref = new LanguageSelector(context).getUserLanguage();
+                LanguageSelector languageSelector = LanguageSelector.getInstance(context);
+                String lang_pref = languageSelector.getUserLanguage();
                 if (lang_pref != null) {
                     if (lang_pref.equals(MyApplication.Language.ENGLISH)) {
                         sp = PrivateSP.Locale_EN;
