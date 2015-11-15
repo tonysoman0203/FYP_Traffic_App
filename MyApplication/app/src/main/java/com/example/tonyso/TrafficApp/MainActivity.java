@@ -347,21 +347,6 @@ public class MainActivity extends BaseActivity
 
         } else if (id == R.id.nav_feedback) {
 
-        }else if (id == R.id.nav_map){
-            tabLayout.setVisibility(View.GONE);
-            fab.setVisibility(View.GONE);
-            fragmentClass = Nav_MapTestFragment.class;
-            try{
-                fragment = (Fragment) fragmentClass.newInstance();
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            FragmentManager fragmentManager = getSupportFragmentManager();
-
-            fragmentManager.beginTransaction().replace(R.id.flcontent, fragment).commit();
-            item.setChecked(true);
-            setTitle(item.getTitle());
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

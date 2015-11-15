@@ -1,6 +1,8 @@
 package com.example.tonyso.TrafficApp;
 
 
+import android.graphics.Bitmap;
+import android.graphics.Camera;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -9,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -19,37 +22,45 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toolbar;
 
 import com.example.tonyso.TrafficApp.Interface.Rss_Listener;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
+import com.example.tonyso.TrafficApp.model.Route;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.rss.XMLReader;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 
 public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallback,
-        GoogleMap.OnMapClickListener,Rss_Listener,GoogleMap.OnMarkerClickListener{
+        GoogleMap.OnMapClickListener,GoogleMap.OnMarkerClickListener{
 
     private SupportMapFragment mapFragment;
     private GoogleMap mMap;
     private List<RouteCCTV> routeList;
     private LanguageSelector languageSelector;
     Map<String,RouteCCTV> roadCCTVMap = new HashMap<>();
+    Map<String,LatLng> regionMap = new HashMap<>();
 
     private static String TRAFFIC_URL = "http://tdcctv.data.one.gov.hk/";
     private static String JPG = ".JPG";
@@ -60,6 +71,11 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
     private Spinner spinner;
 
     CoordinatorLayout coordinatorLayout;
+    String []arr,latlng;
+
+    Toolbar toolbar;
+
+    boolean isTrafficOn;
 
     public Nav_TrafficFragment() {
         // Required empty public constructor
@@ -82,53 +98,140 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
         this.savedInstanceState = savedInstanceState;
         this.coordinatorLayout = (CoordinatorLayout)getActivity().findViewById(R.id.coordinateLayoutMain);
 
+        //Spinner to let user select different district to see RouteCCTV
         spinner = (Spinner) v.findViewById(R.id.spinner);
+        setSpinnerProperty();
         languageSelector = LanguageSelector.getInstance(getContext());
-        XMLReader xmlReader = new XMLReader(this.getContext(),this);
-        xmlReader.feedImageXml();
-
+        MyApplication myApplication = (MyApplication)getActivity().getApplication();
+        routeList = myApplication.list;
+        //XMLReader xmlReader = new XMLReader(this.getContext(),this);
+        //xmlReader.feedImageXml();
         mapFragment.getMapAsync(this);
-
+        onSpinnerItemSelected();
         return v;
+    }
+
+    private void onSpinnerItemSelected() {
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                removePreviousMarker();
+                setMarker(mMap,position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+    private void removePreviousMarker() {
+        mMap.clear();
+    }
+
+    private void setSpinnerProperty(){
+        arr = getResources().getStringArray(R.array.regions);
+        latlng = getResources().getStringArray(R.array.region_LatLng);
+        setRegionHashMap(arr, latlng);
+        ArrayAdapter<String> dataadpater = new ArrayAdapter(getContext(),android.R.layout.simple_spinner_item,arr);
+        dataadpater.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(dataadpater);
+        spinner.setSelection(0);
+    }
+
+    /**
+     *  This mehtod setMarker is to setup the marker based on user selected
+     *  @param googleMap is a Google Map Instance
+     *  @param posDistrict is the user selection id
+     *
+     */
+    private void setMarker(GoogleMap googleMap,int posDistrict){
+        mMap = googleMap;
+        int p = posDistrict;
+        if (p==0) return;
+        String name = arr[p];
+        List<RouteCCTV>selectedRoute = new ArrayList<>();
+        for (int i = 0 ; i< routeList.size() ; i++){
+            String d;
+            if (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH)){
+                d = routeList.get(i).getRegion()[0];
+            }else{
+                d = routeList.get(i).getRegion()[1];
+            }
+            if (d.matches(name)){
+                selectedRoute.add(routeList.get(i));
+            }
+        }
+        //Get the Latlng first and set the map;
+        LatLng latLng = regionMap.get(name);
+        CameraUpdate center = CameraUpdateFactory.newLatLng(latLng);
+        CameraUpdate zoom = CameraUpdateFactory.zoomTo((float)11);
+        mMap.moveCamera(center);
+        mMap.animateCamera(zoom);
+
+        //Setup the Marker
+        for (int count = 0;count<selectedRoute.size();count++){
+            RouteCCTV routeCCTV = selectedRoute.get(count);
+            String desc;
+            double[] latlng = selectedRoute.get(count).getLatLngs();
+            LatLng location = new LatLng(latlng[0],latlng[1]);
+            if (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH)){
+                desc = routeCCTV.getDescription()[0];
+                roadCCTVMap.put(desc,routeCCTV);
+            }else{
+                desc = routeCCTV.getDescription()[1];
+                roadCCTVMap.put(desc,routeCCTV);
+            }
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(location);
+            markerOptions.title(desc);
+            mMap.addMarker(markerOptions);
+        }
+        mMap.setOnMarkerClickListener(this);
+        mMap.setInfoWindowAdapter(new MapInfoAdapter());
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
+        inflater.inflate(R.menu.menu_nav_traffic_monitoring,menu);
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.nav_traffic_terrain:
+                mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                break;
+            case R.id.nav_traffic_satelite:
+                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                break;
+            case R.id.nav_traffic_traffic:
+                mMap.setTrafficEnabled(true);
+
+                break;
+            case R.id.nav_traffic_default:
+                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        RouteCCTV routeCCTV;
-        setGoogleMapProperty();
-        String desc ;
-        if (routeList.size()!=0){
-            for (int count = 0;count<routeList.size();count++){
-                routeCCTV = routeList.get(count);
-//                key = routeList .get(count).getKey();
-                double[] latlng = routeList.get(count).getLatLngs();
-                LatLng sydney = new LatLng(latlng[0],latlng[1]);
-                if (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH)){
-                    desc = routeCCTV.getDescription()[0];
-                    roadCCTVMap.put(desc,routeCCTV);
-                }else{
-                    desc = routeCCTV.getDescription()[1];
-                    roadCCTVMap.put(desc,routeCCTV);
-                }
-
-                mMap.addMarker(new MarkerOptions().position(sydney).title(desc));
-            }
-            mMap.setOnMarkerClickListener(this);
-            mMap.setInfoWindowAdapter(new MapInfoAdapter());
-        }
+        setGoogleMapProperty(mMap);
     }
 
-
-    /*Set Google Map property*/
-    private void setGoogleMapProperty(){
-        mMap.setMyLocationEnabled(true);
+    /** The Method setGoogleMapProperty is to set the property of map
+     *
+     * @param googleMap
+     */
+    private void setGoogleMapProperty(GoogleMap googleMap){
+        googleMap.setMyLocationEnabled(true);
     }
 
     @Override
@@ -143,64 +246,31 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
         return false;
     }
 
-    @Override
-    public void ParsedInfo(List list) {
-        routeList = list;
-        final String []arr = getResources().getStringArray(R.array.regions);
-        ArrayAdapter<String> dataadpater = new ArrayAdapter(getContext(),android.R.layout.simple_spinner_item,arr);
-        dataadpater.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(dataadpater);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Snackbar.make(coordinatorLayout,arr[position] , Snackbar.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-    }
-
-//    private List<String> getDropdownlist() {
-//        List<String> sortedRegions = new ArrayList<>();
-//        String pref = languageSelector.getLanguage();
-//        String curr,region="";
-//        int j = 0;
-//        for (int i = 0; i < routeList.size(); i++) {
-//            j = i + 1;
-//            if (j>=routeList.size()) break;
-//            String[] currRegions = routeList.get(i).getRegion(); //Get regions first from each RouteCCTV Object //current
-//            String[] r = routeList.get(j).getRegion();
+//    @Override
+//    public void ParsedInfo(List list) {
+//        routeList = list;
 //
-//            if (!Arrays.equals(currRegions,r)){
-//                Log.e(getTag(), "i 's value:" + currRegions[1] + " j's value:" + r[1]);
-//                if (pref.equals(MyApplication.Language.ENGLISH)){
-//                    curr = currRegions[0];
-//                    region = r[0];
-//                }else{
-//                    curr = currRegions[1];
-//                    region = r[1];
-//                }
-//                sortedRegions.add(region);
-//            }else{
-//                continue;
-//            }
-//
-//        }
-//
-//
-//        return sortedRegions;
 //    }
+
+    public void setRegionHashMap(String[] arr, String[] regionHashMap) {
+        double[] tmp;
+        for (int i = 0;i < arr.length;i++) {
+            tmp = new double[2];
+            String t = regionHashMap[i];
+            String[]sp = t.split(" ");
+            tmp[0] = Double.parseDouble(sp[0]);
+            tmp[1] = Double.parseDouble(sp[1]);
+            LatLng latLng = new LatLng(tmp[0],tmp[1]);
+            regionMap.put(arr[i],latLng);
+        }
+
+    }
 
 
     public class MapInfoAdapter implements GoogleMap.InfoWindowAdapter{
 
         @Override
-        public View getInfoWindow(Marker marker) {
-            return null;
-        }
+        public View getInfoWindow(Marker marker) {return null;}
 
         @Override
         public View getInfoContents(Marker marker) {
@@ -220,12 +290,12 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
             RouteCCTV routeCCTV = roadCCTVMap.get(title);
             String imgKey = routeCCTV.getKey();
             String URL = TRAFFIC_URL.concat(imgKey).concat(JPG);
-            //Log.e(getTag(), URL);
+
             Picasso.with(getContext()).load(URL).into(viewHolder.imgRoutecctv
                     , new Callback() {
                 @Override
                 public void onSuccess() {
-                    viewHolder.progressBar.setVisibility(View.GONE);
+
                 }
 
                 @Override
@@ -235,8 +305,7 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
             });
 
             viewHolder.cctvtitle.setText(title);
-            viewHolder.imgAddBK.setImageResource(R.drawable.ic_bookmark);
-            viewHolder.btnMore.setText("More");
+            viewHolder.btnMore.setText(getString(R.string.bookMark_More));
             //Picasso.with(getContext()).load(R.drawable.ic_bookmark).into(viewHolder.imgAddBK);
 
             return view;
@@ -244,8 +313,7 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
 
         public class ViewHolder extends RecyclerView.ViewHolder{
             ImageView imgRoutecctv;
-            ImageButton imgAddBK;
-            Button btnMore;
+            Button btnMore,btnAddBookmark,btnFindNear;
             TextView cctvtitle;
             ProgressBar progressBar;
 
@@ -253,8 +321,9 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
                 super(itemView);
                 cctvtitle = (TextView)itemView.findViewById(R.id.map_snapshot_title);
                 imgRoutecctv = (ImageView)itemView.findViewById(R.id.map_snapshot);
-                imgAddBK = (ImageButton)itemView.findViewById(R.id.imgAddBookMark);
-                btnMore = (Button)itemView.findViewById(R.id.btnBKMore);
+                btnAddBookmark = (Button)itemView.findViewById(R.id.imgAddBookMark);
+                btnMore = (Button)itemView.findViewById(R.id.btnRouteMore);
+                btnFindNear = (Button)itemView.findViewById(R.id.btnPopupNear);
                 progressBar = (ProgressBar)itemView.findViewById(R.id.progressbar);
             }
         }

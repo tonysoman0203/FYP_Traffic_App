@@ -10,6 +10,7 @@
     <string name="Refresh">Refresh</string>
 
     <string-array name="regions">
+        <item>Choose District</item>
         <item>Hong Kong Island</item>
         <item>Kowloon</item>
         <item>Tsuen Wan</item>
@@ -19,6 +20,16 @@
         <item>Lantau</item>
     </string-array>
 
+    <string-array name="region_LatLng">
+        <item>0 0</item>
+        <item>22.2588624 114.1900789</item>
+        <item>22.3294286 114.1921509</item>
+        <item>22.3699569 114.1095949</item>
+        <item>22.3922313 113.9770816</item>
+        <item>22.4687434 114.1132054</item>
+        <item>22.3871376 114.1865953</item>
+        <item>22.279703 113.939074</item>
+    </string-array>
     <string-array name="Tabs_Titles">
         <item>Real-Time Traffic</item>
         <item>BookMarks</item>
@@ -87,6 +98,9 @@
     <string name="nav_traffic_satelite">Satelite</string>
     <string name="map_mode">Map Mode</string>
     <string name="nav_traffic_traffic">Traffic</string>
+    <string name="popup_add_bookMark">BookMark</string>
+    <string name="popup_near">Near</string>
+    <string name="nav_map_default">Normal</string>
     <!-- Menu Nav Traffic-->
 
 </resources>

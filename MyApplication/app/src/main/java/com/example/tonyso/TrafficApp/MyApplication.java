@@ -2,6 +2,11 @@ package com.example.tonyso.TrafficApp;
 
 import android.app.Application;
 
+import com.example.tonyso.TrafficApp.model.RouteCCTV;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by TonySo on 17/9/2015.
  */
@@ -23,4 +28,5 @@ public class MyApplication extends Application{
     public static double Lat ;
     public static double lng;
 
+    public List<RouteCCTV> list ;
 }

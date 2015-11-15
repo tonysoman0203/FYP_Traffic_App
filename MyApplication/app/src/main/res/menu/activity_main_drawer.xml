@@ -12,13 +12,6 @@
 
             android:icon="@drawable/ic_directions_black_48dp"
             android:title="@string/nav_suggestion" />
-        <item android:id="@+id/nav_map"
-
-            android:icon="@android:drawable/ic_dialog_map"
-            android:title="Map Test" />
-        <!--<item android:id="@+id/nav_manage" android:icon="@android:drawable/ic_menu_manage"
-            android:title="Tools" />
-    -->
     </group>
 
     <item android:title="@string/nav_header_Miscellaneous">

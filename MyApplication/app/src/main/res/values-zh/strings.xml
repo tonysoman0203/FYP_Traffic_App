@@ -32,8 +32,10 @@
     <string name="alert_box_title_language_choice">語言</string>
     <string name="title_activity_settings">設定</string>
     <string name="bookMark_More">更多</string>
+    <string name="popup_add_bookMark" >收藏</string>
 
     <string-array name="regions">
+        <item>選擇地區</item>
         <item>香港島</item>
         <item>九龍</item>
         <item>荃灣</item>
@@ -42,5 +44,7 @@
         <item>沙田及馬鞍山</item>
         <item>大嶼山</item>
     </string-array>
+    <string name="item_tab_bk_detail" translatable="false">更多</string>
+    <string name="popup_near">附近</string>
 
 </resources>

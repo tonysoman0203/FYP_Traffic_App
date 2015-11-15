@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 
 
 import com.example.tonyso.TrafficApp.MyApplication;
+import com.example.tonyso.TrafficApp.rss.XMLReader;
 import com.example.tonyso.TrafficApp.utility.encryption.ShareStorage;
 import com.example.tonyso.TrafficApp.utility.encryption.StoreObject;
 
@@ -16,14 +17,16 @@ import java.util.Locale;
 public class BaseActivity extends AppCompatActivity {
 
     String currLang;
+    XMLReader xmlReader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        xmlReader = new XMLReader(this);
+        MyApplication myApplication = (MyApplication) getApplication();
+        myApplication.list = xmlReader.getImageXML();
         storeUserLanuguage();
-        //Configuration configuration = new Configuration();
-        //configuration.locale = new Locale(currLang);
-        //onConfigurationChanged(configuration);
+
     }
 
     //SetDefaultUserLanguage in FirstLaunch

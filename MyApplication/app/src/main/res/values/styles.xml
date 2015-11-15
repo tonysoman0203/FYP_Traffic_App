@@ -15,7 +15,7 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="TextLabel" parent="Base.TextAppearance.AppCompat.Body1">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:layout_marginLeft">5dp</item>
         <item name="android:textColor">#000000</item>
         <item name="android:layout_marginTop">5dp</item>
@@ -31,6 +31,7 @@
 
     <style name="BookMarkTextView" parent="Base.TextAppearance.AppCompat.Small">
         <item name="android:layout_marginBottom">10dp</item>
+
     </style>
 
     <style name="MyTabLayout" parent="Widget.Design.TabLayout">
@@ -49,4 +50,11 @@
         <item name="textAllCaps">true</item>
     </style>
 
+    <style name="PopupButtonStyle" parent="Base.Widget.AppCompat.Button.Small">
+        <item name="android:textSize">12sp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:dividerVertical">@android:drawable/divider_horizontal_dark</item>
+        <item name="android:background">@android:color/transparent</item>
+
+    </style>
 </resources>
