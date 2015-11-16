@@ -9,7 +9,6 @@ import android.widget.ImageView;
 
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.model.Route;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -61,7 +60,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.HomeViewHolder
 //            Picasso.Builder picasso = new Picasso.Builder(context);
 //            picasso.memoryCache(new LruCache(context));
 //
-            Picasso.with(context).load(url).into(imgview);
+            //Picasso.with(context).load(url).into(imgview);
 
         } catch (Exception e) {
             e.printStackTrace();

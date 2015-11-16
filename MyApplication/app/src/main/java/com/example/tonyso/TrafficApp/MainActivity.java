@@ -45,7 +45,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.squareup.picasso.Picasso;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.Locale;
 
@@ -96,6 +96,7 @@ public class MainActivity extends BaseActivity
 
     TabLayout tabLayout;
     View headerLayout;
+    ImageLoader imageLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +117,7 @@ public class MainActivity extends BaseActivity
     }
 
     private void init() {
+        imageLoader = ImageLoader.getInstance();
         tabLayout = (TabLayout)findViewById(R.id.tablayout);
         broadcastReceiver = myBroadCastReceiver;
         languageSelector = LanguageSelector.getInstance(this);
@@ -193,11 +195,18 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void onBackPressed() {
+        int count = getFragmentManager().getBackStackEntryCount();
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if (count == 0) {
+                super.onBackPressed();
+                //additional code
+            } else {
+                getFragmentManager().popBackStack();
+            }
         }
     }
 
@@ -320,6 +329,7 @@ public class MainActivity extends BaseActivity
             }
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.flcontent, fragment).commit();
+
             item.setChecked(true);
             setTitle(getString(R.string.app_name));
             //fragmentManager.beginTransaction().replace(R.id.flcontent,tab_mainFragment ).commit();
@@ -335,7 +345,7 @@ public class MainActivity extends BaseActivity
             }
             FragmentManager fragmentManager = getSupportFragmentManager();
 
-            fragmentManager.beginTransaction().replace(R.id.flcontent, fragment).commit();
+            fragmentManager.beginTransaction().replace(R.id.flcontent, fragment).addToBackStack(Nav_TrafficFragment.class.getName()).commit();
             item.setChecked(true);
             setTitle(item.getTitle());
         } else if (id == R.id.nav_suggestion) {
@@ -443,7 +453,7 @@ public class MainActivity extends BaseActivity
     @Override
     public void onRefreshIcon(String URL) {
         ImageView imageView = (ImageView)headerLayout.findViewById(R.id.bgHeader);
-        Picasso.with(this).load(URL).into(imageView);
+        imageLoader.displayImage(URL,imageView);
     }
 
     @Override

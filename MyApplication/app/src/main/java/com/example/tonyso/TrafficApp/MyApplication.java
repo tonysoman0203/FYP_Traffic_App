@@ -1,6 +1,7 @@
 package com.example.tonyso.TrafficApp;
 
 import android.app.Application;
+import android.content.res.Configuration;
 
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 
@@ -29,4 +30,33 @@ public class MyApplication extends Application{
     public static double lng;
 
     public List<RouteCCTV> list ;
+
+    public MyApplication() {
+        super();
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+    }
 }

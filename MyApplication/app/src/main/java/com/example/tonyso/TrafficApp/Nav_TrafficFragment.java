@@ -3,10 +3,12 @@ package com.example.tonyso.TrafficApp;
 
 import android.graphics.Bitmap;
 import android.graphics.Camera;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,11 +41,18 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+import com.nostra13.universalimageloader.core.display.SimpleBitmapDisplayer;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -81,6 +90,8 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
         // Required empty public constructor
     }
 
+    ImageLoader imageLoader;
+
     public static Nav_TrafficFragment newInstance(String title,int indicatorColor,int dividerColor){
         Nav_TrafficFragment f = new Nav_TrafficFragment();
         f.setTitle(title);
@@ -94,6 +105,7 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_traffic_monitoring,container,false);
         mapFragment = (SupportMapFragment)getChildFragmentManager().findFragmentById(R.id.map);
+        imageLoader = ImageLoader.getInstance();
         setHasOptionsMenu(true);
         this.savedInstanceState = savedInstanceState;
         this.coordinatorLayout = (CoordinatorLayout)getActivity().findViewById(R.id.coordinateLayoutMain);
@@ -125,8 +137,19 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
             }
         });
     }
-    private void removePreviousMarker() {
-        mMap.clear();
+    private void removePreviousMarker() {mMap.clear();}
+
+    private void setRegionHashMap(String[] arr, String[] regionHashMap) {
+        double[] tmp;
+        for (int i = 0;i < arr.length;i++) {
+            tmp = new double[2];
+            String t = regionHashMap[i];
+            String[]sp = t.split(" ");
+            tmp[0] = Double.parseDouble(sp[0]);
+            tmp[1] = Double.parseDouble(sp[1]);
+            LatLng latLng = new LatLng(tmp[0],tmp[1]);
+            regionMap.put(arr[i],latLng);
+        }
     }
 
     private void setSpinnerProperty(){
@@ -196,7 +219,6 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
         inflater.inflate(R.menu.menu_nav_traffic_monitoring,menu);
-
     }
 
     @Override
@@ -209,8 +231,13 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
                 mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                 break;
             case R.id.nav_traffic_traffic:
-                mMap.setTrafficEnabled(true);
-
+                if(isTrafficOn){
+                    mMap.setTrafficEnabled(false);
+                    isTrafficOn = false;
+                }else{
+                    mMap.setTrafficEnabled(true);
+                    isTrafficOn = true;
+                }
                 break;
             case R.id.nav_traffic_default:
                 mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -235,10 +262,7 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
     }
 
     @Override
-    public void onMapClick(LatLng latLng) {
-
-    }
-
+    public void onMapClick(LatLng latLng) {}
 
     @Override
     public boolean onMarkerClick(Marker marker) {
@@ -252,22 +276,23 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
 //
 //    }
 
-    public void setRegionHashMap(String[] arr, String[] regionHashMap) {
-        double[] tmp;
-        for (int i = 0;i < arr.length;i++) {
-            tmp = new double[2];
-            String t = regionHashMap[i];
-            String[]sp = t.split(" ");
-            tmp[0] = Double.parseDouble(sp[0]);
-            tmp[1] = Double.parseDouble(sp[1]);
-            LatLng latLng = new LatLng(tmp[0],tmp[1]);
-            regionMap.put(arr[i],latLng);
-        }
 
-    }
 
 
     public class MapInfoAdapter implements GoogleMap.InfoWindowAdapter{
+
+        private DisplayImageOptions options;
+        private ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
+
+        public MapInfoAdapter() {
+            options = new DisplayImageOptions.Builder()
+                    .showImageOnLoading(R.drawable.ic_action_loading)
+                    .showImageForEmptyUri(R.drawable.ic_error_black_24dp)
+                    .cacheInMemory(true)
+                    .considerExifParams(true)
+                    .displayer(new SimpleBitmapDisplayer())
+                    .build();
+        }
 
         @Override
         public View getInfoWindow(Marker marker) {return null;}
@@ -290,19 +315,20 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
             RouteCCTV routeCCTV = roadCCTVMap.get(title);
             String imgKey = routeCCTV.getKey();
             String URL = TRAFFIC_URL.concat(imgKey).concat(JPG);
+            imageLoader.displayImage(URL, viewHolder.imgRoutecctv, options,animateFirstListener);
 
-            Picasso.with(getContext()).load(URL).into(viewHolder.imgRoutecctv
-                    , new Callback() {
-                @Override
-                public void onSuccess() {
-
-                }
-
-                @Override
-                public void onError() {
-
-                }
-            });
+//            Picasso.with(getContext()).load(URL).into(viewHolder.imgRoutecctv
+//                    , new Callback() {
+//                @Override
+//                public void onSuccess() {
+//
+//                }
+//
+//                @Override
+//                public void onError() {
+//
+//                }
+//            });
 
             viewHolder.cctvtitle.setText(title);
             viewHolder.btnMore.setText(getString(R.string.bookMark_More));
@@ -310,6 +336,8 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
 
             return view;
         }
+
+
 
         public class ViewHolder extends RecyclerView.ViewHolder{
             ImageView imgRoutecctv;
@@ -325,6 +353,22 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
                 btnMore = (Button)itemView.findViewById(R.id.btnRouteMore);
                 btnFindNear = (Button)itemView.findViewById(R.id.btnPopupNear);
                 progressBar = (ProgressBar)itemView.findViewById(R.id.progressbar);
+            }
+        }
+    }
+    private static class AnimateFirstDisplayListener extends SimpleImageLoadingListener {
+
+        static final List<String> displayedImages = Collections.synchronizedList(new LinkedList<String>());
+
+        @Override
+        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+            if (loadedImage != null) {
+                ImageView imageView = (ImageView) view;
+                boolean firstDisplay = !displayedImages.contains(imageUri);
+                if (firstDisplay) {
+                    FadeInBitmapDisplayer.animate(imageView, 500);
+                    displayedImages.add(imageUri);
+                }
             }
         }
     }
