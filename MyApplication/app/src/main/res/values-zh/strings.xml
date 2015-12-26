@@ -3,7 +3,6 @@
     <string name="app_name">交通實時通</string>
 
     <string name="Refresh">重新下載／更新</string>
-    <string name="WEATHER_TAG_ZH">氣 溫 ：</string>
     <string name="Degree_ZH"> 度</string>
     <string name="action_settings">我的設定</string>
     <string name="date">日期 ：</string>
@@ -27,11 +26,9 @@
     <string name="nav_suggestion">路線建議</string>
     <string name="language_choice">語言</string>
     <string name="DegreeSign">\u2103</string>
-    <string name="English">English</string>
     <string name="pref_title_Language">語言</string>
     <string name="alert_box_title_language_choice">語言</string>
     <string name="title_activity_settings">設定</string>
-    <string name="bookMark_More">更多</string>
     <string name="popup_add_bookMark" >收藏</string>
 
     <string-array name="regions">
@@ -44,7 +41,14 @@
         <item>沙田及馬鞍山</item>
         <item>大嶼山</item>
     </string-array>
-    <string name="item_tab_bk_detail" translatable="false">更多</string>
+
     <string name="popup_near">附近</string>
+    <string name="route_detail_Region">地區</string>
+    <string name="route_detail_RouteName">路線名稱</string>
+    <string name="route_detail_StartTime">開始時間</string>
+    <string name="route_detail_TargetTime">結束時間</string>
+    <string name="route_detail_btnReset">重設(開始及結束時間)</string>
+    <string name="route_detail_btnSave">加入收藏</string>
+    <string name="language_alert">你已經選擇 %s. 請重新選擇。</string>
 
 </resources>

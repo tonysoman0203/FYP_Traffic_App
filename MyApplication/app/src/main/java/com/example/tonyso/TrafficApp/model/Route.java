@@ -6,17 +6,17 @@ import java.io.Serializable;
  * Created by TonySo on 16/9/2015.
  */
 public class Route implements Serializable{
-    private long route_id;
-    private String Name;
-    private String SatuationLevel;
-    private String Ref_ID; //RD659F
-    private String imageURL;
+    protected int route_id;
+    protected String name;
+    protected String sat_level;
+    protected String ref_key; //RD659F
+    protected String imageURL;
 
-    public Route(long route_id, String name, String satuationLevel, String ref_ID, String imageURL) {
+    public Route(int route_id, String name, String sat_level, String refkey, String imageURL) {
         this.route_id = route_id;
-        Name = name;
-        SatuationLevel = satuationLevel;
-        Ref_ID = ref_ID;
+        this.name = name;
+        this.sat_level = sat_level;
+        ref_key = refkey;
         this.imageURL = imageURL;
     }
 
@@ -28,32 +28,32 @@ public class Route implements Serializable{
         return route_id;
     }
 
-    public void setRoute_id(long route_id) {
+    public void setRoute_id(int route_id) {
         this.route_id = route_id;
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        this.Name = name;
+        this.name = name;
     }
 
-    public String getSatuationLevel() {
-        return SatuationLevel;
+    public String getSat_level() {
+        return sat_level;
     }
 
-    public void setSatuationLevel(String satuationLevel) {
-        this.SatuationLevel = satuationLevel;
+    public void setSat_level(String sat_level) {
+        this.sat_level = sat_level;
     }
 
-    public String getRef_ID() {
-        return Ref_ID;
+    public String getRef_key() {
+        return ref_key;
     }
 
-    public void setRef_ID(String ref_ID) {
-        this.Ref_ID = ref_ID;
+    public void setRef_key(String ref_key) {
+        this.ref_key = ref_key;
     }
 
     public String getImageURL() {

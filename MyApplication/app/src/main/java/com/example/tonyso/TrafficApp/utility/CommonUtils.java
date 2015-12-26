@@ -12,8 +12,11 @@ import com.example.tonyso.TrafficApp.MyApplication;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -40,6 +43,32 @@ public class CommonUtils {
     public static String getTime (){
         Calendar c = Calendar.getInstance();
         return new SimpleDateFormat("HH:mm:ss",Locale.TRADITIONAL_CHINESE).format(c.getTime());
+    }
+
+    public static Timestamp getTimestamp(String time){
+        Timestamp timestamp = null;
+        try{
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+            Date parsedDate = dateFormat.parse(time);
+            timestamp = new java.sql.Timestamp(parsedDate.getTime());
+            return timestamp;
+        }catch(Exception e){//this generic but you can control another types of exception
+           e.printStackTrace();
+        }
+        return timestamp;
+    }
+
+    public static Time getTime(String time){
+        Time t = null;
+        try{
+            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+            Date parsedDate = dateFormat.parse(time);
+            t = new java.sql.Time(parsedDate.getTime());
+            return t;
+        }catch(Exception e){//this generic but you can control another types of exception
+            e.printStackTrace();
+        }
+        return t;
     }
 
     /**

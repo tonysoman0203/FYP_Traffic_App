@@ -41,8 +41,4 @@ public class BaseFragment extends Fragment {
         this.icon = icon;
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
 }

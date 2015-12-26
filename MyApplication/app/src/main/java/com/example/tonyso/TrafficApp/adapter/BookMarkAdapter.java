@@ -11,7 +11,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
+import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.Tab_BookMarkFragment;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -33,9 +35,11 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
     private static String JPG = ".JPG";
     private ImageLoader imageLoader;
     private DisplayImageOptions imageOptions;
-    public BookMarkAdapter(List<TimedBookMark> dataSets, Tab_BookMarkFragment tab_bookMarkFragment) {
+    private LanguageSelector languageSelector;
+
+    public BookMarkAdapter(List<TimedBookMark> dataSets,Context tab_bookMarkFragment) {
         myDatasets = dataSets;
-        this.context = tab_bookMarkFragment.getContext();
+        this.context = tab_bookMarkFragment;
         imageLoader = ImageLoader.getInstance();
         imageOptions = new DisplayImageOptions.Builder()
                 .showImageOnLoading(R.drawable.ic_action_loading)
@@ -44,12 +48,13 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
                 .considerExifParams(true)
                 .displayer(new SimpleBitmapDisplayer())
                 .build();
+        languageSelector = LanguageSelector.getInstance(context);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         TextView time,roadName,remainTime,district;
-        Button btnDetail;
+        //Button btnDetail;
         ProgressBar progressBar;
         public ViewHolder(View itemView) {
             super(itemView);
@@ -58,7 +63,7 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
             remainTime = (TextView)itemView.findViewById(R.id.txtRemainTime);
             roadName = (TextView)itemView.findViewById(R.id.txtRoadName);
             //satLevel = (TextView)itemView.findViewById(R.id.txtSatLevel);
-            btnDetail = (Button)itemView.findViewById(R.id.btnDetail);
+            //btnDetail = (Button)itemView.findViewById(R.id.btnDetail);
             district = (TextView)itemView.findViewById(R.id.txtDistrict);
             progressBar = (ProgressBar)itemView.findViewById(R.id.bkprogressbar);
             progressBar.setVisibility(View.VISIBLE);
@@ -74,10 +79,16 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final BookMarkAdapter.ViewHolder holder, int position) {
-        holder.time.setText(myDatasets.get(position).getTimestamp().toString());
-        holder.roadName.setText(myDatasets.get(position).getBkRouteName());
-        //holder.satLevel.setText(myDatasets.get(position).getSatuationLevel());
-        holder.district.setText(myDatasets.get(position).getDistrict());
+        holder.time.setText(myDatasets.get(position).getStartTime().toString());
+        if (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH)){
+            holder.roadName.setText(myDatasets.get(position).getBkRouteName()[0]);
+            //holder.satLevel.setText(myDatasets.get(position).getSat_level());
+            holder.district.setText(myDatasets.get(position).getRegions()[0]);
+        }else{
+            holder.roadName.setText(myDatasets.get(position).getBkRouteName()[1]);
+            //holder.satLevel.setText(myDatasets.get(position).getSat_level());
+            holder.district.setText(myDatasets.get(position).getRegions()[1]);
+        }
         String url = TRAFFIC_URL.concat(myDatasets.get(position).getRouteImageKey()).concat(JPG);
         imageLoader.displayImage(url, holder.imageView, imageOptions, new ImageLoadingListener() {
             @Override

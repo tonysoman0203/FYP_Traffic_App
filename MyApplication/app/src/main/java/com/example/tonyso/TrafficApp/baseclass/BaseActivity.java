@@ -1,12 +1,16 @@
 package com.example.tonyso.TrafficApp.baseclass;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.LruCache;
 
 
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
+import com.example.tonyso.TrafficApp.Singleton.RouteMapping;
+import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
 import com.example.tonyso.TrafficApp.rss.XMLReader;
 import com.example.tonyso.TrafficApp.utility.encryption.ShareStorage;
 import com.example.tonyso.TrafficApp.utility.encryption.StoreObject;
@@ -27,16 +31,20 @@ import java.util.Locale;
 public class BaseActivity extends AppCompatActivity {
 
     String currLang;
-    XMLReader xmlReader;
+    RouteMapping routeMapping ;
+    SQLiteDatabase sqLiteDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        xmlReader = new XMLReader(this);
         MyApplication myApplication = (MyApplication) getApplication();
-        myApplication.list = xmlReader.getImageXML();
         storeUserLanuguage();
+        routeMapping = RouteMapping.getInstance(this);
+        routeMapping.setImageCache();
+        myApplication.list = routeMapping.loadCache();
         initImageLoader();
+        //initialize SQLLite
+        sqLiteDatabase = SQLiteHelper.getDatabase(this);
     }
 
     //SetDefaultUserLanguage in FirstLaunch
@@ -62,11 +70,12 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
+
     private void initImageLoader(){
 
         ImageLoaderConfiguration configuration = new ImageLoaderConfiguration.Builder(this)
-                .threadPoolSize(3) // default
-                .threadPriority(Thread.NORM_PRIORITY)
+                .threadPoolSize(4) // default
+                .threadPriority(Thread.MAX_PRIORITY)
                 .tasksProcessingOrder(QueueProcessingType.FIFO)
                 .memoryCache(new LruMemoryCache(2 * 1024 * 1024))
                 .memoryCacheSize(2 * 1024 * 1024)
@@ -102,5 +111,6 @@ public class BaseActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
     }
+
 
 }

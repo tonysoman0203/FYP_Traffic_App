@@ -7,11 +7,14 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="TextLabel" parent="Base.TextAppearance.AppCompat.Body1">
@@ -44,6 +47,7 @@
         <item name="tabTextAppearance">@style/MyTabTextAppearance</item>
         <item name="tabSelectedTextColor">@android:color/white</item>
     </style>
+
     <style name="MyTabTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">15sp</item>
         <item name="android:textColor">@android:color/black</item>
@@ -51,10 +55,14 @@
     </style>
 
     <style name="PopupButtonStyle" parent="Base.Widget.AppCompat.Button.Small">
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:dividerVertical">@android:drawable/divider_horizontal_dark</item>
-        <item name="android:background">@android:color/transparent</item>
-
     </style>
+
+    <style name="ExpandedAppBar" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

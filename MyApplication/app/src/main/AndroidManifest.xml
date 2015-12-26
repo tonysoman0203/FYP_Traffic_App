@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.tonyso.TrafficApp" >
+    package="com.example.tonyso.TrafficApp">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -15,15 +15,15 @@
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
+        android:configChanges="orientation|screenSize"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:configChanges="orientation|screenSize"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
-            android:name="com.example.tonyso.TrafficApp.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,9 +32,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.tonyso.TrafficApp.SettingsActivity"
+            android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName="com.example.tonyso.TrafficApp.MainActivity" >
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
@@ -43,8 +43,7 @@
         <service
             android:name=".CountDownService"
             android:enabled="true"
-            android:exported="true" >
-        </service>
+            android:exported="true" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -57,6 +56,29 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <service
+            android:name=".ImageService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity
+            android:name=".Nav_TrafficActivity"
+            android:label="@string/nav_traffic_traffic"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.tonyso.TrafficApp.MainActivity" />
+        </activity>
+        <activity
+            android:name=".TrafficInfoDetailScrollingActivity"
+            android:label="@string/title_activity_traffic_info_detail_scrolling"
+            android:parentActivityName=".Nav_TrafficActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.tonyso.TrafficApp.Nav_TrafficActivity" />
+        </activity>
     </application>
 
 </manifest>

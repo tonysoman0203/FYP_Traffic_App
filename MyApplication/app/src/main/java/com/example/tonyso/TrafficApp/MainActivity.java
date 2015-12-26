@@ -30,11 +30,11 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.Interface.OnFragmentInteractionListener;
 import com.example.tonyso.TrafficApp.Interface.WeatherRefreshHandler;
+import com.example.tonyso.TrafficApp.Singleton.RouteMapping;
 import com.example.tonyso.TrafficApp.rss.RssReader;
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
 import com.example.tonyso.TrafficApp.location.GPSLocationFinder;
@@ -48,6 +48,8 @@ import com.google.android.gms.location.LocationServices;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.Locale;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class MainActivity extends BaseActivity
@@ -88,7 +90,7 @@ public class MainActivity extends BaseActivity
 
     BroadcastReceiver broadcastReceiver;
 
-    Intent broadCastTimerIntent;
+    Intent broadCastTimerIntent,ImageDownloadService;
     CoordinatorLayout coordinatorLayout;
     //TabLayout tabLayout;
 
@@ -97,6 +99,8 @@ public class MainActivity extends BaseActivity
     TabLayout tabLayout;
     View headerLayout;
     ImageLoader imageLoader;
+
+    RouteMapping routeMapping;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,17 +111,20 @@ public class MainActivity extends BaseActivity
             initNavigationDrawer();
             LabelFindViewById();
             initRSSReader();
-            setUpCountDownService();
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         int indicatorColor = this.getResources().getColor(R.color.colorAccent);
         int dividerColor = Color.WHITE;
-        fragmentManager.beginTransaction().replace(R.id.flcontent, Tab_MainFragment.newInstance(getString(R.string.app_name),indicatorColor,dividerColor,tabLayout)).commit();
+
+        fragmentManager.beginTransaction().replace(R.id.flcontent,
+                Tab_MainFragment.newInstance(getString(R.string.app_name),
+                        indicatorColor, dividerColor, tabLayout)).commit();
 
     }
 
     private void init() {
         imageLoader = ImageLoader.getInstance();
+        routeMapping =  RouteMapping.getInstance(this);
         tabLayout = (TabLayout)findViewById(R.id.tablayout);
         broadcastReceiver = myBroadCastReceiver;
         languageSelector = LanguageSelector.getInstance(this);
@@ -154,7 +161,6 @@ public class MainActivity extends BaseActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
         navigationView = (NavigationView) drawer.findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         headerLayout = navigationView.inflateHeaderView(R.layout.nav_header_main);
@@ -173,6 +179,11 @@ public class MainActivity extends BaseActivity
     private void setUpCountDownService(){
         broadCastTimerIntent = new Intent(this,CountDownService.class);
         startService(broadCastTimerIntent);
+    }
+
+    private void setImageDownloadService(){
+        ImageDownloadService = new Intent(MainActivity.this,ImageService.class);
+        startService(ImageDownloadService);
     }
 
     private void LabelFindViewById(){
@@ -194,24 +205,6 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    public void onBackPressed() {
-        int count = getFragmentManager().getBackStackEntryCount();
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            if (count == 0) {
-                super.onBackPressed();
-                //additional code
-            } else {
-                getFragmentManager().popBackStack();
-            }
-        }
-    }
-
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
@@ -221,7 +214,7 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
-
+        Log.i(MainActivity.class.getName(), "OnResume------@");
         CommonUtils.checkPlayServices(this, PLAY_SERVICES_RESOLUTION_REQUEST);
 
         if (languageSelector.getLanguage().equals(MyApplication.Language.ZH_HANT)) {
@@ -236,7 +229,13 @@ public class MainActivity extends BaseActivity
             startLocationUpdates();
         }
 
-        startService(broadCastTimerIntent);
+        setUpCountDownService();
+        setImageDownloadService();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     @Override
@@ -255,6 +254,7 @@ public class MainActivity extends BaseActivity
     protected void onPause() {
         super.onPause();
         stopService(broadCastTimerIntent);
+        stopService(ImageDownloadService);
         if (mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
             mGoogleApiClient.disconnect();
@@ -293,6 +293,10 @@ public class MainActivity extends BaseActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        if (toggle.isDrawerIndicatorEnabled() &&
+                toggle.onOptionsItemSelected(item)) {
+            return true;
+        }
         int id = item.getItemId();
         switch (id){
             case R.id.action_search:
@@ -303,6 +307,10 @@ public class MainActivity extends BaseActivity
                 Snackbar.make(coordinatorLayout,"Setting button click"
                         ,Snackbar.LENGTH_LONG).show();
                 break;
+            // Handle home button in non-drawer mode
+            case android.R.id.home:
+                getSupportFragmentManager().popBackStackImmediate();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -316,7 +324,7 @@ public class MainActivity extends BaseActivity
         int id = item.getItemId();
         Fragment fragment = null;
         Class fragmentClass;
-
+        Intent intent;
         if (id == R.id.nav_home) {
             tabLayout.setVisibility(View.VISIBLE);
             fab.setVisibility(View.VISIBLE);
@@ -329,29 +337,16 @@ public class MainActivity extends BaseActivity
             }
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.flcontent, fragment).commit();
-
             item.setChecked(true);
             setTitle(getString(R.string.app_name));
             //fragmentManager.beginTransaction().replace(R.id.flcontent,tab_mainFragment ).commit();
         } else if (id == R.id.nav_traffic) {
-            tabLayout.setVisibility(View.GONE);
-            fab.setVisibility(View.GONE);
-            fragmentClass = Nav_TrafficFragment.class;
-            try{
-                fragment = (Fragment) fragmentClass.newInstance();
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            FragmentManager fragmentManager = getSupportFragmentManager();
-
-            fragmentManager.beginTransaction().replace(R.id.flcontent, fragment).addToBackStack(Nav_TrafficFragment.class.getName()).commit();
-            item.setChecked(true);
-            setTitle(item.getTitle());
+            intent = new Intent(this,Nav_TrafficActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_suggestion) {
 
         } else if (id == R.id.nav_setting) {
-            Intent intent = new Intent(this,SettingsActivity.class);
+            intent = new Intent(this,SettingsActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_about) {
 
@@ -447,12 +442,9 @@ public class MainActivity extends BaseActivity
         textView.setText(s);
     }
 
-
-
-
     @Override
     public void onRefreshIcon(String URL) {
-        ImageView imageView = (ImageView)headerLayout.findViewById(R.id.bgHeader);
+        CircleImageView imageView = (CircleImageView)headerLayout.findViewById(R.id.bgHeader);
         imageLoader.displayImage(URL,imageView);
     }
 

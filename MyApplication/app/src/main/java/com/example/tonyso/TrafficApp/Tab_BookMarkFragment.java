@@ -1,17 +1,24 @@
 package com.example.tonyso.TrafficApp;
 
 
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
 import com.example.tonyso.TrafficApp.adapter.BookMarkAdapter;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
+
+import org.w3c.dom.Text;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -24,8 +31,13 @@ import java.util.List;
  */
 public class Tab_BookMarkFragment extends BaseFragment {
 
+    private static final String TAG = Tab_BookMarkFragment.class.getName();
     RecyclerView recyclerView;
-    BookMarkAdapter bookMarkAdapter;
+    public static BookMarkAdapter bookMarkAdapter;
+    static SQLiteHelper sqLiteHelper ;
+    TextView msg;
+    public static List<TimedBookMark>bookmarklist;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     public Tab_BookMarkFragment() {
         // Required empty public constructor
@@ -45,28 +57,46 @@ public class Tab_BookMarkFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_tab_bookmark,container,false);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipeRefreshBookMarklist);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshItems();
+            }
+        });
+        sqLiteHelper = new SQLiteHelper(this.getContext());
         recyclerView = (RecyclerView)v.findViewById(R.id.tab_bookmark_recyclerlist);
-        bookMarkAdapter = new BookMarkAdapter(getDataSets(),this);
+        msg= (TextView)v.findViewById(R.id.txtBookMarkMsg);
+        setDatasets();
         return v;
     }
 
-    private List<TimedBookMark> getDataSets() {
-        List<TimedBookMark> bookMarkSortedList = new ArrayList<>();
-        bookMarkSortedList.add(new TimedBookMark(0,"香港仔隧道灣仔入口",
-                new Timestamp(Calendar.getInstance().getTimeInMillis()),"H210F","香港島"));
+    private void setDatasets(){
+        bookmarklist = getDataSets();
+        if (getDataSets()==null){
+            recyclerView.setVisibility(View.GONE);
+            msg.setText("There is no Bookmark...");
+        }else{
+            recyclerView.setVisibility(View.VISIBLE);
+            msg.setVisibility(View.GONE);
+            bookMarkAdapter = new BookMarkAdapter(bookmarklist,this.getContext());
+        }
+    }
 
-        bookMarkSortedList.add(new TimedBookMark(1,"香港仔隧道香港仔入口",
-                new Timestamp(Calendar.getInstance().getTimeInMillis()),"H421F","香港島"));
+    private void refreshItems() {
+        // Load items
+        bookmarklist = getDataSets();
+        // Load complete
+        onItemsLoadComplete();
+    }
 
-        bookMarkSortedList.add(new TimedBookMark(2,"漆咸道近公主道",
-                new Timestamp(Calendar.getInstance().getTimeInMillis()),"K109F","九龍"));
-
-        bookMarkSortedList.add(new TimedBookMark(3,"海底隧道九龍入口",
-                new Timestamp(Calendar.getInstance().getTimeInMillis()),"K107F","九龍"));
-
-        bookMarkSortedList.add(new TimedBookMark(4,"獅子山隧道公路近新田圍邨",
-                new Timestamp(Calendar.getInstance().getTimeInMillis()),"ST725F","沙田及馬鞍山"));
-        return bookMarkSortedList;
+    private void onItemsLoadComplete() {
+        // Update the adapter and notify data set changed
+        bookmarklist = getDataSets();
+        bookMarkAdapter = new BookMarkAdapter(bookmarklist,this.getContext());
+        recyclerView.setAdapter(bookMarkAdapter);
+        // Stop refresh animation
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -81,4 +111,24 @@ public class Tab_BookMarkFragment extends BaseFragment {
         recyclerView.setAdapter(bookMarkAdapter);
         //setupDividerItemDecoration(mRecyclerView);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.e(TAG, "OnResume:" + TAG);
+
+        bookmarklist = getDataSets();
+        bookMarkAdapter = new BookMarkAdapter(bookmarklist,this.getContext());
+        recyclerView.setAdapter(bookMarkAdapter);
+    }
+
+    public static List<TimedBookMark> getDataSets() {
+
+        if (sqLiteHelper.getBookmarksList().size()>0)
+            return sqLiteHelper.getBookmarksList();
+        else
+            return null;
+    }
+
+
 }

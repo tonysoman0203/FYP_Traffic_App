@@ -123,22 +123,4 @@ public class Tab_MainFragment extends BaseFragment {
 
     }
 
-//    private LinkedList<BaseFragment> getFragments(){
-//        int indicatorColor = this.getResources().getColor(R.color.colorAccent);
-//        int dividerColor = Color.WHITE;
-//
-//        int ic_home = R.drawable.ic_home_white_48dp;
-//        int ic_bookmark = R.drawable.ic_bookmark_white_48dp;
-//        int ic_history = R.drawable.ic_history_white_48dp;
-//
-//        LinkedList<BaseFragment> fragments = new LinkedList<>();
-//        String home = getString(R.string.tab_Home);
-//        String bookmark = getString(R.string.tab_BookMarks);
-//        String history = getString(R.string.tab_History);
-//        fragments.add(Tab_HomeFragment.newInstance(home, indicatorColor, dividerColor,ic_home));
-//        fragments.add(Tab_BookMarkFragment.newInstance(bookmark, indicatorColor, dividerColor,ic_bookmark));
-//        fragments.add(Tab_HistoryFragment.newInstance(history, indicatorColor, dividerColor,ic_history));
-//        return fragments;
-//    }
-
 }
