@@ -33,10 +33,27 @@
     </style>
 
     <style name="BookMarkTextView" parent="Base.TextAppearance.AppCompat.Small">
-        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:layout_margin">8dp</item>
 
     </style>
 
+        <style name="BookMarkTextView.RemainingTime" parent="Base.TextAppearance.AppCompat.Display2">
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_margin">5dp</item>
+
+    </style>
+
+    <style name="BookMarkTextView.CirclePlaceHolder" parent="BookMarkTextView">
+        <item name="android:layout_gravity">center</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textAppearance">?attr/textAppearanceListItem</item>
+    </style>
+
+    
     <style name="MyTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabTextColor">@android:color/darker_gray</item>
         <item name="tabIndicatorColor">@android:color/white</item>

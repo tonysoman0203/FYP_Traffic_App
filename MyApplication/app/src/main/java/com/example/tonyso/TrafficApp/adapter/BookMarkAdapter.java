@@ -42,7 +42,6 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         this.context = tab_bookMarkFragment;
         imageLoader = ImageLoader.getInstance();
         imageOptions = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.drawable.ic_action_loading)
                 .showImageForEmptyUri(R.drawable.ic_error_black_24dp)
                 .cacheInMemory(true)
                 .considerExifParams(true)
@@ -53,28 +52,27 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
-        TextView time,roadName,remainTime,district;
+        TextView time,roadName,remainTime,district,routePlaceholder;
         //Button btnDetail;
         ProgressBar progressBar;
         public ViewHolder(View itemView) {
             super(itemView);
             imageView = (ImageView)itemView.findViewById(R.id.bkImage);
             time = (TextView)itemView.findViewById(R.id.bkTime);
-            remainTime = (TextView)itemView.findViewById(R.id.txtRemainTime);
+            remainTime = (TextView)itemView.findViewById(R.id.txtRemainTIme);
             roadName = (TextView)itemView.findViewById(R.id.txtRoadName);
             //satLevel = (TextView)itemView.findViewById(R.id.txtSatLevel);
             //btnDetail = (Button)itemView.findViewById(R.id.btnDetail);
             district = (TextView)itemView.findViewById(R.id.txtDistrict);
             progressBar = (ProgressBar)itemView.findViewById(R.id.bkprogressbar);
-            progressBar.setVisibility(View.VISIBLE);
+            routePlaceholder = (TextView)itemView.findViewById(R.id.txtRoutePlaceHolder);
         }
     }
 
     @Override
     public BookMarkAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_tab_bookmark_recycleritem, parent,false);
-        ViewHolder viewHolder = new ViewHolder(view);
-        return viewHolder;
+        return new ViewHolder(view);
     }
 
     @Override
@@ -93,7 +91,7 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         imageLoader.displayImage(url, holder.imageView, imageOptions, new ImageLoadingListener() {
             @Override
             public void onLoadingStarted(String imageUri, View view) {
-
+                holder.progressBar.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -103,7 +101,7 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
 
             @Override
             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-
+                holder.progressBar.setVisibility(View.GONE);
             }
 
             @Override

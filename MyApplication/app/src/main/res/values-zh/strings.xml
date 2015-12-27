@@ -50,5 +50,6 @@
     <string name="route_detail_btnReset">重設(開始及結束時間)</string>
     <string name="route_detail_btnSave">加入收藏</string>
     <string name="language_alert">你已經選擇 %s. 請重新選擇。</string>
+    <string name="Minute">分鐘</string>
 
 </resources>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout2"
+        android:layout_marginTop="63dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+
+        <Button
+            style="@style/PopupButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:text="@string/popup_near"
+            android:drawableTop="@drawable/ic_near_me_black_36dp"
+            android:id="@+id/btnNear"
+            android:drawableTint="@color/colorPrimary"
+            android:drawableTintMode="src_in"
+            android:layout_weight="1" />
+
+        <Button
+        style="@style/PopupButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:id="@+id/btnBookmark"
+        android:background="@android:color/transparent"
+        android:text="@string/popup_add_bookMark"
+        android:drawableTop="@drawable/ic_bookmark_black_36dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:layout_alignTop="@+id/btnRouteMore"
+        android:layout_toRightOf="@+id/map_snapshot_title"
+        android:layout_toEndOf="@+id/map_snapshot_title"
+        android:drawableTint="@color/colorPrimary"
+        android:drawableTintMode="src_in"
+        android:layout_weight="1" />
+
+        <Button
+            style="@style/PopupButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/btnShare"
+            android:background="@android:color/transparent"
+            android:text="@string/popup_share"
+            android:drawableTop="@drawable/ic_share_black_36dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:layout_alignTop="@+id/btnRouteMore"
+            android:layout_toRightOf="@+id/map_snapshot_title"
+            android:layout_toEndOf="@+id/map_snapshot_title"
+            android:drawableTint="@color/colorPrimary"
+            android:drawableTintMode="src_in"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+</RelativeLayout>

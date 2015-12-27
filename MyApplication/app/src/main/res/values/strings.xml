@@ -103,6 +103,7 @@
     <string name="route_detail_btnSave">Save To Bookmark</string>
     <string name="route_detail_btnReset">Reset (Start Time and Target Time) </string>
 
+    <string name="Minute">Minutes</string>
 
     <string name="title_activity_traffic_info_detail_scrolling">TrafficInfoDetailScrollingActivity</string>
 
