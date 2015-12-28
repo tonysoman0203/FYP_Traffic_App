@@ -42,7 +42,7 @@ public class OnSetTimeListener implements View.OnFocusChangeListener,TimePickerD
         // TODO Auto-generated method stub
         hour = hourOfDay;
         this.minute = minute;
-        this.editText.setText( hourOfDay + ":" + minute);
+        this.editText.setText( String.format("%02d:%02d",hourOfDay,minute));
     }
 
 }
