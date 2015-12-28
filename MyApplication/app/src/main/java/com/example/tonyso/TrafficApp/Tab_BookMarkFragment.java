@@ -1,7 +1,9 @@
 package com.example.tonyso.TrafficApp;
 
 
-import android.database.sqlite.SQLiteDatabase;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -18,12 +20,7 @@ import com.example.tonyso.TrafficApp.adapter.BookMarkAdapter;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 
-import org.w3c.dom.Text;
-
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 
 
 /**
@@ -32,12 +29,17 @@ import java.util.List;
 public class Tab_BookMarkFragment extends BaseFragment {
 
     private static final String TAG = Tab_BookMarkFragment.class.getName();
+    public static final String HELPER = "Helper";
     RecyclerView recyclerView;
     public static BookMarkAdapter bookMarkAdapter;
     static SQLiteHelper sqLiteHelper ;
     TextView msg;
-    public static List<TimedBookMark>bookmarklist;
+    public static ArrayList<TimedBookMark> bookmarklist;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    BroadcastReceiver broadcastReceiver;
+
+    // Intent for Counting Remaining Time: Tag
+    public static final String LIST = "list";
 
     public Tab_BookMarkFragment() {
         // Required empty public constructor
@@ -57,6 +59,12 @@ public class Tab_BookMarkFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_tab_bookmark,container,false);
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+            }
+        };
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipeRefreshBookMarklist);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -67,19 +75,21 @@ public class Tab_BookMarkFragment extends BaseFragment {
         sqLiteHelper = new SQLiteHelper(this.getContext());
         recyclerView = (RecyclerView)v.findViewById(R.id.tab_bookmark_recyclerlist);
         msg= (TextView)v.findViewById(R.id.txtBookMarkMsg);
-        setDatasets();
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(layoutManager);
         return v;
     }
 
     private void setDatasets(){
-        bookmarklist = getDataSets();
-        if (getDataSets()==null){
+        if (getDataSets().size() <= 0) {
             recyclerView.setVisibility(View.GONE);
             msg.setText("There is no Bookmark...");
         }else{
+            bookmarklist = getDataSets();
             recyclerView.setVisibility(View.VISIBLE);
             msg.setVisibility(View.GONE);
             bookMarkAdapter = new BookMarkAdapter(bookmarklist,this.getContext());
+            recyclerView.setAdapter(bookMarkAdapter);
         }
     }
 
@@ -100,34 +110,35 @@ public class Tab_BookMarkFragment extends BaseFragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        setupItemList();;
-    }
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "OnResume@" + TAG);
 
-    private void setupItemList() {
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(bookMarkAdapter);
-        //setupDividerItemDecoration(mRecyclerView);
+        setDatasets();
+
+        if (getDataSets().size() > 0) {
+            Intent bookmarkService = new Intent(getActivity(), BookMarkService.class);
+            bookmarkService.putExtra(LIST, bookmarklist);
+            getActivity().startService(bookmarkService);
+        } else {
+            Log.d(TAG, "Service Not Yet Started");
+        }
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        Log.e(TAG, "OnResume:" + TAG);
+    public void onStart() {
+        super.onStart();
 
-        bookmarklist = getDataSets();
-        bookMarkAdapter = new BookMarkAdapter(bookmarklist,this.getContext());
-        recyclerView.setAdapter(bookMarkAdapter);
     }
 
-    public static List<TimedBookMark> getDataSets() {
-
+    public static ArrayList<TimedBookMark> getDataSets() {
+        int size = sqLiteHelper.getBookmarksList().size();
+        Log.e(TAG, "SQLITE.LIST.SIZE=" + size);
         if (sqLiteHelper.getBookmarksList().size()>0)
             return sqLiteHelper.getBookmarksList();
-        else
-            return null;
+        else {
+            return new ArrayList<>();
+        }
     }
 
 

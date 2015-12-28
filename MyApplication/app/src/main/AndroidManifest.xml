@@ -79,6 +79,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.tonyso.TrafficApp.Nav_TrafficActivity" />
         </activity>
+
+        <service
+            android:name=".BookMarkService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

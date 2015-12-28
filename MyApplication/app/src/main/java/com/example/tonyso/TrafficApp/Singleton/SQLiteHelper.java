@@ -10,7 +10,6 @@ import android.util.Log;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by TonySoMan on 25/6/2015.
@@ -87,8 +86,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         }
 
         // Getting All Contacts
-        public List<TimedBookMark> getBookmarksList() {
-            List<TimedBookMark> bookMark_List = new ArrayList<>();
+        public ArrayList<TimedBookMark> getBookmarksList() {
+            ArrayList<TimedBookMark> bookMark_List = new ArrayList<>();
             try {
         // Select All Query
                 String selectQuery = "SELECT * FROM " + BOOKMARK_TABLE_NAME;

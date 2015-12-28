@@ -3,9 +3,9 @@ package com.example.tonyso.TrafficApp;
 import android.app.Application;
 import android.content.res.Configuration;
 
+import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,6 +18,7 @@ public class MyApplication extends Application{
         public static final String ENGLISH = "en";
     }
 
+    public static SQLiteHelper sqLiteHelper;
     public static final String Language_Locale = "Locale";
     public static final String Language_UserPref = "UserPref";
 
@@ -59,4 +60,6 @@ public class MyApplication extends Application{
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
     }
+
+
 }

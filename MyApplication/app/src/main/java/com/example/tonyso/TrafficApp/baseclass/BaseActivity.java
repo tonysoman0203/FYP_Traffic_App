@@ -1,24 +1,18 @@
 package com.example.tonyso.TrafficApp.baseclass;
 
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.LruCache;
-
 
 import com.example.tonyso.TrafficApp.MyApplication;
-import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.Singleton.RouteMapping;
 import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
-import com.example.tonyso.TrafficApp.rss.XMLReader;
 import com.example.tonyso.TrafficApp.utility.encryption.ShareStorage;
 import com.example.tonyso.TrafficApp.utility.encryption.StoreObject;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.decode.BaseImageDecoder;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
@@ -32,7 +26,9 @@ public class BaseActivity extends AppCompatActivity {
 
     String currLang;
     RouteMapping routeMapping ;
-    SQLiteDatabase sqLiteDatabase;
+
+    public static SQLiteDatabase sqLiteDatabase;
+    public static SQLiteHelper sqLiteHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +40,8 @@ public class BaseActivity extends AppCompatActivity {
         myApplication.list = routeMapping.loadCache();
         initImageLoader();
         //initialize SQLLite
+        //sqLiteDatabase = SQLiteHelper.getDatabase(this);
+        sqLiteHelper = new SQLiteHelper(this);
         sqLiteDatabase = SQLiteHelper.getDatabase(this);
     }
 
