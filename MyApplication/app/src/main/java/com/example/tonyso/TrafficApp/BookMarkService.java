@@ -2,13 +2,14 @@ package com.example.tonyso.TrafficApp;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class BookMarkService extends Service {
 
@@ -20,6 +21,7 @@ public class BookMarkService extends Service {
     static final public String CURR_TIME_RESULT = "com.example.tonyso.myapplication.BookmarkService.RESULT";
 
     static final public String MESSAGE = "com.example.tonyso.myapplication.BookmarkService.MSG";
+    static final public String POS = "com.example.tonyso.myapplication.BookmarkService.POSITION";
 
     public BookMarkService() {
 
@@ -41,42 +43,41 @@ public class BookMarkService extends Service {
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
         timedBookMarkArrayList = (ArrayList<TimedBookMark>) intent.getSerializableExtra(Tab_BookMarkFragment.LIST);
         for (int i = 0; i < timedBookMarkArrayList.size(); i++) {
-            remainTimeTask = new RemainTimeTask(
-                    new String[]{timedBookMarkArrayList.get(i).getStartTime(),
-                            timedBookMarkArrayList.get(i).getTargetTime()},
+            remainTimeTask = new RemainTimeTask(timedBookMarkArrayList.get(i).getRemainTime(),
                     i, localBroadcastManager);
         }
-        remainTimeTask.execute();
-
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(remainTimeTask, 0, 360000);
         return super.onStartCommand(intent, flags, startId);
     }
 
-    public static class RemainTimeTask extends AsyncTask<String, Void, Integer> {
-        String startTime, endTime;
+    public static class RemainTimeTask extends TimerTask {
+        int remainTime;
         int pos;
         LocalBroadcastManager localBroadcastManager;
 
-        public RemainTimeTask(String[] strings, int pos, LocalBroadcastManager localBroadcastManager) {
-            startTime = strings[0];
-            endTime = strings[1];
-            this.pos = pos;
+        public RemainTimeTask(int remainTime, int i, LocalBroadcastManager localBroadcastManager) {
+            System.out.print("RemainTimeTask");
+            this.remainTime = remainTime;
+            this.pos = i;
             this.localBroadcastManager = localBroadcastManager;
         }
 
         @Override
-        protected Integer doInBackground(String... params) {
-            //int result = Integer.parseInt(endTime)-Integer.parseInt(startTime);
-            //if (String.valueOf(result)=="")
-            return -1;
-
-            //return result;
+        public void run() {
+            while (remainTime != 0) {
+                sendResult(remainTime);
+                remainTime--;
+            }
+            this.cancel();
         }
 
-        @Override
-        protected void onPostExecute(Integer s) {
-            super.onPostExecute(s);
+        public void sendResult(int message) {
             Intent intent = new Intent(CURR_TIME_RESULT);
-            intent.putExtra(MESSAGE, s);
+            if (message != -1) {
+                intent.putExtra(MESSAGE, message);
+                intent.putExtra(POS, pos);
+            }
             localBroadcastManager.sendBroadcast(intent);
         }
     }

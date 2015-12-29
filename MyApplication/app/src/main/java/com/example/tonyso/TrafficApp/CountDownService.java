@@ -58,6 +58,7 @@ public class CountDownService extends Service {
             String currTime = CommonUtils.getTime();
             sendResult(currTime);
         }
+
         public void sendResult(String message) {
             Intent intent = new Intent(CURR_TIME_RESULT);
             if(message != null)

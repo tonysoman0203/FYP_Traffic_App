@@ -7,6 +7,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -98,13 +99,13 @@ public class TrafficInfoDetailScrollingActivity extends AppCompatActivity {
     private void setImageHeader() {
         imageRoute.setImageBitmap(routeImg);
 
-//        Palette.from(routeImg).generate(new Palette.PaletteAsyncListener() {
-//            @Override
-//            public void onGenerated(Palette palette) {
-//                int mutedColor = palette.getMutedColor(getResources().getColor(R.color.colorPrimary));
-//                collapsingToolbarLayout.setContentScrimColor(mutedColor);
-//            }
-//        });
+        Palette.from(routeImg).generate(new Palette.PaletteAsyncListener() {
+            @Override
+            public void onGenerated(Palette palette) {
+                int mutedColor = palette.getMutedColor(getResources().getColor(R.color.colorPrimary));
+                collapsingToolbarLayout.setContentScrimColor(mutedColor);
+            }
+        });
     }
 
     /**

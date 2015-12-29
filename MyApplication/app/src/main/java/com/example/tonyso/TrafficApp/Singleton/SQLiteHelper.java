@@ -29,6 +29,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     private static final String KEY_DISTRICT = "District";
     private static final String KEY_DISTRICT_ZH = "District_ZH";
     private static final String KEY_TIMEOVER = "isTimeOver";
+    private static final String KEY_REMAIN_TIME = "remainTime";
 
     //Create Table
     public static final String CREATE_TABLE =
@@ -36,11 +37,12 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                     KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                     KEY_ROUTE_NAME + " TEXT," +
                     KEY_ROUTE_NAME_ZH + " TEXT," +
-                    KEY_STARTTIME + " TEXT," +
-                    KEY_TARGETTIME + " TEXT," +
+                    KEY_STARTTIME + " DATETIME," +
+                    KEY_TARGETTIME + " DATETIME," +
+                    KEY_REMAIN_TIME + " TEXT," +
                     KEY_ROUTEIMAGEKEY + " TEXT," +
                     KEY_DISTRICT + " TEXT," +
-                    KEY_DISTRICT_ZH + " TEXT," +
+                    KEY_DISTRICT_ZH + " DATETIME," +
                     KEY_TIMEOVER + " boolean NOT NULL default 0);";
 
     //Drop Table
@@ -73,17 +75,27 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(KEY_ROUTE_NAME, bookMark.getBkRouteName()[0]);
             values.put(KEY_ROUTE_NAME_ZH, bookMark.getBkRouteName()[1]);
-            values.put(KEY_STARTTIME, bookMark.getStartTime().toString());
-            values.put(KEY_TARGETTIME, bookMark.getTargetTime().toString());
+            values.put(KEY_STARTTIME, String.valueOf(bookMark.getStartTime()));
+            values.put(KEY_TARGETTIME, String.valueOf(bookMark.getTargetTime()));
             values.put(KEY_ROUTEIMAGEKEY, bookMark.getRouteImageKey());
             values.put(KEY_DISTRICT, bookMark.getRegions()[0]);
             values.put(KEY_DISTRICT_ZH, bookMark.getRegions()[1]);
+            values.put(KEY_REMAIN_TIME, String.valueOf(bookMark.getRemainTime()));
             values.put(KEY_TIMEOVER, bookMark.isTimeOver());
             // Inserting Row
             long success = db.insert(BOOKMARK_TABLE_NAME, null, values);
             db.close(); // Closing database connection
             return success;
         }
+
+    public long onUpdateBookMarkRemainingTime(TimedBookMark timedBookMark) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(KEY_REMAIN_TIME, timedBookMark.getRemainTime());
+        long success = db.update(BOOKMARK_TABLE_NAME, cv, "_id=" + timedBookMark.get_id(), null);
+        db.close();
+        return success;
+    }
 
         // Getting All Contacts
         public ArrayList<TimedBookMark> getBookmarksList() {
@@ -103,9 +115,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                                 .setBkRouteName(new String[]{cursor.getString(1), cursor.getString(2)})
                                 .setTimestamp(cursor.getString(3))
                                 .setTargetTime(cursor.getString(4))
-                                .setRouteImageKey(cursor.getString(5))
-                                .setDistrict(new String[]{cursor.getString(6), cursor.getString(7)})
-                                .setIsTimeOver((cursor.getInt(8) == 1) ? true : false);
+                                .setRemainTime(Integer.parseInt((cursor.getString(5))))
+                                .setRouteImageKey(cursor.getString(6))
+                                .setDistrict(new String[]{cursor.getString(7), cursor.getString(8)})
+                                .setIsTimeOver((cursor.getInt(9) == 1) ? true : false);
                         bookMark_List.add(builder.build());
                     } while (cursor.moveToNext());
                 }

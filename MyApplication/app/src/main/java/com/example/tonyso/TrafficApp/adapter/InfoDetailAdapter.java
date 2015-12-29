@@ -1,7 +1,5 @@
 package com.example.tonyso.TrafficApp.adapter;
 
-import android.app.Dialog;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import com.example.tonyso.TrafficApp.Interface.RecyclerViewHelper;
 import com.example.tonyso.TrafficApp.MyApplication;
@@ -24,12 +21,12 @@ import com.example.tonyso.TrafficApp.OnSetTimeListener;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
-import com.example.tonyso.TrafficApp.Tab_BookMarkFragment;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
-import com.example.tonyso.TrafficApp.utility.CommonUtils;
 
-import java.util.Calendar;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -58,6 +55,12 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private String tempString;
     private String startTime, endTime;
     private int bookmark_id = 0;
+
+    private static final int VERIFIY_INPUT_SAME_VALUE = 100001;
+    private static final int VERIFIY_INPUT_END_IS_BIGGER_THAN_FRONT_VALUE = 100002;
+    private static final int VERIFIY_INPUT_FRONT_IS_BIGGER_THAN_END_VALUE = 100003;
+
+    OnSetTimeListener startTimeListener, endTImeListener;
 
     public InfoDetailAdapter(Context content, int recyclerViewSize, CoordinatorLayout coordinatorLayout,RouteCCTV routeCCTV){
         this.context = content;
@@ -129,17 +132,14 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((AddBookMarkViewHolder)holder).routeWrapper.getEditText().setText(route.getDescription()[1]);
             ((AddBookMarkViewHolder)holder).regionWrapper.getEditText().setText(route.getRegion()[1]);
         }
-        OnSetTimeListener startTimeListener = new OnSetTimeListener(((AddBookMarkViewHolder)holder).startTimeWrapper.getEditText(),context);
-        OnSetTimeListener endTimeListener = new OnSetTimeListener(((AddBookMarkViewHolder)holder).TargetTimeWrapper.getEditText(),context);
-        //GetTime
-        startTime =  ((AddBookMarkViewHolder)holder).startTimeWrapper.getEditText().getText().toString();
-        endTime =  ((AddBookMarkViewHolder)holder).TargetTimeWrapper.getEditText().getText().toString();
+        startTimeListener = new OnSetTimeListener(((AddBookMarkViewHolder) holder).startTimeWrapper.getEditText(), context);
+        endTImeListener = new OnSetTimeListener(((AddBookMarkViewHolder) holder).TargetTimeWrapper.getEditText(), context);
 
         ((AddBookMarkViewHolder)holder).btnAdd.setTag(4);
         ((AddBookMarkViewHolder)holder).btnReset.setTag(5);
 
-        ((AddBookMarkViewHolder)holder).btnAdd.setOnClickListener(new OnButtonClickListener(this, p));
-        ((AddBookMarkViewHolder)holder).btnReset.setOnClickListener(new OnButtonClickListener(this, p));
+        ((AddBookMarkViewHolder) holder).btnAdd.setOnClickListener(new OnButtonClickListener(this, p, holder));
+        ((AddBookMarkViewHolder) holder).btnReset.setOnClickListener(new OnButtonClickListener(this, p, holder));
     }
 
     @Override
@@ -178,22 +178,80 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     @Override
-    public void onAddBookmarkClick() {
-        SQLiteHelper sql = new SQLiteHelper(context);
-        long success = sql.add_Bookmark(new TimedBookMark.Builder()
+    public void onAddBookmarkClick(RecyclerView.ViewHolder viewHolder) {
+        startTime = ((AddBookMarkViewHolder) viewHolder).startTimeWrapper.getEditText().getText().toString();
+        endTime = ((AddBookMarkViewHolder) viewHolder).TargetTimeWrapper.getEditText().getText().toString();
+
+        int isVerifyDateAndTime = checkValidDateAndTime(startTime, endTime);
+        Log.e("Verification Date and Time", "" + isVerifyDateAndTime);
+        Log.e(TAG, "CheckPoint: StartTime:" + startTime + " EndTIme: " + endTime);
+
+        switch (isVerifyDateAndTime) {
+            case VERIFIY_INPUT_SAME_VALUE:
+                Snackbar.make(coordinatorLayout, "Same Value", Snackbar.LENGTH_SHORT).show();
+                break;
+            case VERIFIY_INPUT_FRONT_IS_BIGGER_THAN_END_VALUE:
+                Snackbar.make(coordinatorLayout, "End is Larger than Front", Snackbar.LENGTH_SHORT).show();
+                break;
+            case -1:
+                new Exception("Unknown Error In Checking").printStackTrace();
+                break;
+            default:
+                SQLiteHelper sql = new SQLiteHelper(context);
+                long success = sql.add_Bookmark(new TimedBookMark.Builder()
                         .set_id(bookmark_id++)
                         .setBkRouteName(route.getDescription())
                         .setDistrict(route.getRegion())
                         .setRouteImageKey(route.getRef_key())
                         .setTimestamp(startTime)
                         .setTargetTime(endTime)
+                        .setRemainTime(getRemainTime(startTime, endTime))
                         .setIsTimeOver(false).build());
-        if (success != -1){
-            Snackbar.make(coordinatorLayout,"Adding Bookmark Success...",Snackbar.LENGTH_SHORT).show();
-        }else{
-            Snackbar.make(coordinatorLayout,"Error Inserting Bookmark...",Snackbar.LENGTH_SHORT).show();
+                if (success != -1) {
+                    Snackbar.make(coordinatorLayout, "Adding Bookmark Success...", Snackbar.LENGTH_SHORT).show();
+                } else {
+                    Snackbar.make(coordinatorLayout, "Error Inserting Bookmark...", Snackbar.LENGTH_SHORT).show();
+                }
+                break;
         }
     }
+
+    private int getRemainTime(String startTime, String endTime) {
+        long start = 0, end = 0;
+        try {
+            start = new SimpleDateFormat("yyyy-mm-dd HH:mm").parse(startTime).getTime();
+            end = new SimpleDateFormat("yyyy-mm-dd HH:mm").parse(endTime).getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Log.e("CheckPoint:GetRemainTime", "" + (int) ((end - start) / 60000));
+        return (int) ((end - start) / 60000);
+    }
+
+    private int checkValidDateAndTime(String startTime, String endTime) {
+        Date start, end;
+        long startInSec = 0, endInSec = 0;
+        try {
+            start = new SimpleDateFormat("yyyy-mm-dd HH:mm").parse(startTime);
+            end = new SimpleDateFormat("yyyy-mm-dd HH:mm").parse(endTime);
+            startInSec = start.getTime();
+            endInSec = end.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        if (startInSec == (endInSec)) {
+            Log.e("CheckValidDateAndTime", "start = end");
+            return VERIFIY_INPUT_SAME_VALUE;
+        } else if (startInSec > endInSec) {
+            Log.e("CheckValidDateAndTime", "start > end");
+            return VERIFIY_INPUT_FRONT_IS_BIGGER_THAN_END_VALUE;
+        } else if (startInSec < endInSec) {
+            Log.e("CheckValidDateAndTime", "start < end");
+            return VERIFIY_INPUT_END_IS_BIGGER_THAN_FRONT_VALUE;
+        }
+        return -1;
+    }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         Button btnShare,btnNear,btnBookmark;
@@ -210,9 +268,9 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             btnBookmark.setTag(2);
             btnShare.setTag(3);
 
-            btnBookmark.setOnClickListener(new OnButtonClickListener(infoDetailAdapter,TYPE_BASE));
-            btnNear.setOnClickListener(new OnButtonClickListener(infoDetailAdapter, TYPE_BASE));
-            btnShare.setOnClickListener(new OnButtonClickListener(infoDetailAdapter,TYPE_BASE));
+            btnBookmark.setOnClickListener(new OnButtonClickListener(infoDetailAdapter, TYPE_BASE, this));
+            btnNear.setOnClickListener(new OnButtonClickListener(infoDetailAdapter, TYPE_BASE, this));
+            btnShare.setOnClickListener(new OnButtonClickListener(infoDetailAdapter, TYPE_BASE, this));
         }
     }
 

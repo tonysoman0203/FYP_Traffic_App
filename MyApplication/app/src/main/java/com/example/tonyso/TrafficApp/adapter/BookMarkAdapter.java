@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.tonyso.TrafficApp.Interface.OnRemainingTimeListener;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
@@ -27,7 +29,8 @@ import java.util.Random;
 /**
  * Created by TonySo on 28/10/15.
  */
-public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHolder>{
+public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHolder>
+        implements OnRemainingTimeListener {
 
     private static final String TAG = BookMarkAdapter.class.getSimpleName();
     List<TimedBookMark> myDatasets;
@@ -54,9 +57,15 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         languageSelector = LanguageSelector.getInstance(context);
     }
 
+    @Override
+    public void onRemainingTimeChanged(int pos) {
+        viewHolderInstance.remainTime.setText("" + pos);
+        Log.e(TAG, "" + myDatasets.get(pos).getRemainTime());
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
-        TextView time, roadName, remainTime, district, routePlaceholder, txtRemainingTime;
+        TextView time, roadName, remainTime, district, routePlaceholder;
         ProgressBar progressBar;
 
         public ViewHolder(View itemView) {
@@ -65,8 +74,6 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
             time = (TextView)itemView.findViewById(R.id.bkTime);
             remainTime = (TextView)itemView.findViewById(R.id.txtRemainTIme);
             roadName = (TextView)itemView.findViewById(R.id.txtRoadName);
-            txtRemainingTime = (TextView) itemView.findViewById(R.id.txtRemainTIme);
-            //btnDetail = (Button)itemView.findViewById(R.id.btnDetail);
             district = (TextView)itemView.findViewById(R.id.txtDistrict);
             progressBar = (ProgressBar)itemView.findViewById(R.id.bkprogressbar);
             routePlaceholder = (TextView)itemView.findViewById(R.id.txtRoutePlaceHolder);
@@ -83,7 +90,8 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final BookMarkAdapter.ViewHolder holder, int position) {
-        holder.time.setText(myDatasets.get(position).getStartTime().toString());
+        String concatString = myDatasets.get(position).getStartTime() + "--" + myDatasets.get(position).getTargetTime();
+        holder.time.setText(concatString);
 
         int color = randomizedRoutePlaceHolderColor();
         holder.routePlaceholder.setBackgroundColor(color);
@@ -127,7 +135,7 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
 
     private int randomizedRoutePlaceHolderColor() {
         random = new Random();
-        return Color.argb(random.nextInt(256), random.nextInt(256), random.nextInt(256), random.nextInt(256));
+        return Color.argb(random.nextInt(255), random.nextInt(255), random.nextInt(255), random.nextInt(255));
     }
 
     @Override

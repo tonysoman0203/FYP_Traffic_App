@@ -12,7 +12,17 @@ public class TimedBookMark implements Serializable {
     private  String targetTime;
     private  String routeImageKey;
     private  String[] regions;
+    private int remainTime;
     private  boolean isTimeOver;
+
+    public int getRemainTime() {
+        return remainTime;
+    }
+
+    public void setRemainTime(int RemainTime) {
+        this.remainTime = RemainTime;
+    }
+
 
     public int get_id() {
         return _id;
@@ -50,6 +60,7 @@ public class TimedBookMark implements Serializable {
         this.routeImageKey = builder.routeImageKey;
         this.regions = builder.district;
         this.isTimeOver = builder.isTimeOver;
+        this.remainTime = builder.remainTime;
     }
 
     public static class Builder{
@@ -58,6 +69,17 @@ public class TimedBookMark implements Serializable {
         private String timestamp;
         private String targetTime;
         private String routeImageKey;
+
+        public int getRemainTime() {
+            return remainTime;
+        }
+
+        public Builder setRemainTime(int remainTime) {
+            this.remainTime = remainTime;
+            return this;
+        }
+
+        private int remainTime;
         private String[] district;
         private boolean isTimeOver;
 
