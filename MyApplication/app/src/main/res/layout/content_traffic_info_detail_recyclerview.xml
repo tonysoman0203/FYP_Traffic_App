@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.tonyso.TrafficApp.TrafficInfoDetailScrollingActivity"
+    tools:context=".InfoDetailActivity"
     tools:showIn="@layout/activity_traffic_info_detail_scrolling"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:layout_height="match_parent">

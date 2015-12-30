@@ -7,7 +7,6 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -15,15 +14,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
-import com.example.tonyso.TrafficApp.Singleton.RouteMapping;
+import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
 import com.example.tonyso.TrafficApp.adapter.InfoDetailAdapter;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
+import com.example.tonyso.TrafficApp.model.TimedBookMark;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 //import android.support.v7.graphics.Palette;
 
-public class TrafficInfoDetailScrollingActivity extends AppCompatActivity {
+public class InfoDetailActivity extends AppCompatActivity {
     //Constant
-    public static final String TAG = TrafficInfoDetailScrollingActivity.class.getName();
+    public static final String TAG = InfoDetailActivity.class.getName();
     public static final String KEY = "key";
     //UI Components.....
     Toolbar toolbar;
@@ -39,7 +40,6 @@ public class TrafficInfoDetailScrollingActivity extends AppCompatActivity {
     Bitmap routeImg =null;
 
     //Instance
-    RouteMapping routeMapping;
     LanguageSelector languageSelector;
 
     //Action
@@ -47,6 +47,9 @@ public class TrafficInfoDetailScrollingActivity extends AppCompatActivity {
     private static final int RECYCLER_VIEW_SIZE = 3;
     InfoDetailAdapter infoDetailAdapter;
     CoordinatorLayout coordinatorLayout;
+    SQLiteHelper sqLiteHelper;
+    TimedBookMark bookMark;
+    String type = "Add_ROUTE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +67,14 @@ public class TrafficInfoDetailScrollingActivity extends AppCompatActivity {
         imageRoute = (ImageView)findViewById(R.id.header);
         recyclerView = (RecyclerView)findViewById(R.id.content_traffic).findViewById(R.id.recyclerview);
         coordinatorLayout = (CoordinatorLayout)findViewById(R.id.coordinate_layout);
-        infoDetailAdapter = new InfoDetailAdapter(this,RECYCLER_VIEW_SIZE,coordinatorLayout,route);
+        infoDetailAdapter = new InfoDetailAdapter()
+                .setContext(this)
+                .setSize(RECYCLER_VIEW_SIZE)
+                .setCoordinatorLayout(coordinatorLayout)
+                .setRoute(route)
+                .setType(type)
+                .setTimedBookMark(bookMark)
+                .build();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(infoDetailAdapter);
     }
@@ -93,19 +103,22 @@ public class TrafficInfoDetailScrollingActivity extends AppCompatActivity {
 
     private void getInstance(){
         //Getting Instance and Cache
-        routeMapping = RouteMapping.getInstance(this);
         languageSelector = LanguageSelector.getInstance(this);
+        sqLiteHelper = new SQLiteHelper(this);
     }
     private void setImageHeader() {
+        if (routeImg == null) {
+            ImageLoader.getInstance().displayImage("http://tdcctv.data.one.gov.hk/" + route.getRef_key() + ".JPG", imageRoute);
+        }
         imageRoute.setImageBitmap(routeImg);
 
-        Palette.from(routeImg).generate(new Palette.PaletteAsyncListener() {
-            @Override
-            public void onGenerated(Palette palette) {
-                int mutedColor = palette.getMutedColor(getResources().getColor(R.color.colorPrimary));
-                collapsingToolbarLayout.setContentScrimColor(mutedColor);
-            }
-        });
+//        Palette.from(routeImg).generate(new Palette.PaletteAsyncListener() {
+//            @Override
+//            public void onGenerated(Palette palette) {
+//                int mutedColor = palette.getMutedColor(getResources().getColor(R.color.colorPrimary));
+//                collapsingToolbarLayout.setContentScrimColor(mutedColor);
+//            }
+//        });
     }
 
     /**
@@ -113,9 +126,21 @@ public class TrafficInfoDetailScrollingActivity extends AppCompatActivity {
      */
     private void getDataFromIntent(){
         intent = getIntent();
-        imageKey = intent.getStringExtra(KEY);
-        route = (RouteCCTV) intent.getSerializableExtra(imageKey);
-        routeImg = routeMapping.getBitmapFromMemCache(imageKey);
+        String intent_type = intent.getStringExtra("type");
+        if (intent_type.equals(Tab_BookMarkFragment.TYPE_EDIT_BOOKMARK)) {
+            type = intent_type;
+            bookMark = sqLiteHelper.getBookmark(intent.getIntExtra(SQLiteHelper.getKeyId(), -1));
+            route = new RouteCCTV.Builder()
+                    .setId(bookMark.get_id())
+                    .setDescription(bookMark.getBkRouteName())
+                    .setRegion(bookMark.getRegions())
+                    .setKey(bookMark.getRouteImageKey())
+                    .setLatLngs(bookMark.getLatLngs())
+                    .build();
+        } else {
+            imageKey = intent.getStringExtra(KEY);
+            route = (RouteCCTV) intent.getSerializableExtra(imageKey);
+        }
     }
 
 }

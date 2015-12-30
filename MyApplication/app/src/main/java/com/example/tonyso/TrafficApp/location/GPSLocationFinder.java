@@ -6,7 +6,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.util.Log;
 
-
 import com.example.tonyso.TrafficApp.Interface.WeatherRefreshHandler;
 import com.example.tonyso.TrafficApp.MainActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
@@ -27,13 +26,7 @@ import java.util.Locale;
 public class GPSLocationFinder implements LocationListener {
     private static final String TAG = GPSLocationFinder.class.getSimpleName();
     MainActivity context;
-//    LocationManager mLocationManager;
-//    protected boolean isGPSEnabled, isNetworkProviderEnabled;
-//    //Geocoder geocoder;
-//    //Criteria criteria;
     Location mLocation;
-    private String locationprovider;
-//    double Latitude,longtitude;
     ErrorDialog errorDialog;
     LanguageSelector languageSelector ;
     WeatherRefreshHandler weatherRefreshHandler;
@@ -41,9 +34,6 @@ public class GPSLocationFinder implements LocationListener {
     public GPSLocationFinder(Context c, WeatherRefreshHandler weatherRefreshHandler) {
         this.context = (MainActivity) c;
         languageSelector = LanguageSelector.getInstance(this.context);
-        //mLocationManager = (LocationManager) c.getSystemService(Context.LOCATION_SERVICE);
-        //geocoder = new Geocoder(context);
-        //initLocation();
         this.weatherRefreshHandler = weatherRefreshHandler;
         errorDialog = ErrorDialog.getInstance(context);
     }
@@ -51,40 +41,6 @@ public class GPSLocationFinder implements LocationListener {
     public GPSLocationFinder(Context context) {
         this.context = (MainActivity) context;
     }
-
-//    private void checkGPS() {
-//        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-//            locationprovider = LocationManager.GPS_PROVIDER;
-//            isGPSEnabled = true;
-//        } else {
-//            isGPSEnabled = false;
-//        }
-//
-//        if (CommonUtils.checkInternetStatus(context)){
-//            if (mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-//                locationprovider = LocationManager.NETWORK_PROVIDER;
-//                isNetworkProviderEnabled = true;
-//            } else {
-//                isNetworkProviderEnabled = false;
-//            }
-//        }
-//
-//        Log.e(getClass().getSimpleName(), "GPS Enabled = " + isGPSEnabled);
-//        Log.e(getClass().getSimpleName(), "Network Enabled = " + isNetworkProviderEnabled);
-//    }
-//
-//    public void initLocation() {
-//        checkGPS();
-//        if (isGPSEnabled || isNetworkProviderEnabled) {
-//            criteria = new Criteria(); // 資訊提供者選取標準
-//            locationprovider = mLocationManager.getBestProvider(criteria, true);
-//        /*    location = mLocationManager.getLastKnownLocation(locationprovider);
-//        */
-//        } else {
-////            Toast.makeText(context, "請開啟定位服務及確保網絡連接", Toast.LENGTH_SHORT).show();
-//        }
-//
-//    }
 
     public void convertLatLongToAddress(Location location, Locale locale) {
        //location = mLocationManager.getLastKnownLocation(locationprovider);
@@ -101,10 +57,6 @@ public class GPSLocationFinder implements LocationListener {
                 String address  = addresses.get(1).getFeatureName();
                Log.e("Address",addresses.get(0).getFeatureName());
                 Log.e("Address",addresses.get(0).getCountryName());
-                //txtlocation.setText(addresses.get(1).getFeatureName());
-//                 Toast.makeText(context,
-//                 "" + addresses.get(1).getFeatureName(),
-//                 Toast.LENGTH_LONG).show();
                 weatherRefreshHandler.onRefreshLocation(address);
             } else {
                 Log.e(TAG,"No Address Found");

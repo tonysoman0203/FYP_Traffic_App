@@ -18,7 +18,6 @@ public class OnButtonClickListener implements View.OnClickListener {
         this.recyclerViewHelper  = recyclerViewHelper;
         this.pos = adapterPosition;
         this.viewHolder = viewHolder;
-
         Log.e(OnButtonClickListener.class.getName(),""+pos);
     }
 

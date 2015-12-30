@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
-    <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/recyclerItembookmarkCardView"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        app:cardCornerRadius="5dp"
-        app:cardElevation="10dp"
-        app:contentPadding="5dp"
-        app:cardUseCompatPadding="true"
-        >
-        <RelativeLayout
+<android.support.v7.widget.CardView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/recyclerItembookmarkCardView"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardUseCompatPadding="true"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
             android:layout_width="match_parent"
+        android:padding="8dp"
             android:layout_height="match_parent">
 
             <ProgressBar
@@ -55,25 +51,6 @@
 
                 <LinearLayout
                     android:orientation="horizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:showDividers="end"
-                    android:layout_gravity="center_vertical">
-
-                    <TextView
-                        style="@style/BookMarkTextView.CirclePlaceHolder"
-                        android:layout_width="58dp"
-                        android:layout_height="56dp"
-                        android:text="H"
-                        android:id="@+id/txtRoutePlaceHolder"
-                        android:autoText="false"
-                        android:background="@drawable/circle_textview" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_width="0dp">
@@ -92,7 +69,8 @@
                             android:layout_below="@+id/bkTime"
                             android:layout_alignLeft="@+id/bkTime"
                             android:layout_alignStart="@+id/bkTime"
-                            style="@style/BookMarkTextView" />
+                            style="@style/BookMarkTextView"
+                            android:background="@drawable/circle_textview" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -154,7 +132,14 @@
             </LinearLayout>
 
         </RelativeLayout>
-    </android.support.v7.widget.CardView>
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:id="@+id/selected_overlay"
+        android:layout_gravity="top|right|end"
+        android:src="@drawable/ic_check_circle_black_36dp"
 
-</LinearLayout>
+        />
+</android.support.v7.widget.CardView>

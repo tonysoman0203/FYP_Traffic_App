@@ -14,32 +14,30 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.Interface.OnFragmentInteractionListener;
 import com.example.tonyso.TrafficApp.Interface.WeatherRefreshHandler;
-import com.example.tonyso.TrafficApp.Singleton.RouteMapping;
-import com.example.tonyso.TrafficApp.rss.RssReader;
+import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
 import com.example.tonyso.TrafficApp.location.GPSLocationFinder;
+import com.example.tonyso.TrafficApp.rss.RssReader;
 import com.example.tonyso.TrafficApp.utility.CommonUtils;
-import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -100,8 +98,6 @@ public class MainActivity extends BaseActivity
     View headerLayout;
     ImageLoader imageLoader;
 
-    RouteMapping routeMapping;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,7 +120,6 @@ public class MainActivity extends BaseActivity
 
     private void init() {
         imageLoader = ImageLoader.getInstance();
-        routeMapping =  RouteMapping.getInstance(this);
         tabLayout = (TabLayout)findViewById(R.id.tablayout);
         broadcastReceiver = myBroadCastReceiver;
         languageSelector = LanguageSelector.getInstance(this);
@@ -181,11 +176,6 @@ public class MainActivity extends BaseActivity
         startService(broadCastTimerIntent);
     }
 
-    private void setImageDownloadService(){
-        ImageDownloadService = new Intent(MainActivity.this,ImageService.class);
-        startService(ImageDownloadService);
-    }
-
     private void LabelFindViewById(){
         lbllocation = (TextView)headerLayout.findViewById(R.id.lblCurrLocation);
         lblWeather = (TextView)headerLayout.findViewById(R.id.lblTemp);
@@ -230,7 +220,7 @@ public class MainActivity extends BaseActivity
         }
 
         setUpCountDownService();
-        setImageDownloadService();
+        //setImageDownloadService();
     }
 
     @Override
@@ -254,7 +244,7 @@ public class MainActivity extends BaseActivity
     protected void onPause() {
         super.onPause();
         stopService(broadCastTimerIntent);
-        stopService(ImageDownloadService);
+        //stopService(ImageDownloadService);
         if (mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
             mGoogleApiClient.disconnect();
@@ -380,11 +370,10 @@ public class MainActivity extends BaseActivity
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
-            MyApplication.Lat = mLastLocation.getLatitude();
-            MyApplication.lng = mLastLocation.getLongitude();
             Log.d(TAG, String.valueOf(mLastLocation.getLatitude()));
             Log.d(TAG, String.valueOf(mLastLocation.getLongitude()));
-            Log.d(TAG+"getAccuracy",String.valueOf(mLastLocation.getAccuracy()));
+            Log.d(TAG, "Speed: " + mLastLocation.getSpeed());
+            Log.d(TAG + "getAccuracy: ", String.valueOf(mLastLocation.getAccuracy()));
             if (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH)) {
                 gpsLocationFinder.convertLatLongToAddress(mLastLocation,ENG);
             }else{

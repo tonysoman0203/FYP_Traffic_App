@@ -56,11 +56,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <service
-            android:name=".ImageService"
-            android:enabled="true"
-            android:exported="true" />
-
         <activity
             android:name=".Nav_TrafficActivity"
             android:label="@string/nav_traffic_traffic"
@@ -71,7 +66,7 @@
                 android:value="com.example.tonyso.TrafficApp.MainActivity" />
         </activity>
         <activity
-            android:name=".TrafficInfoDetailScrollingActivity"
+            android:name=".InfoDetailActivity"
             android:label="@string/title_activity_traffic_info_detail_scrolling"
             android:parentActivityName=".Nav_TrafficActivity"
             android:theme="@style/AppTheme.NoActionBar">

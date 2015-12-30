@@ -1,11 +1,7 @@
 package com.example.tonyso.TrafficApp;
 
 
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -13,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,11 +16,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.example.tonyso.TrafficApp.Singleton.RouteMapping;
+import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
-import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -36,11 +30,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,8 +64,6 @@ public class Nav_TrafficActivity extends BaseActivity implements OnMapReadyCallb
     boolean isTrafficOn;
     Toolbar toolbar;
     ImageLoader imageLoader;
-    RouteMapping routeMapping;
-
     View view;
 
     @Override
@@ -107,7 +94,6 @@ public class Nav_TrafficActivity extends BaseActivity implements OnMapReadyCallb
 
     private void getInstance(){
         imageLoader = ImageLoader.getInstance();
-        routeMapping = RouteMapping.getInstance(this);
         sqLiteHelper = new SQLiteHelper(this);
         languageSelector = LanguageSelector.getInstance(this);
         MyApplication myApplication = (MyApplication)getApplication();
@@ -210,6 +196,12 @@ public class Nav_TrafficActivity extends BaseActivity implements OnMapReadyCallb
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
@@ -264,42 +256,19 @@ public class Nav_TrafficActivity extends BaseActivity implements OnMapReadyCallb
         viewGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Intent intent = new Intent(getApplicationContext(),TrafficInfoDetailScrollingActivity.class);
+                final Intent intent = new Intent(getApplicationContext(), InfoDetailActivity.class);
                 final String title = marker.getTitle();
                 Log.e(TAG, title);
                 intent.putExtra("key", title);
                 intent.putExtra(title, roadCCTVMap.get(title));
+                intent.putExtra("type", "Add_ROUTE");
                 //check Image is Not NULL
-                final ProgressDialog pd = ProgressDialog.show(Nav_TrafficActivity.this,
-                        "讀取中", "請等待", true);
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try{
-                            while (routeMapping.getBitmapFromMemCache(title)==null){
-                                URL url = new URL(TRAFFIC_URL.concat(roadCCTVMap.get(title).getRef_key()).concat(JPG));
-                                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                                connection.setDoInput(true);
-                                connection.connect();
-                                InputStream input = connection.getInputStream();
-                                Bitmap myBitmap = BitmapFactory.decodeStream(input);
-                                //myApplication.list.get(n).setBitmap(myBitmap);
-                                routeMapping.addBitmapToMemoryCache(title,myBitmap);
-                                if (routeMapping.getBitmapFromMemCache(title)!=null){
-                                    startActivity(intent);
-                                }else {
-                                    Snackbar.make(coordinatorLayout, "Image Not Cache...", Snackbar.LENGTH_SHORT).show();
-                                }
-                            }
-                        } catch (MalformedURLException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } finally {
-                            pd.dismiss();
-                        }
-                    }
-                }).start();
+                startActivity(intent);
+//                if (routeMapping.getBitmapFromMemCache(title)!=null){
+//
+//                }else {
+//                    Snackbar.make(coordinatorLayout, "Image Not Cache...", Snackbar.LENGTH_SHORT).show();
+//                }
 
                 }
         });

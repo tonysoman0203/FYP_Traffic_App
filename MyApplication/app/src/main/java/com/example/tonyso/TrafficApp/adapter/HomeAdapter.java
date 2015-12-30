@@ -57,10 +57,10 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.HomeViewHolder
             /*PlaceHolder Error Fetch .... API
             * See in http://square.github.io/picasso/javadoc/index.html
             * */
-//            Picasso.Builder picasso = new Picasso.Builder(context);
-//            picasso.memoryCache(new LruCache(context));
+//            Picasso.Builder picasso = new Picasso.Builder(frag);
+//            picasso.memoryCache(new LruCache(frag));
 //
-            //Picasso.with(context).load(url).into(imgview);
+            //Picasso.with(frag).load(url).into(imgview);
 
         } catch (Exception e) {
             e.printStackTrace();

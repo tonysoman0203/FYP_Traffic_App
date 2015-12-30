@@ -5,8 +5,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.tonyso.TrafficApp.MyApplication;
-import com.example.tonyso.TrafficApp.Singleton.RouteMapping;
 import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
+import com.example.tonyso.TrafficApp.model.RouteCCTV;
+import com.example.tonyso.TrafficApp.rss.XMLReader;
 import com.example.tonyso.TrafficApp.utility.encryption.ShareStorage;
 import com.example.tonyso.TrafficApp.utility.encryption.StoreObject;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
@@ -17,6 +18,7 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.decode.BaseImageDecoder;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -25,8 +27,6 @@ import java.util.Locale;
 public class BaseActivity extends AppCompatActivity {
 
     String currLang;
-    RouteMapping routeMapping ;
-
     public static SQLiteDatabase sqLiteDatabase;
     public static SQLiteHelper sqLiteHelper;
 
@@ -35,14 +35,17 @@ public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         MyApplication myApplication = (MyApplication) getApplication();
         storeUserLanuguage();
-        routeMapping = RouteMapping.getInstance(this);
-        routeMapping.setImageCache();
-        myApplication.list = routeMapping.loadCache();
+        myApplication.list = loadCache();
         initImageLoader();
         //initialize SQLLite
         //sqLiteDatabase = SQLiteHelper.getDatabase(this);
         sqLiteHelper = new SQLiteHelper(this);
         sqLiteDatabase = SQLiteHelper.getDatabase(this);
+    }
+
+    public List<RouteCCTV> loadCache() {
+        XMLReader xmlReader = new XMLReader(this);
+        return xmlReader.getImageXML();
     }
 
     //SetDefaultUserLanguage in FirstLaunch

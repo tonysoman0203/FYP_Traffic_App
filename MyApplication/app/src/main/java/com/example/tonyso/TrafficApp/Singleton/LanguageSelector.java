@@ -1,6 +1,7 @@
 package com.example.tonyso.TrafficApp.Singleton;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.utility.encryption.ShareStorage;
@@ -15,7 +16,6 @@ public class LanguageSelector {
 
     private LanguageSelector(Context context) {
         this.context = context;
-//        langPref = context.getSharedPreferences(MyApplication.Language_Tag,0);
     }
 
     public static LanguageSelector getInstance(Context context){
@@ -27,10 +27,16 @@ public class LanguageSelector {
                 }
             }
         }
-        System.out.println(LanguageSelector.class.getName()+" Using Same Instance of"+languageSelector);
+        Log.d(LanguageSelector.class.getName(), "Using Same Instance of" + languageSelector);
         return languageSelector;
     }
 
+    @Override
+    public String toString() {
+        return "LanguageSelector{" +
+                "context=" + context +
+                '}';
+    }
 
     public String getUserLanguage() {
           return (String) ShareStorage.retrieveData(MyApplication.Language_UserPref, ShareStorage.DataType.STRING, ShareStorage.SP.PrivateData, context).getValue();

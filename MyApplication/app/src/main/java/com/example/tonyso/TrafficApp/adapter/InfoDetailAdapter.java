@@ -1,12 +1,12 @@
 package com.example.tonyso.TrafficApp.adapter;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.tonyso.TrafficApp.InfoDetailActivity;
 import com.example.tonyso.TrafficApp.Interface.RecyclerViewHelper;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.OnButtonClickListener;
@@ -21,8 +22,10 @@ import com.example.tonyso.TrafficApp.OnSetTimeListener;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
+import com.example.tonyso.TrafficApp.Tab_BookMarkFragment;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
+import com.example.tonyso.TrafficApp.utility.CommonUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,42 +37,110 @@ import java.util.GregorianCalendar;
  */
 public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements RecyclerViewHelper{
 
-    Context context;
+    InfoDetailActivity context;
     private int size;
+    private CoordinatorLayout coordinatorLayout;
+    RouteCCTV route;
 
+    public TimedBookMark getTimedBookMark() {
+        return timedBookMark;
+    }
+
+    public InfoDetailAdapter setTimedBookMark(TimedBookMark timedBookMark) {
+        this.timedBookMark = timedBookMark;
+        return this;
+    }
+
+    TimedBookMark timedBookMark;
+    private String type;
+
+    private InfoDetailAdapter(InfoDetailAdapter infoDetailAdapter) {
+        this.context = infoDetailAdapter.getContext();
+        this.size = infoDetailAdapter.getSize();
+        this.coordinatorLayout = infoDetailAdapter.coordinatorLayout;
+        this.route = infoDetailAdapter.route;
+        this.type = infoDetailAdapter.type;
+        this.timedBookMark = infoDetailAdapter.timedBookMark;
+        res = context.getResources();
+        getObjectInstance();
+    }
+
+    public InfoDetailAdapter() {
+
+    }
+
+    public InfoDetailAdapter build() {
+        return new InfoDetailAdapter(this);
+    }
+
+    public InfoDetailActivity getContext() {
+        return context;
+    }
+
+    public InfoDetailAdapter setContext(InfoDetailActivity context) {
+        this.context = context;
+        return this;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public InfoDetailAdapter setSize(int size) {
+        this.size = size;
+        return this;
+    }
+
+    public RouteCCTV getRoute() {
+        return route;
+    }
+
+    public InfoDetailAdapter setRoute(RouteCCTV route) {
+        this.route = route;
+        return this;
+    }
+
+    public CoordinatorLayout getCoordinatorLayout() {
+        return coordinatorLayout;
+    }
+
+    public InfoDetailAdapter setCoordinatorLayout(CoordinatorLayout coordinatorLayout) {
+        this.coordinatorLayout = coordinatorLayout;
+        return this;
+    }
+
+
+    public String getType() {
+        return type;
+    }
+
+    public InfoDetailAdapter setType(String type) {
+        this.type = type;
+        return this;
+    }
+
+    SQLiteDatabase sqLiteDatabase;
+    Resources res;
+    private static final String TAG = InfoDetailAdapter.class.getName();
+    LanguageSelector languageSelector;
+    GregorianCalendar calendar;
+    private String startTime, endTime;
+    private int bookmark_id = 0;
+
+    //Constant Integer
     private static final int TYPE_BASE = 0;
     private static final int TYPE_NEAR_HEADER = 1;
     private static final int TYPE_BOOKMAKR_HEADER = 3;
     private static final int TYPE_SHARE_HEADER = 5;
     private static final int TYPE_NEAR_ITEM = 2;
     private static final int TYPE_BOOKMARK_ITEM = 4;
-
-    SQLiteDatabase sqLiteDatabase;
-    Resources res;
-    private static CoordinatorLayout coordinatorLayout;
-
-    private static final String TAG = InfoDetailAdapter.class.getName();
-    RouteCCTV route;
-    LanguageSelector languageSelector;
-    GregorianCalendar calendar;
-    private String tempString;
-    private String startTime, endTime;
-    private int bookmark_id = 0;
-
     private static final int VERIFIY_INPUT_SAME_VALUE = 100001;
     private static final int VERIFIY_INPUT_END_IS_BIGGER_THAN_FRONT_VALUE = 100002;
     private static final int VERIFIY_INPUT_FRONT_IS_BIGGER_THAN_END_VALUE = 100003;
+    private static final int VERIFIY_INPUT_DATE_FRONT_IS_BIGGER_THAN_END_VALUE = 100004;
 
     OnSetTimeListener startTimeListener, endTImeListener;
 
-    public InfoDetailAdapter(Context content, int recyclerViewSize, CoordinatorLayout coordinatorLayout,RouteCCTV routeCCTV){
-        this.context = content;
-        this.size = recyclerViewSize;
-        res = context.getResources();
-        this.coordinatorLayout = coordinatorLayout;
-        this.route = routeCCTV;
-        getObjectInstance();
-    }
 
     private void getObjectInstance(){
         sqLiteDatabase =SQLiteHelper.getDatabase(context);
@@ -119,7 +190,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }else if (position == TYPE_BOOKMARK_ITEM){
             configBookmarkItem(holder,position);
         }else if (position == TYPE_NEAR_ITEM) {
-
+            //Near Locations....
         }
     }
 
@@ -132,8 +203,20 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((AddBookMarkViewHolder)holder).routeWrapper.getEditText().setText(route.getDescription()[1]);
             ((AddBookMarkViewHolder)holder).regionWrapper.getEditText().setText(route.getRegion()[1]);
         }
+
+        if (type.equals(Tab_BookMarkFragment.TYPE_EDIT_BOOKMARK)) {
+            ((AddBookMarkViewHolder) holder).startTimeWrapper.getEditText().setText(timedBookMark.getStartTime());
+            ((AddBookMarkViewHolder) holder).TargetTimeWrapper.getEditText().setText(timedBookMark.getTargetTime());
+        }
+
         startTimeListener = new OnSetTimeListener(((AddBookMarkViewHolder) holder).startTimeWrapper.getEditText(), context);
         endTImeListener = new OnSetTimeListener(((AddBookMarkViewHolder) holder).TargetTimeWrapper.getEditText(), context);
+
+        if (type.equals(Tab_BookMarkFragment.TYPE_EDIT_BOOKMARK)) {
+            ((AddBookMarkViewHolder) holder).btnAdd.setText(res.getString(R.string.edit_bookmark));
+        } else {
+            ((AddBookMarkViewHolder) holder).btnAdd.setText(res.getString(R.string.route_detail_btnSave));
+        }
 
         ((AddBookMarkViewHolder)holder).btnAdd.setTag(4);
         ((AddBookMarkViewHolder)holder).btnReset.setTag(5);
@@ -159,6 +242,12 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             return TYPE_BASE;
     }
 
+    /**
+     * To Determine whether the position is which type of Header
+     *
+     * @param position
+     * @return
+     */
     private boolean isPositionHeader(int position) {
         return position == TYPE_NEAR_HEADER || position ==TYPE_BOOKMAKR_HEADER || position == TYPE_SHARE_HEADER;
     }
@@ -168,10 +257,10 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         Snackbar.make(coordinatorLayout,"Button click : "+tag,Snackbar.LENGTH_SHORT).show();
         switch (tag){
             case 1:
-                this.notifyItemMoved(pos,TYPE_NEAR_ITEM);
+                this.notifyItemMoved(pos, TYPE_NEAR_ITEM);
                 break;
             case 2:
-                this.notifyItemMoved(pos,TYPE_BOOKMARK_ITEM);
+                this.notifyItemMoved(pos, TYPE_BOOKMARK_ITEM);
                 break;
             default:break;
         }
@@ -181,42 +270,92 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onAddBookmarkClick(RecyclerView.ViewHolder viewHolder) {
         startTime = ((AddBookMarkViewHolder) viewHolder).startTimeWrapper.getEditText().getText().toString();
         endTime = ((AddBookMarkViewHolder) viewHolder).TargetTimeWrapper.getEditText().getText().toString();
+        if (!checkInputField(viewHolder)) {
+            Log.e("Error Handling ...", "OOps...");
+        } else {
+            ((AddBookMarkViewHolder) viewHolder).startTimeWrapper.setErrorEnabled(false);
+            ((AddBookMarkViewHolder) viewHolder).TargetTimeWrapper.setErrorEnabled(false);
+            int isVerifyDateAndTime = checkValidDateAndTime(startTime, endTime);
+            Log.e("VerificationDateAndTime", "" + isVerifyDateAndTime);
+            Log.e(TAG, "CheckPoint: StartTime:" + startTime + " EndTIme: " + endTime);
 
-        int isVerifyDateAndTime = checkValidDateAndTime(startTime, endTime);
-        Log.e("Verification Date and Time", "" + isVerifyDateAndTime);
-        Log.e(TAG, "CheckPoint: StartTime:" + startTime + " EndTIme: " + endTime);
-
-        switch (isVerifyDateAndTime) {
-            case VERIFIY_INPUT_SAME_VALUE:
-                Snackbar.make(coordinatorLayout, "Same Value", Snackbar.LENGTH_SHORT).show();
-                break;
-            case VERIFIY_INPUT_FRONT_IS_BIGGER_THAN_END_VALUE:
-                Snackbar.make(coordinatorLayout, "End is Larger than Front", Snackbar.LENGTH_SHORT).show();
-                break;
-            case -1:
-                new Exception("Unknown Error In Checking").printStackTrace();
-                break;
-            default:
-                SQLiteHelper sql = new SQLiteHelper(context);
-                long success = sql.add_Bookmark(new TimedBookMark.Builder()
-                        .set_id(bookmark_id++)
-                        .setBkRouteName(route.getDescription())
-                        .setDistrict(route.getRegion())
-                        .setRouteImageKey(route.getRef_key())
-                        .setTimestamp(startTime)
-                        .setTargetTime(endTime)
-                        .setRemainTime(getRemainTime(startTime, endTime))
-                        .setIsTimeOver(false).build());
-                if (success != -1) {
-                    Snackbar.make(coordinatorLayout, "Adding Bookmark Success...", Snackbar.LENGTH_SHORT).show();
-                } else {
-                    Snackbar.make(coordinatorLayout, "Error Inserting Bookmark...", Snackbar.LENGTH_SHORT).show();
-                }
-                break;
+            switch (isVerifyDateAndTime) {
+                case VERIFIY_INPUT_SAME_VALUE:
+                    Snackbar.make(coordinatorLayout, "Same Value", Snackbar.LENGTH_SHORT).show();
+                    break;
+                case VERIFIY_INPUT_FRONT_IS_BIGGER_THAN_END_VALUE:
+                    Snackbar.make(coordinatorLayout, "End is Larger than Front", Snackbar.LENGTH_SHORT).show();
+                    break;
+                case VERIFIY_INPUT_DATE_FRONT_IS_BIGGER_THAN_END_VALUE:
+                    Snackbar.make(coordinatorLayout, "Front Date is Larger than Front", Snackbar.LENGTH_SHORT).show();
+                    break;
+                case -1:
+                    new Exception("Unknown Error In Checking").printStackTrace();
+                    break;
+                default:
+                    if (type.equals("Add_ROUTE")) {
+                        SQLiteHelper sql = new SQLiteHelper(context);
+                        long success = sql.add_Bookmark(new TimedBookMark.Builder()
+                                .set_id(bookmark_id++)
+                                .setBkRouteName(route.getDescription())
+                                .setDistrict(route.getRegion())
+                                .setRouteImageKey(route.getRef_key())
+                                .setTimestamp(startTime)
+                                .setTargetTime(endTime)
+                                .setRemainTime(getRemainTime(startTime, endTime))
+                                .setLatLngs(route.getLatLngs())
+                                .setIsTimeOver(false).build());
+                        if (success != -1) {
+                            Snackbar.make(coordinatorLayout, "Adding Bookmark Success...", Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            Snackbar.make(coordinatorLayout, "Error Inserting Bookmark...", Snackbar.LENGTH_SHORT).show();
+                        }
+                        break;
+                    } else if (type.equals(Tab_BookMarkFragment.TYPE_EDIT_BOOKMARK)) {
+                        SQLiteHelper sql = new SQLiteHelper(context);
+                        long success = sql.editBookmark(new TimedBookMark.Builder()
+                                .set_id(timedBookMark.get_id())
+                                .setBkRouteName(route.getDescription())
+                                .setDistrict(route.getRegion())
+                                .setRouteImageKey(route.getRef_key())
+                                .setTimestamp(startTime)
+                                .setTargetTime(endTime)
+                                .setRemainTime(getRemainTime(startTime, endTime))
+                                .setLatLngs(route.getLatLngs())
+                                .setIsTimeOver(false).build());
+                        if (success != -1) {
+                            Snackbar.make(coordinatorLayout, "Editing Bookmark Success...", Snackbar.LENGTH_SHORT).show();
+                            context.setResult(Tab_BookMarkFragment.EDIT_BOOKMARK_RESULT_CODE);
+                            context.finish();
+                        } else {
+                            Snackbar.make(coordinatorLayout, "Error Inserting Bookmark...", Snackbar.LENGTH_SHORT).show();
+                        }
+                        break;
+                    } else
+                        break;
+            }
         }
     }
 
-    private int getRemainTime(String startTime, String endTime) {
+    private boolean checkInputField(RecyclerView.ViewHolder viewHolder) {
+        viewHolder = ((AddBookMarkViewHolder) viewHolder);
+        if (TextUtils.isEmpty(((AddBookMarkViewHolder) viewHolder).routeWrapper.getEditText().toString())) {
+            ((AddBookMarkViewHolder) viewHolder).routeWrapper.setError("Please Enter a route name...");
+            return false;
+        } else if (TextUtils.isEmpty(((AddBookMarkViewHolder) viewHolder).regionWrapper.getEditText().toString())) {
+            ((AddBookMarkViewHolder) viewHolder).routeWrapper.setError("Please Enter a region name...");
+            return false;
+        } else if (TextUtils.isEmpty(startTime)) {
+            ((AddBookMarkViewHolder) viewHolder).startTimeWrapper.setError("Please Enter a valid date and time...");
+            return false;
+        } else if (TextUtils.isEmpty(endTime)) {
+            ((AddBookMarkViewHolder) viewHolder).TargetTimeWrapper.setError("Please Enter a valid date and time...");
+            return false;
+        } else
+            return true;
+    }
+
+    public static int getRemainTime(String startTime, String endTime) {
         long start = 0, end = 0;
         try {
             start = new SimpleDateFormat("yyyy-mm-dd HH:mm").parse(startTime).getTime();
@@ -224,20 +363,29 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        Log.e("CheckPoint:GetRemainTime", "" + (int) ((end - start) / 60000));
+        Log.e("GetRemainTime", "" + (int) ((end - start) / 60000));
         return (int) ((end - start) / 60000);
     }
 
     private int checkValidDateAndTime(String startTime, String endTime) {
-        Date start, end;
+        Date start = null, end = null, currDate = null;
         long startInSec = 0, endInSec = 0;
         try {
             start = new SimpleDateFormat("yyyy-mm-dd HH:mm").parse(startTime);
             end = new SimpleDateFormat("yyyy-mm-dd HH:mm").parse(endTime);
+            currDate = new SimpleDateFormat("yyyy-mm-dd HH:mm").parse(CommonUtils.getCurrentDateTime());
             startInSec = start.getTime();
             endInSec = end.getTime();
         } catch (ParseException e) {
             e.printStackTrace();
+        }
+
+        if (start.after(currDate) || end.after(currDate)) {
+            Log.e("CheckValidDateAndTime", "start < end");
+            return VERIFIY_INPUT_END_IS_BIGGER_THAN_FRONT_VALUE;
+        } else if (start.before(currDate) || end.before(currDate)) {
+            Log.e("CheckValidDateAndTime", "start Date > end Date");
+            return VERIFIY_INPUT_DATE_FRONT_IS_BIGGER_THAN_END_VALUE;
         }
         if (startInSec == (endInSec)) {
             Log.e("CheckValidDateAndTime", "start = end");

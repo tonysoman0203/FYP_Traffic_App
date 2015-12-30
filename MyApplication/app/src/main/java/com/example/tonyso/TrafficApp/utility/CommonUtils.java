@@ -7,13 +7,12 @@ import android.net.NetworkInfo;
 import android.util.Log;
 import android.widget.Toast;
 
-
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -45,6 +44,18 @@ public class CommonUtils {
         return new SimpleDateFormat("HH:mm:ss",Locale.TRADITIONAL_CHINESE).format(c.getTime());
     }
 
+    public static long getTimeInSec(String time) {
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        try {
+            Date parsedDate = dateFormat.parse(time);
+            return parsedDate.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
     public static Timestamp getTimestamp(String time){
         Timestamp timestamp = null;
         try{
@@ -58,13 +69,13 @@ public class CommonUtils {
         return timestamp;
     }
 
-    public static Time getTime(String time){
-        Time t = null;
+    public static String getCurrentDateTime() {
+        String t = "Error With text";
         try{
-            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
-            Date parsedDate = dateFormat.parse(time);
-            t = new java.sql.Time(parsedDate.getTime());
-            return t;
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd HH:mm");
+            Calendar c = Calendar.getInstance();
+            Date d = c.getTime();
+            return dateFormat.format(d);
         }catch(Exception e){//this generic but you can control another types of exception
             e.printStackTrace();
         }

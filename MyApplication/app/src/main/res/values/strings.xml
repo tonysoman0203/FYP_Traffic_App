@@ -197,5 +197,7 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="Language">Language</string>
+    <string name="edit_bookmark">Edit Bookmark</string>
+    <string name="bookmark_delete">delete</string>
 
 </resources>
