@@ -1,7 +1,6 @@
 package com.example.tonyso.TrafficApp.adapter;
 
 import android.content.res.Resources;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
@@ -15,14 +14,14 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.InfoDetailActivity;
-import com.example.tonyso.TrafficApp.Interface.RecyclerViewHelper;
 import com.example.tonyso.TrafficApp.MyApplication;
-import com.example.tonyso.TrafficApp.OnButtonClickListener;
-import com.example.tonyso.TrafficApp.OnSetTimeListener;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
 import com.example.tonyso.TrafficApp.Tab_BookMarkFragment;
+import com.example.tonyso.TrafficApp.listener.OnButtonClickListener;
+import com.example.tonyso.TrafficApp.listener.OnSetTimeListener;
+import com.example.tonyso.TrafficApp.listener.RecyclerViewListener;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 import com.example.tonyso.TrafficApp.utility.CommonUtils;
@@ -35,24 +34,34 @@ import java.util.GregorianCalendar;
 /**
  * Created by soman on 2015/12/25.
  */
-public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements RecyclerViewHelper{
+public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements RecyclerViewListener {
 
-    InfoDetailActivity context;
+    private InfoDetailActivity context;
     private int size;
     private CoordinatorLayout coordinatorLayout;
-    RouteCCTV route;
-
-    public TimedBookMark getTimedBookMark() {
-        return timedBookMark;
-    }
-
-    public InfoDetailAdapter setTimedBookMark(TimedBookMark timedBookMark) {
-        this.timedBookMark = timedBookMark;
-        return this;
-    }
-
-    TimedBookMark timedBookMark;
+    private RouteCCTV route;
+    private TimedBookMark timedBookMark;
     private String type;
+    private Resources res;
+    private static final String TAG = InfoDetailAdapter.class.getName();
+    private LanguageSelector languageSelector;
+    private GregorianCalendar calendar;
+    private String startTime, endTime;
+    private int bookmark_id = 0;
+
+    //Constant Integer
+    private static final int TYPE_BASE = 0;
+    private static final int TYPE_NEAR_HEADER = 1;
+    private static final int TYPE_BOOKMAKR_HEADER = 3;
+    private static final int TYPE_SHARE_HEADER = 5;
+    private static final int TYPE_NEAR_ITEM = 2;
+    private static final int TYPE_BOOKMARK_ITEM = 4;
+    private static final int VERIFIY_INPUT_SAME_VALUE = 100001;
+    private static final int VERIFIY_INPUT_END_IS_BIGGER_THAN_FRONT_VALUE = 100002;
+    private static final int VERIFIY_INPUT_FRONT_IS_BIGGER_THAN_END_VALUE = 100003;
+    private static final int VERIFIY_INPUT_DATE_FRONT_IS_BIGGER_THAN_END_VALUE = 100004;
+
+    OnSetTimeListener startTimeListener, endTImeListener;
 
     private InfoDetailAdapter(InfoDetailAdapter infoDetailAdapter) {
         this.context = infoDetailAdapter.getContext();
@@ -66,11 +75,21 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public InfoDetailAdapter() {
-
+        //Required Empty Constructor to Build adapter instance
     }
 
     public InfoDetailAdapter build() {
         return new InfoDetailAdapter(this);
+    }
+
+
+    public TimedBookMark getTimedBookMark() {
+        return timedBookMark;
+    }
+
+    public InfoDetailAdapter setTimedBookMark(TimedBookMark timedBookMark) {
+        this.timedBookMark = timedBookMark;
+        return this;
     }
 
     public InfoDetailActivity getContext() {
@@ -109,7 +128,6 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         return this;
     }
 
-
     public String getType() {
         return type;
     }
@@ -119,34 +137,61 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         return this;
     }
 
-    SQLiteDatabase sqLiteDatabase;
-    Resources res;
-    private static final String TAG = InfoDetailAdapter.class.getName();
-    LanguageSelector languageSelector;
-    GregorianCalendar calendar;
-    private String startTime, endTime;
-    private int bookmark_id = 0;
-
-    //Constant Integer
-    private static final int TYPE_BASE = 0;
-    private static final int TYPE_NEAR_HEADER = 1;
-    private static final int TYPE_BOOKMAKR_HEADER = 3;
-    private static final int TYPE_SHARE_HEADER = 5;
-    private static final int TYPE_NEAR_ITEM = 2;
-    private static final int TYPE_BOOKMARK_ITEM = 4;
-    private static final int VERIFIY_INPUT_SAME_VALUE = 100001;
-    private static final int VERIFIY_INPUT_END_IS_BIGGER_THAN_FRONT_VALUE = 100002;
-    private static final int VERIFIY_INPUT_FRONT_IS_BIGGER_THAN_END_VALUE = 100003;
-    private static final int VERIFIY_INPUT_DATE_FRONT_IS_BIGGER_THAN_END_VALUE = 100004;
-
-    OnSetTimeListener startTimeListener, endTImeListener;
-
-
-    private void getObjectInstance(){
-        sqLiteDatabase =SQLiteHelper.getDatabase(context);
+    private void getObjectInstance() {
         languageSelector = LanguageSelector.getInstance(context);
         calendar = new GregorianCalendar();
     }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        Button btnShare, btnNear, btnBookmark;
+        InfoDetailAdapter infoDetailAdapter;
+
+        public ViewHolder(View itemView, InfoDetailAdapter infoDetailAdapter) {
+            super(itemView);
+            btnBookmark = (Button) itemView.findViewById(R.id.btnBookmark);
+            btnNear = (Button) itemView.findViewById(R.id.btnNear);
+            btnShare = (Button) itemView.findViewById(R.id.btnShare);
+            this.infoDetailAdapter = infoDetailAdapter;
+
+            //setTag
+            btnNear.setTag(1);
+            btnBookmark.setTag(2);
+            btnShare.setTag(3);
+
+            //Set Button Behavior
+            btnBookmark.setOnClickListener(new OnButtonClickListener(infoDetailAdapter, TYPE_BASE, this));
+            btnNear.setOnClickListener(new OnButtonClickListener(infoDetailAdapter, TYPE_BASE, this));
+            btnShare.setOnClickListener(new OnButtonClickListener(infoDetailAdapter, TYPE_BASE, this));
+        }
+    }
+
+    public static class AddBookMarkViewHolder extends RecyclerView.ViewHolder {
+        TextInputLayout routeWrapper, regionWrapper, startTimeWrapper, TargetTimeWrapper;
+        Button btnAdd, btnReset;
+
+        public AddBookMarkViewHolder(View itemView) {
+            super(itemView);
+            routeWrapper = (TextInputLayout) itemView.findViewById(R.id.routeWrapper);
+            regionWrapper = (TextInputLayout) itemView.findViewById(R.id.regionWrapper);
+            startTimeWrapper = (TextInputLayout) itemView.findViewById(R.id.startTimeWrapper);
+            TargetTimeWrapper = (TextInputLayout) itemView.findViewById(R.id.targetTimeWrapper);
+            btnAdd = (Button) itemView.findViewById(R.id.btnAdd);
+            btnReset = (Button) itemView.findViewById(R.id.btnReset);
+        }
+    }
+
+    /**
+     * Header Class extends ViewHolder to display Header TextView
+     */
+    public static class ViewHolderHeader extends RecyclerView.ViewHolder {
+        public final TextView header;
+
+        public ViewHolderHeader(View itemView) {
+            super(itemView);
+            header = (TextView) itemView.findViewById(R.id.txtHeaderText);
+        }
+    }
+
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -400,49 +445,5 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         return -1;
     }
 
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        Button btnShare,btnNear,btnBookmark;
-        InfoDetailAdapter infoDetailAdapter;
-        public ViewHolder(View itemView, InfoDetailAdapter infoDetailAdapter) {
-            super(itemView);
-            btnBookmark = (Button) itemView.findViewById(R.id.btnBookmark);
-            btnNear = (Button) itemView.findViewById(R.id.btnNear);
-            btnShare = (Button) itemView.findViewById(R.id.btnShare);
-            this.infoDetailAdapter = infoDetailAdapter;
-
-            //setTag
-            btnNear.setTag(1);
-            btnBookmark.setTag(2);
-            btnShare.setTag(3);
-
-            btnBookmark.setOnClickListener(new OnButtonClickListener(infoDetailAdapter, TYPE_BASE, this));
-            btnNear.setOnClickListener(new OnButtonClickListener(infoDetailAdapter, TYPE_BASE, this));
-            btnShare.setOnClickListener(new OnButtonClickListener(infoDetailAdapter, TYPE_BASE, this));
-        }
-    }
-
-    public static class AddBookMarkViewHolder extends RecyclerView.ViewHolder{
-        TextInputLayout routeWrapper,regionWrapper,startTimeWrapper,TargetTimeWrapper;
-        Button btnAdd,btnReset;
-
-        public AddBookMarkViewHolder(View itemView) {
-            super(itemView);
-            routeWrapper = (TextInputLayout) itemView.findViewById(R.id.routeWrapper);
-            regionWrapper = (TextInputLayout) itemView.findViewById(R.id.regionWrapper);
-            startTimeWrapper = (TextInputLayout) itemView.findViewById(R.id.startTimeWrapper);
-            TargetTimeWrapper = (TextInputLayout) itemView.findViewById(R.id.targetTimeWrapper);
-            btnAdd  = (Button)itemView.findViewById(R.id.btnAdd);
-            btnReset  = (Button)itemView.findViewById(R.id.btnReset);
-        }
-    }
-    public static class ViewHolderHeader extends RecyclerView.ViewHolder {
-        public final TextView header;
-
-        public ViewHolderHeader(View itemView){
-            super(itemView);
-            header = (TextView) itemView.findViewById(R.id.txtHeaderText);
-        }
-    }
 }
 

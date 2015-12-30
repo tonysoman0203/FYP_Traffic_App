@@ -6,11 +6,11 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.util.Log;
 
-import com.example.tonyso.TrafficApp.Interface.WeatherRefreshHandler;
 import com.example.tonyso.TrafficApp.MainActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.Singleton.ErrorDialog;
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
+import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -29,12 +29,12 @@ public class GPSLocationFinder implements LocationListener {
     Location mLocation;
     ErrorDialog errorDialog;
     LanguageSelector languageSelector ;
-    WeatherRefreshHandler weatherRefreshHandler;
+    WeatherRefreshListener weatherRefreshListener;
 
-    public GPSLocationFinder(Context c, WeatherRefreshHandler weatherRefreshHandler) {
+    public GPSLocationFinder(Context c, WeatherRefreshListener weatherRefreshListener) {
         this.context = (MainActivity) c;
         languageSelector = LanguageSelector.getInstance(this.context);
-        this.weatherRefreshHandler = weatherRefreshHandler;
+        this.weatherRefreshListener = weatherRefreshListener;
         errorDialog = ErrorDialog.getInstance(context);
     }
 
@@ -57,7 +57,7 @@ public class GPSLocationFinder implements LocationListener {
                 String address  = addresses.get(1).getFeatureName();
                Log.e("Address",addresses.get(0).getFeatureName());
                 Log.e("Address",addresses.get(0).getCountryName());
-                weatherRefreshHandler.onRefreshLocation(address);
+                weatherRefreshListener.onRefreshLocation(address);
             } else {
                 Log.e(TAG,"No Address Found");
             }

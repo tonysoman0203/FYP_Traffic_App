@@ -31,10 +31,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.tonyso.TrafficApp.Interface.OnFragmentInteractionListener;
-import com.example.tonyso.TrafficApp.Interface.WeatherRefreshHandler;
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
+import com.example.tonyso.TrafficApp.listener.OnFragmentInteractionListener;
+import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
 import com.example.tonyso.TrafficApp.location.GPSLocationFinder;
 import com.example.tonyso.TrafficApp.rss.RssReader;
 import com.example.tonyso.TrafficApp.utility.CommonUtils;
@@ -53,7 +53,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,WeatherRefreshHandler,OnFragmentInteractionListener {
+        GoogleApiClient.OnConnectionFailedListener, WeatherRefreshListener, OnFragmentInteractionListener {
 
     LanguageSelector languageSelector;
 

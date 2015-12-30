@@ -1,23 +1,25 @@
 package com.example.tonyso.TrafficApp.adapter;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.tonyso.TrafficApp.Interface.OnRemainingTimeListener;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
 import com.example.tonyso.TrafficApp.Tab_BookMarkFragment;
+import com.example.tonyso.TrafficApp.listener.OnItemClickListener;
+import com.example.tonyso.TrafficApp.listener.OnRemainingTimeListener;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -27,12 +29,11 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by TonySo on 28/10/15.
  */
-public class BookMarkAdapter extends SelectableRecyclerViewAdapter<BookMarkAdapter.ViewHolder>
+public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHolder>
         implements OnRemainingTimeListener {
 
     public static final String TAG = BookMarkAdapter.class.getSimpleName();
@@ -48,16 +49,14 @@ public class BookMarkAdapter extends SelectableRecyclerViewAdapter<BookMarkAdapt
     ViewHolder viewHolderInstance;
     OnItemClickListener onItemClickListener;
 
-    /* Interface for handling clicks - both normal and long ones. */
-    public interface OnItemClickListener {
-        /**
-         * Called when the view is clicked.
-         *
-         * @param v           view that is clicked
-         * @param position    of the clicked item
-         * @param isLongClick true if long click, false otherwise
-         */
-        void onClick(View v, int position, boolean isLongClick);
+    private int position;
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
@@ -131,9 +130,6 @@ public class BookMarkAdapter extends SelectableRecyclerViewAdapter<BookMarkAdapt
     }
 
     public void removeSelectedItem(Integer pos) {
-        //myDatasets = bookmarklist;
-        //addDatatoSortedList(myDatasets);
-        //myDatasets.remove(pos);
         sortedList.beginBatchedUpdates();
         try {
             SQLiteHelper sqLiteHelper = new SQLiteHelper(frag.getContext());
@@ -145,27 +141,15 @@ public class BookMarkAdapter extends SelectableRecyclerViewAdapter<BookMarkAdapt
         }
         sortedList.endBatchedUpdates();
         notifyItemRemoved(pos);
-        notifyItemChanged(pos);
-        notifyDataSetChanged();
-    }
-
-    public SortedList<TimedBookMark> getSortedList() {
-        return sortedList;
-    }
-
-    public BookMarkAdapter setSortedList(SortedList<TimedBookMark> sortedList) {
-        this.sortedList = sortedList;
-        return this;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
-            View.OnLongClickListener
+            View.OnCreateContextMenuListener
     {
         ImageView imageView;
         TextView time, roadName, remainTime, district;
         ProgressBar progressBar;
         View itemView;
-        ImageView selectedView;
         OnItemClickListener onItemClickListener;
 
         public ViewHolder(View itemView, OnItemClickListener onItemClickListener) {
@@ -177,29 +161,25 @@ public class BookMarkAdapter extends SelectableRecyclerViewAdapter<BookMarkAdapt
             roadName = (TextView)itemView.findViewById(R.id.txtRoadName);
             district = (TextView)itemView.findViewById(R.id.txtDistrict);
             progressBar = (ProgressBar)itemView.findViewById(R.id.bkprogressbar);
-            selectedView = (ImageView) itemView.findViewById(R.id.selected_overlay);
 
             this.onItemClickListener = onItemClickListener;
 
             this.itemView.setOnClickListener(this);
-            this.itemView.setOnLongClickListener(this);
+            this.itemView.setOnCreateContextMenuListener(this);
         }
 
         @Override
         public void onClick(View v) {
             Log.d(TAG, "ItemView Click at @ At POS " + getAdapterPosition());
             if (onItemClickListener != null) {
-                onItemClickListener.onClick(v, getAdapterPosition(), false);
+                onItemClickListener.onClick(v, getAdapterPosition());
             }
         }
 
         @Override
-        public boolean onLongClick(View v) {
-            Log.d(TAG, "ItemView Long Click at @ At POS " + getAdapterPosition());
-            if (onItemClickListener != null) {
-                onItemClickListener.onClick(v, getAdapterPosition(), true);
-            }
-            return false;
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            menu.add(Menu.NONE, R.id.bookmark_delete, Menu.NONE, frag.getResources().getString(R.string.bookmark_delete));
+            menu.add(Menu.NONE, R.id.bookmark_share, Menu.NONE, frag.getResources().getString(R.string.popup_share));
         }
     }
 
@@ -217,9 +197,6 @@ public class BookMarkAdapter extends SelectableRecyclerViewAdapter<BookMarkAdapt
         holder.time.setText(concatString);
 
         holder.remainTime.setText("" + sortedList.get(position).getRemainTime());
-
-        int color = randomizedRoutePlaceHolderColor();
-        holder.roadName.setBackgroundColor(color);
 
         if (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH)) {
             holder.roadName.setText(sortedList.get(position).getBkRouteName()[0]);
@@ -253,13 +230,19 @@ public class BookMarkAdapter extends SelectableRecyclerViewAdapter<BookMarkAdapt
 
             }
         });
-        // Highlight the item if it's selected
-        holder.selectedView.setVisibility(isSelected(position) ? View.VISIBLE : View.INVISIBLE);
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                setPosition(holder.getAdapterPosition());
+                return false;
+            }
+        });
     }
 
-    private int randomizedRoutePlaceHolderColor() {
-        Random random = new Random();
-        return Color.argb(random.nextInt(255), random.nextInt(255), random.nextInt(255), random.nextInt(255));
+    @Override
+    public void onViewRecycled(ViewHolder holder) {
+        holder.itemView.setOnLongClickListener(null);
+        super.onViewRecycled(holder);
     }
 
     @Override

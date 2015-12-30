@@ -251,7 +251,6 @@ public class Nav_TrafficActivity extends BaseActivity implements OnMapReadyCallb
     public boolean onMarkerClick(final Marker marker) {
         snackbar = Snackbar.make(coordinatorLayout,marker.getTitle(),Snackbar.LENGTH_INDEFINITE);
         ViewGroup viewGroup = (ViewGroup) snackbar.getView();
-
         //Get Route Object
         viewGroup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -261,19 +260,12 @@ public class Nav_TrafficActivity extends BaseActivity implements OnMapReadyCallb
                 Log.e(TAG, title);
                 intent.putExtra("key", title);
                 intent.putExtra(title, roadCCTVMap.get(title));
-                intent.putExtra("type", "Add_ROUTE");
-                //check Image is Not NULL
+                intent.putExtra("type", InfoDetailActivity.ADD_ROUTE_TYPE);
                 startActivity(intent);
-//                if (routeMapping.getBitmapFromMemCache(title)!=null){
-//
-//                }else {
-//                    Snackbar.make(coordinatorLayout, "Image Not Cache...", Snackbar.LENGTH_SHORT).show();
-//                }
 
                 }
         });
         snackbar.show();
-        //marker.showInfoWindow();
         return true;
     }
 

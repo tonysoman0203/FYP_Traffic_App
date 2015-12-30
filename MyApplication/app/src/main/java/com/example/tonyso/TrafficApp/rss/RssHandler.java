@@ -6,12 +6,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 
-import com.example.tonyso.TrafficApp.Interface.Rss_Listener;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
-import com.example.tonyso.TrafficApp.model.Weather;
 import com.example.tonyso.TrafficApp.Singleton.ErrorDialog;
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
+import com.example.tonyso.TrafficApp.listener.Rss_Listener;
+import com.example.tonyso.TrafficApp.model.Weather;
 
 import org.xml.sax.helpers.DefaultHandler;
 import org.xmlpull.v1.XmlPullParser;

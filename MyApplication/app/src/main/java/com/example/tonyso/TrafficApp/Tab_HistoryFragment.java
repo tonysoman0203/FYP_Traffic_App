@@ -10,8 +10,8 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import com.example.tonyso.TrafficApp.Interface.OnFragmentInteractionListener;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
+import com.example.tonyso.TrafficApp.listener.OnFragmentInteractionListener;
 
 /**
  * A fragment representing a list of Items.

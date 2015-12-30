@@ -1,21 +1,19 @@
-package com.example.tonyso.TrafficApp;
+package com.example.tonyso.TrafficApp.listener;
 
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
-import com.example.tonyso.TrafficApp.Interface.RecyclerViewHelper;
-
 /**
  * Created by soman on 2015/12/25.
  */
 public class OnButtonClickListener implements View.OnClickListener {
-    RecyclerViewHelper recyclerViewHelper;
+    RecyclerViewListener recyclerViewListener;
     int pos;
     RecyclerView.ViewHolder viewHolder;
 
-    public OnButtonClickListener(RecyclerViewHelper recyclerViewHelper, int adapterPosition, RecyclerView.ViewHolder viewHolder) {
-        this.recyclerViewHelper  = recyclerViewHelper;
+    public OnButtonClickListener(RecyclerViewListener recyclerViewListener, int adapterPosition, RecyclerView.ViewHolder viewHolder) {
+        this.recyclerViewListener = recyclerViewListener;
         this.pos = adapterPosition;
         this.viewHolder = viewHolder;
         Log.e(OnButtonClickListener.class.getName(),""+pos);
@@ -27,12 +25,11 @@ public class OnButtonClickListener implements View.OnClickListener {
         int tag = (Integer) v.getTag();
         switch (tag){
             case 1:case 2:case 3:
-                recyclerViewHelper.onRecyclerViewIndex(tag,pos);
+                recyclerViewListener.onRecyclerViewIndex(tag, pos);
                 break;
             case 4:
-                recyclerViewHelper.onAddBookmarkClick(viewHolder);
+                recyclerViewListener.onAddBookmarkClick(viewHolder);
                 break;
-
             default:break;
         }
     }

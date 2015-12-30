@@ -1,4 +1,4 @@
-package com.example.tonyso.TrafficApp.Interface;
+package com.example.tonyso.TrafficApp.listener;
 /**
  * This interface must be implemented by activities that contain this
  * fragment to allow an interaction in this fragment to be communicated

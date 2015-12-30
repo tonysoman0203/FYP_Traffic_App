@@ -3,12 +3,12 @@ package com.example.tonyso.TrafficApp.rss;
 import android.app.ProgressDialog;
 import android.util.Log;
 
-import com.example.tonyso.TrafficApp.Interface.WeatherRefreshHandler;
-import com.example.tonyso.TrafficApp.Interface.Rss_Listener;
 import com.example.tonyso.TrafficApp.MainActivity;
-import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
-import com.example.tonyso.TrafficApp.model.Weather;
 import com.example.tonyso.TrafficApp.Singleton.ErrorDialog;
+import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
+import com.example.tonyso.TrafficApp.listener.Rss_Listener;
+import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
+import com.example.tonyso.TrafficApp.model.Weather;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,13 +21,13 @@ public class RssReader implements Rss_Listener {
     private String URL = "http://rss.weather.gov.hk/rss/";
     String CURRWEATHER_FILE_NAME = "";
     MainActivity context;
-    WeatherRefreshHandler weatherRefreshHandler;
+    WeatherRefreshListener weatherRefreshListener;
     ErrorDialog errorDialog;
     LanguageSelector languageSelector ;
 
-    public RssReader(MainActivity context, WeatherRefreshHandler weatherRefreshHandler, String fileName) {
+    public RssReader(MainActivity context, WeatherRefreshListener weatherRefreshListener, String fileName) {
         this.context = context;
-        this.weatherRefreshHandler = weatherRefreshHandler;
+        this.weatherRefreshListener = weatherRefreshListener;
         this.CURRWEATHER_FILE_NAME = fileName;
         this.URL = URL.concat(CURRWEATHER_FILE_NAME);
         this.languageSelector = LanguageSelector.getInstance(this.context);
@@ -57,8 +57,8 @@ public class RssReader implements Rss_Listener {
         context.rss_Handler.post(new Runnable() {
             public void run() {
                 List<Weather>weathers = weatherList;
-                weatherRefreshHandler.onRefreshWeather(weathers.get(0).getDegree());
-                weatherRefreshHandler.onRefreshIcon(weathers.get(0).getWeatherIcon());
+                weatherRefreshListener.onRefreshWeather(weathers.get(0).getDegree());
+                weatherRefreshListener.onRefreshIcon(weathers.get(0).getWeatherIcon());
                 return;
             }
         });

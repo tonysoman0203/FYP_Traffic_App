@@ -26,6 +26,7 @@ public class InfoDetailActivity extends AppCompatActivity {
     //Constant
     public static final String TAG = InfoDetailActivity.class.getName();
     public static final String KEY = "key";
+    public static final String ADD_ROUTE_TYPE = "Add_ROUTE";
     //UI Components.....
     Toolbar toolbar;
     FloatingActionButton fab;

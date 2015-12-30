@@ -2,13 +2,11 @@ package com.example.tonyso.TrafficApp.rss;
 
 import android.content.Context;
 import android.content.res.XmlResourceParser;
-import android.util.Log;
 
-import com.example.tonyso.TrafficApp.Interface.Rss_Listener;
 import com.example.tonyso.TrafficApp.R;
+import com.example.tonyso.TrafficApp.listener.Rss_Listener;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.utility.Convertor;
-import com.google.android.gms.maps.model.LatLng;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
