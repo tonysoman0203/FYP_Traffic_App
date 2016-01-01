@@ -1,48 +1,43 @@
 package com.example.tonyso.TrafficApp;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
+import com.example.tonyso.TrafficApp.adapter.HistoryAdapter;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
-import com.example.tonyso.TrafficApp.listener.OnFragmentInteractionListener;
+import com.example.tonyso.TrafficApp.model.TimedBookMark;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Large screen devices (such as tablets) are supported by replacing the ListView
- * with a GridView.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
- * interface.
- */
-public class Tab_HistoryFragment extends BaseFragment implements
-        AbsListView.OnItemClickListener{
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
-    private OnFragmentInteractionListener mListener;
+import jp.wasabeef.recyclerview.animators.FadeInRightAnimator;
 
-    /**
-     * The fragment's ListView/GridView.
-     */
-    private AbsListView mListView;
+public class Tab_HistoryFragment extends BaseFragment implements Observer {
 
-    /**
-     * The Adapter which will be used to populate the ListView/GridView with
-     * Views.
-     */
-    private ListAdapter mAdapter;
+    private RecyclerView mRecyclerHistoryView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private List<TimedBookMark> historyList = new ArrayList<>();
+    private HistoryAdapter historyAdapter;
+    private View view;
+    private TextView emptyView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
     public Tab_HistoryFragment() {
+
     }
 
     public static Tab_HistoryFragment newInstance(String title, int indicatorColor, int dividerColor,int icon){
@@ -57,48 +52,70 @@ public class Tab_HistoryFragment extends BaseFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // TODO: Change Adapter to display your content
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_bookmarkhistory_list, container, false);
-
-        // Set the adapter
-        mListView = (AbsListView) view.findViewById(android.R.id.list);
-        ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
-
-        // Set OnItemClickListener so we can be notified on item clicks
-        mListView.setOnItemClickListener(this);
-
+        View view = inflater.inflate(R.layout.fragment_tab_history_list, container, false);
+        emptyView = (TextView) view.findViewById(R.id.emptyText);
+        initializeUIView(view);
+        setHistoryAdapter();
         return view;
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+    private void setHistoryAdapter() {
+        historyList = getBookMarkHistoryList();
+        if (historyList.size() <= 0) {
+            mRecyclerHistoryView.setVisibility(View.GONE);
+            setEmptyText("There is no History....");
+        } else {
+            emptyView.setVisibility(View.GONE);
+            mRecyclerHistoryView.setVisibility(View.VISIBLE);
+            historyAdapter = new HistoryAdapter(getContext(), historyList);
+            mRecyclerHistoryView.setAdapter(historyAdapter);
         }
     }
+
+    private void initializeUIView(View view) {
+        mRecyclerHistoryView = (RecyclerView) view.findViewById(R.id.historylist);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.SwipeRefresh_History_Layout);
+        mSwipeRefreshLayout.setColorSchemeColors(android.R.color.holo_red_light, android.R.color.holo_blue_bright, android.R.color.holo_green_light, android.R.color.holo_orange_light);
+        mSwipeRefreshLayout.setOnRefreshListener(mOnRefreshListener);
+        mRecyclerHistoryView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        mRecyclerHistoryView.setItemAnimator(new FadeInRightAnimator());
+    }
+
+    private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Snackbar.make(getView(), "I am Refreshing...Wait for while...", Snackbar.LENGTH_LONG).show();
+                }
+            }, 3000);
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
+    };
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            mListener.onFragmentInteraction("The ID is" +String.valueOf(id));
-        }
+    /**
+     * Get History List From SQLiteDatabase
+     * if History LIST 's size > 0
+     *
+     * @return bookkmark History List with no item and size == 0
+     */
+    private List<TimedBookMark> getBookMarkHistoryList() {
+        SQLiteHelper sqLiteHelper = new SQLiteHelper(this.getContext());
+        if (sqLiteHelper.getBookmarkHistory().size() > 0) {
+            return sqLiteHelper.getBookmarkHistory();
+        } else
+            return new ArrayList<>();
     }
 
     /**
@@ -107,13 +124,13 @@ public class Tab_HistoryFragment extends BaseFragment implements
      * to supply the text it should use.
      */
     public void setEmptyText(CharSequence emptyText) {
-        View emptyView = mListView.getEmptyView();
-
-        if (emptyView instanceof TextView) {
+        if (emptyView != null) {
             ((TextView) emptyView).setText(emptyText);
         }
     }
 
-
-
+    @Override
+    public void update(Observable observable, Object data) {
+        setHistoryAdapter();
+    }
 }

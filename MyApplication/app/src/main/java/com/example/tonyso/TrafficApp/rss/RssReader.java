@@ -31,7 +31,7 @@ public class RssReader implements Rss_Listener {
         this.CURRWEATHER_FILE_NAME = fileName;
         this.URL = URL.concat(CURRWEATHER_FILE_NAME);
         this.languageSelector = LanguageSelector.getInstance(this.context);
-        errorDialog = ErrorDialog.getInstance(this.context);
+        this.errorDialog = ErrorDialog.getInstance(this.context);
         Log.e(getClass().getSimpleName(), this.URL);
     }
 

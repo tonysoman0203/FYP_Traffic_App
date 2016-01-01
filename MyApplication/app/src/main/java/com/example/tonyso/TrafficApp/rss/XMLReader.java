@@ -5,7 +5,6 @@ import android.content.res.XmlResourceParser;
 import android.util.Log;
 
 import com.example.tonyso.TrafficApp.R;
-import com.example.tonyso.TrafficApp.listener.Rss_Listener;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.utility.Convertor;
 
@@ -21,9 +20,8 @@ import java.util.List;
  */
 public class XMLReader {
     Context context;
-
     private static final String TAG = XMLReader.class.getSimpleName();
-    private static final String imageList ="image-list";
+    private static final String IMAGE_LIST_TITLEt = "image-list";
     private static final String image ="image";
     private static final String IMAGE_KEY ="key";
     private static final String IMAGE_ENG_REGION = "english-region";
@@ -31,14 +29,7 @@ public class XMLReader {
     private static final String IMAGE_ENG_DESC = "english-description";
     private static final String IMAGE_CHI_DESC = "chinese-description";
     private static final String IMAGE_COORDINATE = "coordinate";
-
-    private Rss_Listener xmlFetchInterface;
     private static final String ns = null;
-
-    private XMLReader(Context context, Rss_Listener xmlFetchInterface) {
-        this.context = context;
-        this.xmlFetchInterface = xmlFetchInterface;
-    }
 
     public static XMLReader reader = null;
 
@@ -65,13 +56,6 @@ public class XMLReader {
                 "context=" + context +
                 '}';
     }
-
-
-
-    public void feedImageXml(){
-        xmlFetchInterface.ParsedInfo(fetchImageXML());
-    }
-
 
     public List<RouteCCTV> getImageXML(){
         return fetchImageXML();

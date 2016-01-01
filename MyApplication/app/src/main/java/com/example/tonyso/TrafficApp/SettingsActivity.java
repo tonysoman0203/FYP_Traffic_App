@@ -23,8 +23,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
-import com.example.tonyso.TrafficApp.utility.encryption.ShareStorage;
-import com.example.tonyso.TrafficApp.utility.encryption.StoreObject;
+import com.example.tonyso.TrafficApp.utility.ShareStorage;
+import com.example.tonyso.TrafficApp.utility.StoreObject;
 
 import java.util.Locale;
 

@@ -100,7 +100,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
                     android:layout_toEndOf="@+id/bkTime"
-                    >
+                    android:id="@+id/timerContainer">
 
                     <Space
                         android:layout_width="10dp"

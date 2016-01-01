@@ -25,4 +25,22 @@ public class MyApplication extends Application{
     public static final String WIFI = "WIFI";
     public List<RouteCCTV> list ;
 
+    BookmarkTimeStatusObserver timeStatusObserver;
+
+    public MyApplication() {
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        timeStatusObserver = new BookmarkTimeStatusObserver();
+    }
+
+    public BookmarkTimeStatusObserver getTimeStatusObserver() {
+        return timeStatusObserver;
+    }
+
+    public void setTimeStatusObserver(BookmarkTimeStatusObserver timeStatusObserver) {
+        this.timeStatusObserver = timeStatusObserver;
+    }
 }

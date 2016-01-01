@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.example.tonyso.TrafficApp.MyApplication;
-import com.example.tonyso.TrafficApp.utility.encryption.ShareStorage;
+import com.example.tonyso.TrafficApp.utility.ShareStorage;
 
 /**
  * Created by SMK338 on 03/08/2015.

@@ -35,8 +35,6 @@ public class RssHandler extends DefaultHandler {
     private final String item = "item";
     private String desc = "";
 
-    //private final String LANG = "language";
-
     private String tagName ="";
 
     private Rss_Listener listener;

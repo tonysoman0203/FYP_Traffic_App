@@ -23,16 +23,11 @@ import java.util.Locale;
  */
 public class CommonUtils {
 
-    Context context;
     static Boolean isConnectingNetwork = false;
     static Boolean isConnectingMobileNetwork = false;
     static Boolean isConnectingWifiNetwork = false;
 
     static NetworkInfo.State isWIFINetwork , isMobileNetwork;
-
-    public CommonUtils(Context context){
-        this.context = context;
-    }
 
     public static String initDate(Locale locale) {
         Calendar c = Calendar.getInstance();

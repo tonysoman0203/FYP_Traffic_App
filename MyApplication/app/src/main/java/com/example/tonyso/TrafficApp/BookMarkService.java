@@ -20,7 +20,8 @@ public class BookMarkService extends Service {
 
     static final public String CURR_TIME_RESULT = "com.example.tonyso.myapplication.BookmarkService.RESULT";
     static final public String MESSAGE = "com.example.tonyso.myapplication.BookmarkService.MSG";
-    static final public String POS = "com.example.tonyso.myapplication.BookmarkService.POSITION";
+    static final public String CHECK_SUM_WITH_DATA = "com.example.tonyso.myapplication.BookmarkService.CHECK_SUM";
+    static final public int CHECK_SUM_WITHOUT_DATA = -1;
     Timer timer;
 
     public BookMarkService() {
@@ -103,7 +104,7 @@ public class BookMarkService extends Service {
             Intent intent = new Intent(CURR_TIME_RESULT);
             if (list.size() > 0) {
                 intent.putExtra(MESSAGE, list);
-                intent.putExtra(POS, 0);
+                intent.putExtra(CHECK_SUM_WITH_DATA, 0);
             }
             localBroadcastManager.sendBroadcast(intent);
         }

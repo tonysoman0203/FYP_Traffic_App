@@ -16,6 +16,10 @@ public class TimedBookMark implements Serializable {
     private  boolean isTimeOver;
     private double[] latLngs = null;
 
+    public void setIsTimeOver(boolean isTimeOver) {
+        this.isTimeOver = isTimeOver;
+    }
+
     public double[] getLatLngs() {
         return latLngs;
     }

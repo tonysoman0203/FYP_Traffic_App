@@ -10,6 +10,7 @@ import android.util.Log;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by TonySoMan on 25/6/2015.
@@ -141,7 +142,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             ArrayList<TimedBookMark> bookMark_List = new ArrayList<>();
             try {
         // Select All Query
-                String selectQuery = "SELECT * FROM " + BOOKMARK_TABLE_NAME;
+                String selectQuery = "SELECT * FROM " + BOOKMARK_TABLE_NAME + " where " + KEY_TIMEOVER + "=0";
 
                 SQLiteDatabase db = getWritableDatabase();
                 Cursor cursor = db.rawQuery(selectQuery, null);
@@ -158,7 +159,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                                 .setRouteImageKey(cursor.getString(6))
                                 .setDistrict(new String[]{cursor.getString(7), cursor.getString(8)})
                                 .setLatLngs(new double[]{Double.parseDouble(cursor.getString(9)), Double.parseDouble(cursor.getString(10))})
-                                .setIsTimeOver((cursor.getInt(11) == 1) ? true : false);
+                                .setIsTimeOver(false);
                         bookMark_List.add(builder.build());
                     } while (cursor.moveToNext());
                 }
@@ -196,6 +197,41 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     public long delete_bookmark(TimedBookMark timedBookMark) {
         SQLiteDatabase db = getWritableDatabase();
         long success = db.delete(BOOKMARK_TABLE_NAME, KEY_ID + "=" + timedBookMark.get_id(), null);
+        db.close();
+        return success;
+    }
+
+    public List<TimedBookMark> getBookmarkHistory() {
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        String sql = "Select * from " + BOOKMARK_TABLE_NAME + " where " + KEY_TIMEOVER + "=1";
+        Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
+        List<TimedBookMark> bookMarks = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            do {
+                TimedBookMark.Builder builder = new TimedBookMark.Builder();
+                builder.set_id(cursor.getInt(0))
+                        .setBkRouteName(new String[]{cursor.getString(1), cursor.getString(2)})
+                        .setTimestamp(cursor.getString(3))
+                        .setTargetTime(cursor.getString(4))
+                        .setRemainTime(Integer.parseInt((cursor.getString(5))))
+                        .setRouteImageKey(cursor.getString(6))
+                        .setDistrict(new String[]{cursor.getString(7), cursor.getString(8)})
+                        .setLatLngs(new double[]{Double.parseDouble(cursor.getString(9)), Double.parseDouble(cursor.getString(10))})
+                        .setIsTimeOver(true);
+                bookMarks.add(builder.build());
+            } while (cursor.moveToNext());
+        }
+        cursor.moveToNext();
+        sqLiteDatabase.close();
+        return bookMarks;
+    }
+
+    public long onUpdateTimeStatus(TimedBookMark timedBookMarks) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues cv = new ContentValues();
+        cv.put(KEY_TIMEOVER, (timedBookMarks.isTimeOver()) ? 1 : 0);
+        long success = db.update(BOOKMARK_TABLE_NAME, cv, "_id=" + timedBookMarks.get_id(), null);
         db.close();
         return success;
     }

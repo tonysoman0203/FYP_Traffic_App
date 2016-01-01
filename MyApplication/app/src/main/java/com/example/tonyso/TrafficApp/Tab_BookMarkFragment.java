@@ -28,6 +28,8 @@ import com.example.tonyso.TrafficApp.listener.OnRemainingTimeListener;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 import jp.wasabeef.recyclerview.animators.FadeInRightAnimator;
 
@@ -36,7 +38,7 @@ import jp.wasabeef.recyclerview.animators.FadeInRightAnimator;
  * A simple {@link Fragment} subclass.
  */
 public class Tab_BookMarkFragment extends BaseFragment
-        implements OnItemClickListener {
+        implements OnItemClickListener, Observer {
 
     private static final String TAG = Tab_BookMarkFragment.class.getName();
     RecyclerView recyclerView;
@@ -57,10 +59,21 @@ public class Tab_BookMarkFragment extends BaseFragment
     public static final int EDIT_BOOKMARK_RESULT_CODE = 2001;
     public static final String TYPE_EDIT_BOOKMARK = "Edit_bookmark_action";
 
+    BookmarkTimeStatusObserver bookmarkTimeStatusObserver;
+    MyApplication myApplication;
+
+    boolean isObserved = false;
+
     public Tab_BookMarkFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        myApplication = (MyApplication) getActivity().getApplication();
+        myApplication.getTimeStatusObserver().addObserver(this);
+    }
 
     public static Tab_BookMarkFragment newInstance(String title,int indicatorColor,int dividerColor,int icon){
         Tab_BookMarkFragment f = new Tab_BookMarkFragment();
@@ -138,20 +151,40 @@ public class Tab_BookMarkFragment extends BaseFragment
     }
 
     private void setBroadcastReceiver() {
-        broadcastReceiver = mbroadcastReceiver;
+        broadcastReceiver = mBroadcastReceiver;
     }
 
-    private BroadcastReceiver mbroadcastReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.e(TAG, "Receive Broadcast:CheckSum= " + intent.getIntExtra(BookMarkService.POS, -1));
+            Log.e(TAG, "Receive Broadcast:CheckSum= " + intent.getIntExtra(BookMarkService.CHECK_SUM_WITH_DATA, BookMarkService.CHECK_SUM_WITHOUT_DATA));
             if (intent.getSerializableExtra(BookMarkService.MESSAGE) != null) {
                 ArrayList<TimedBookMark> arrayList = (ArrayList<TimedBookMark>) intent.getSerializableExtra(BookMarkService.MESSAGE);
-                sqLiteHelper.onUpdateBookMarkRemainingTime(arrayList);
-                onRemainingTimeListener.onRemainingTimeChanged(arrayList);
+                for (TimedBookMark t : arrayList) {
+                    if (t.getRemainTime() <= 0) {
+                        t.setIsTimeOver(true);
+                        sqLiteHelper.onUpdateTimeStatus(t);
+                        sqLiteHelper.onUpdateBookMarkRemainingTime(arrayList);
+                        onRemainingTimeListener.onRemainingTimeChanged(arrayList);
+                        arrayList.remove(t);
+                        isObserved = true;
+                    } else {
+                        isObserved = false;
+                        sqLiteHelper.onUpdateBookMarkRemainingTime(arrayList);
+                        onRemainingTimeListener.onRemainingTimeChanged(arrayList);
+                    }
+                    break;
+                }
             }
         }
     };
+
+    @Override
+    public void update(Observable observable, Object data) {
+        if (isObserved) {
+            bookmarkTimeStatusObserver.setIsTimeOverChanged(isObserved);
+        }
+    }
 
     private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
@@ -193,7 +226,7 @@ public class Tab_BookMarkFragment extends BaseFragment
                 getActivity().stopService(bookmarkService);
                 getActivity().startService(bookmarkService);
             }
-        }, 1000);
+        }, 2000);
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
@@ -235,5 +268,4 @@ public class Tab_BookMarkFragment extends BaseFragment
         }
         return super.onContextItemSelected(item);
     }
-
 }

@@ -33,7 +33,6 @@ import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
-import com.example.tonyso.TrafficApp.listener.OnFragmentInteractionListener;
 import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
 import com.example.tonyso.TrafficApp.location.GPSLocationFinder;
 import com.example.tonyso.TrafficApp.rss.RssReader;
@@ -53,7 +52,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, WeatherRefreshListener, OnFragmentInteractionListener {
+        GoogleApiClient.OnConnectionFailedListener, WeatherRefreshListener {
 
     LanguageSelector languageSelector;
 
@@ -88,7 +87,7 @@ public class MainActivity extends BaseActivity
 
     BroadcastReceiver broadcastReceiver;
 
-    Intent broadCastTimerIntent,ImageDownloadService;
+    Intent broadCastTimerIntent;
     CoordinatorLayout coordinatorLayout;
     //TabLayout tabLayout;
 
@@ -434,18 +433,13 @@ public class MainActivity extends BaseActivity
     @Override
     public void onRefreshIcon(String URL) {
         CircleImageView imageView = (CircleImageView)headerLayout.findViewById(R.id.bgHeader);
-        imageLoader.displayImage(URL,imageView);
+        imageLoader.displayImage(URL, imageView);
     }
 
     @Override
     public void onRefreshLocation(String address) {
         TextView textView = (TextView)navigationView.findViewById(R.id.txtLocation);
         textView.setText(address);
-    }
-
-    @Override
-    public void onFragmentInteraction(String id) {
-        Snackbar.make(coordinatorLayout,"Hello Fragment id ="+id,Snackbar.LENGTH_LONG).show();
     }
 
     public static class ErrorDialogFragment extends DialogFragment {
