@@ -53,6 +53,7 @@ public class RssReader implements Rss_Listener {
         th.start();
     }
 
+    @Override
     public void ParsedInfo(final List weatherList) {
         context.rss_Handler.post(new Runnable() {
             public void run() {

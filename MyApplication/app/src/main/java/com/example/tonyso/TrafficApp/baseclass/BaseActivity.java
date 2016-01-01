@@ -44,7 +44,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public List<RouteCCTV> loadCache() {
-        XMLReader xmlReader = new XMLReader(this);
+        XMLReader xmlReader = XMLReader.getInstance(this);
         return xmlReader.getImageXML();
     }
 

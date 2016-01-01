@@ -2,6 +2,7 @@ package com.example.tonyso.TrafficApp.rss;
 
 import android.content.Context;
 import android.content.res.XmlResourceParser;
+import android.util.Log;
 
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.listener.Rss_Listener;
@@ -34,14 +35,38 @@ public class XMLReader {
     private Rss_Listener xmlFetchInterface;
     private static final String ns = null;
 
-    public XMLReader(Context context,Rss_Listener xmlFetchInterface) {
+    private XMLReader(Context context, Rss_Listener xmlFetchInterface) {
         this.context = context;
         this.xmlFetchInterface = xmlFetchInterface;
     }
 
-    public XMLReader(Context context) {
+    public static XMLReader reader = null;
+
+    private XMLReader(Context context) {
         this.context = context;
     }
+
+    public static XMLReader getInstance(Context context) {
+        if (reader == null) {
+            synchronized (XMLReader.class) {
+                if (reader == null) {
+                    reader = new XMLReader(context);
+                    return reader;
+                }
+            }
+        }
+        Log.d(TAG, "Using Same Instance of" + reader.context);
+        return reader;
+    }
+
+    @Override
+    public String toString() {
+        return "XMLReader {" +
+                "context=" + context +
+                '}';
+    }
+
+
 
     public void feedImageXml(){
         xmlFetchInterface.ParsedInfo(fetchImageXML());
