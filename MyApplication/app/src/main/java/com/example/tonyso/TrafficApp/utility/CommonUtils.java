@@ -51,6 +51,11 @@ public class CommonUtils {
         return -1;
     }
 
+    public static Date getCurrentDate() {
+        Calendar c = Calendar.getInstance();
+        return c.getTime();
+    }
+
     public static Timestamp getTimestamp(String time){
         Timestamp timestamp = null;
         try{

@@ -38,10 +38,6 @@ public class GPSLocationFinder implements LocationListener {
         errorDialog = ErrorDialog.getInstance(context);
     }
 
-    public GPSLocationFinder(Context context) {
-        this.context = (MainActivity) context;
-    }
-
     public void convertLatLongToAddress(Location location, Locale locale) {
        //location = mLocationManager.getLastKnownLocation(locationprovider);
         try {

@@ -143,6 +143,26 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         notifyItemRemoved(pos);
     }
 
+    public void removeSelectedItem() {
+        sortedList.beginBatchedUpdates();
+        SQLiteHelper sqLiteHelper = new SQLiteHelper(frag.getContext());
+        try {
+            for (int i = 0; i < sortedList.size(); i++) {
+                if (sortedList.get(i).getRemainTime() <= 0) {
+                    long success = sqLiteHelper.delete_bookmark(sortedList.get(i));
+                    if (success != -1) {
+                        sortedList.removeItemAt(i);
+                        notifyItemRemoved(i);
+                    }
+
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+        sortedList.endBatchedUpdates();
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
             View.OnCreateContextMenuListener
     {

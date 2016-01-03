@@ -36,6 +36,7 @@ import java.util.GregorianCalendar;
  */
 public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements RecyclerViewListener {
 
+
     private InfoDetailActivity context;
     private int size;
     private CoordinatorLayout coordinatorLayout;
@@ -53,9 +54,10 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private static final int TYPE_BASE = 0;
     private static final int TYPE_NEAR_HEADER = 1;
     private static final int TYPE_BOOKMAKR_HEADER = 3;
+    private static final int TYPE_BOOKMARK_ITEM = 4;
     private static final int TYPE_SHARE_HEADER = 5;
     private static final int TYPE_NEAR_ITEM = 2;
-    private static final int TYPE_BOOKMARK_ITEM = 4;
+
     private static final int VERIFIY_INPUT_SAME_VALUE = 100001;
     private static final int VERIFIY_INPUT_END_IS_BIGGER_THAN_FRONT_VALUE = 100002;
     private static final int VERIFIY_INPUT_FRONT_IS_BIGGER_THAN_END_VALUE = 100003;
@@ -252,6 +254,19 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (type.equals(Tab_BookMarkFragment.TYPE_EDIT_BOOKMARK)) {
             ((AddBookMarkViewHolder) holder).startTimeWrapper.getEditText().setText(timedBookMark.getStartTime());
             ((AddBookMarkViewHolder) holder).TargetTimeWrapper.getEditText().setText(timedBookMark.getTargetTime());
+        } else if (type.equals(InfoDetailActivity.VIEW_HISTORY_RECORD)) {
+            ((AddBookMarkViewHolder) holder).startTimeWrapper.getEditText().setText(timedBookMark.getStartTime());
+            ((AddBookMarkViewHolder) holder).TargetTimeWrapper.getEditText().setText(timedBookMark.getTargetTime());
+
+            ((AddBookMarkViewHolder) holder).regionWrapper.getEditText().setEnabled(false);
+            ((AddBookMarkViewHolder) holder).routeWrapper.getEditText().setEnabled(false);
+
+            ((AddBookMarkViewHolder) holder).startTimeWrapper.getEditText().setEnabled(false);
+            ((AddBookMarkViewHolder) holder).TargetTimeWrapper.getEditText().setEnabled(false);
+
+            ((AddBookMarkViewHolder) holder).btnAdd.setVisibility(View.GONE);
+            ((AddBookMarkViewHolder) holder).btnReset.setVisibility(View.GONE);
+
         }
 
         startTimeListener = new OnSetTimeListener(((AddBookMarkViewHolder) holder).startTimeWrapper.getEditText(), context);

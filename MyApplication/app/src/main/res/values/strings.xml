@@ -106,7 +106,7 @@
     <string name="title_activity_traffic_info_detail_scrolling">InfoDetailActivity</string>
     <string name="edit_bookmark">Edit Bookmark</string>
     <string name="bookmark_delete">Delete Bookmark</string>
-
+    <string name="history_record_delete">Delete History Record </string>
     <!-- TODO: Route Detail Text END-->
 
     <!-- TODO: Bookmark Text Here -->

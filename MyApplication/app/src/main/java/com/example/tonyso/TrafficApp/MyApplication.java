@@ -19,9 +19,6 @@ public class MyApplication extends Application{
     public static final String Language_Locale = "Locale";
     public static final String Language_UserPref = "UserPref";
 
-    public static final String fileName_zh = "CurrentWeather_uc.xml";
-    public static final String fileName = "CurrentWeather.xml";
-
     public static final String WIFI = "WIFI";
     public List<RouteCCTV> list ;
 

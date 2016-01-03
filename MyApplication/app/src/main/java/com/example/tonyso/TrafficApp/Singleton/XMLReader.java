@@ -1,4 +1,4 @@
-package com.example.tonyso.TrafficApp.rss;
+package com.example.tonyso.TrafficApp.Singleton;
 
 import android.content.Context;
 import android.content.res.XmlResourceParser;

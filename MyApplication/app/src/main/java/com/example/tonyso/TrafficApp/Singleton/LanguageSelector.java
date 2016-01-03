@@ -27,7 +27,7 @@ public class LanguageSelector {
                 }
             }
         }
-        Log.d(LanguageSelector.class.getName(), "Using Same Instance of" + languageSelector);
+        Log.d(LanguageSelector.class.getName(), "Using Same Instance of " + languageSelector);
         return languageSelector;
     }
 

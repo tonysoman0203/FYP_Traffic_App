@@ -119,7 +119,6 @@ public class Tab_BookMarkFragment extends BaseFragment
     @Override
     public void onPause() {
         super.onPause();
-//        if (bookmarkService != null)
         getActivity().stopService(bookmarkService);
 
     }
@@ -161,13 +160,15 @@ public class Tab_BookMarkFragment extends BaseFragment
             if (intent.getSerializableExtra(BookMarkService.MESSAGE) != null) {
                 ArrayList<TimedBookMark> arrayList = (ArrayList<TimedBookMark>) intent.getSerializableExtra(BookMarkService.MESSAGE);
                 for (TimedBookMark t : arrayList) {
-                    if (t.getRemainTime() <= 0) {
+                    if (t.getRemainTime() == 0) {
                         t.setIsTimeOver(true);
                         sqLiteHelper.onUpdateTimeStatus(t);
                         sqLiteHelper.onUpdateBookMarkRemainingTime(arrayList);
                         onRemainingTimeListener.onRemainingTimeChanged(arrayList);
                         arrayList.remove(t);
+                        bookMarkAdapter.removeSelectedItem();
                         isObserved = true;
+                        break;
                     } else {
                         isObserved = false;
                         sqLiteHelper.onUpdateBookMarkRemainingTime(arrayList);

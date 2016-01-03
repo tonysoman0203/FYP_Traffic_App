@@ -6,8 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
+import com.example.tonyso.TrafficApp.Singleton.XMLReader;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
-import com.example.tonyso.TrafficApp.rss.XMLReader;
 import com.example.tonyso.TrafficApp.utility.ShareStorage;
 import com.example.tonyso.TrafficApp.utility.StoreObject;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;

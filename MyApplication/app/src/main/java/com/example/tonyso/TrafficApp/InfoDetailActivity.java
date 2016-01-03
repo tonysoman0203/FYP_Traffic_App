@@ -10,11 +10,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
+import com.example.tonyso.TrafficApp.adapter.HistoryAdapter;
 import com.example.tonyso.TrafficApp.adapter.InfoDetailAdapter;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
@@ -27,6 +29,8 @@ public class InfoDetailActivity extends AppCompatActivity {
     public static final String TAG = InfoDetailActivity.class.getName();
     public static final String KEY = "key";
     public static final String ADD_ROUTE_TYPE = "Add_ROUTE";
+    public static final String VIEW_HISTORY_RECORD = "View History";
+
     //UI Components.....
     Toolbar toolbar;
     FloatingActionButton fab;
@@ -47,7 +51,7 @@ public class InfoDetailActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     private static final int RECYCLER_VIEW_SIZE = 3;
     InfoDetailAdapter infoDetailAdapter;
-    CoordinatorLayout coordinatorLayout;
+    public CoordinatorLayout coordinatorLayout;
     SQLiteHelper sqLiteHelper;
     TimedBookMark bookMark;
     String type = "Add_ROUTE";
@@ -107,19 +111,15 @@ public class InfoDetailActivity extends AppCompatActivity {
         languageSelector = LanguageSelector.getInstance(this);
         sqLiteHelper = new SQLiteHelper(this);
     }
-    private void setImageHeader() {
-        if (routeImg == null) {
-            ImageLoader.getInstance().displayImage("http://tdcctv.data.one.gov.hk/" + route.getRef_key() + ".JPG", imageRoute);
-        }
-        imageRoute.setImageBitmap(routeImg);
 
-//        Palette.from(routeImg).generate(new Palette.PaletteAsyncListener() {
-//            @Override
-//            public void onGenerated(Palette palette) {
-//                int mutedColor = palette.getMutedColor(getResources().getColor(R.color.colorPrimary));
-//                collapsingToolbarLayout.setContentScrimColor(mutedColor);
-//            }
-//        });
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+    private void setImageHeader() {
+            ImageLoader.getInstance().displayImage("http://tdcctv.data.one.gov.hk/" + route.getRef_key() + ".JPG", imageRoute);
     }
 
     /**
@@ -128,19 +128,41 @@ public class InfoDetailActivity extends AppCompatActivity {
     private void getDataFromIntent(){
         intent = getIntent();
         String intent_type = intent.getStringExtra("type");
-        if (intent_type.equals(Tab_BookMarkFragment.TYPE_EDIT_BOOKMARK)) {
-            type = intent_type;
-            bookMark = sqLiteHelper.getBookmark(intent.getIntExtra(SQLiteHelper.getKeyId(), -1));
-            route = new RouteCCTV.Builder()
-                    .setId(bookMark.get_id())
-                    .setDescription(bookMark.getBkRouteName())
-                    .setRegion(bookMark.getRegions())
-                    .setKey(bookMark.getRouteImageKey())
-                    .setLatLngs(bookMark.getLatLngs())
-                    .build();
+        if (intent_type != null) {
+            switch (intent_type) {
+                case Tab_BookMarkFragment.TYPE_EDIT_BOOKMARK:
+                    type = intent_type;
+                    bookMark = sqLiteHelper.getBookmark(intent.getIntExtra(SQLiteHelper.getKeyId(), -1));
+                    if (bookMark != null) {
+                        route = new RouteCCTV.Builder()
+                                .setId(bookMark.get_id())
+                                .setDescription(bookMark.getBkRouteName())
+                                .setRegion(bookMark.getRegions())
+                                .setKey(bookMark.getRouteImageKey())
+                                .setLatLngs(bookMark.getLatLngs())
+                                .build();
+                    }
+                    break;
+                case VIEW_HISTORY_RECORD:
+                    type = intent_type;
+                    bookMark = sqLiteHelper.getBookmark(intent.getIntExtra(HistoryAdapter.INTENT_TAG_HISTORY_ITEM, -1));
+                    if (bookMark != null) {
+                        route = new RouteCCTV.Builder()
+                                .setId(bookMark.get_id())
+                                .setDescription(bookMark.getBkRouteName())
+                                .setRegion(bookMark.getRegions())
+                                .setKey(bookMark.getRouteImageKey())
+                                .setLatLngs(bookMark.getLatLngs())
+                                .build();
+                    }
+                    break;
+                default:
+                    imageKey = intent.getStringExtra(KEY);
+                    route = (RouteCCTV) intent.getSerializableExtra(imageKey);
+                    break;
+            }
         } else {
-            imageKey = intent.getStringExtra(KEY);
-            route = (RouteCCTV) intent.getSerializableExtra(imageKey);
+            Log.e(TAG, "Intent is null Exception....");
         }
     }
 

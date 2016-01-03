@@ -1,4 +1,4 @@
-package com.example.tonyso.TrafficApp.rss;
+package com.example.tonyso.TrafficApp.listener;
 
 //import java.io.BufferedReader;
 
@@ -10,7 +10,6 @@ import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.Singleton.ErrorDialog;
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
-import com.example.tonyso.TrafficApp.listener.Rss_Listener;
 import com.example.tonyso.TrafficApp.model.Weather;
 
 import org.xml.sax.helpers.DefaultHandler;
@@ -60,7 +59,7 @@ public class RssHandler extends DefaultHandler {
         this.listener = listener;
     }
 
-    protected void setupHTTPConnection(URL myURL){
+    public void setupHTTPConnection(URL myURL) {
         try {
             connection = (HttpURLConnection) myURL.openConnection();
             connection.setReadTimeout(10000);
@@ -87,7 +86,7 @@ public class RssHandler extends DefaultHandler {
         }
     }
 
-    protected void processWeatherFeed(Context context, URL url) {
+    public void processWeatherFeed(Context context, URL url) {
         setupHTTPConnection(url);
         try {
             weathers = new ArrayList<>();

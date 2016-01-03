@@ -32,10 +32,10 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
+import com.example.tonyso.TrafficApp.Singleton.RssReader;
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
 import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
 import com.example.tonyso.TrafficApp.location.GPSLocationFinder;
-import com.example.tonyso.TrafficApp.rss.RssReader;
 import com.example.tonyso.TrafficApp.utility.CommonUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -186,11 +186,7 @@ public class MainActivity extends BaseActivity
     }
 
     private void initRSSReader(){
-        if (languageSelector.getLanguage().equals(MyApplication.Language.ZH_HANT)) {
-            rssReader = new RssReader(this, this, MyApplication.fileName_zh);
-        } else {
-            rssReader = new RssReader(this, this, MyApplication.fileName);
-        }
+        rssReader = new RssReader(this, this);
     }
 
     @Override

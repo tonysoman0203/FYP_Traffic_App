@@ -2,7 +2,7 @@ package com.example.tonyso.TrafficApp.listener;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.Context;
+import android.support.design.widget.Snackbar;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -10,7 +10,14 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
 
+import com.example.tonyso.TrafficApp.InfoDetailActivity;
+import com.example.tonyso.TrafficApp.utility.CommonUtils;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by soman on 2015/12/26.
@@ -18,15 +25,13 @@ import java.util.Calendar;
 public class OnSetTimeListener implements View.OnFocusChangeListener,
         TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
     private EditText editText;
-    private Calendar myCalendar;
-    private Context context;
+    private InfoDetailActivity context;
     public int hour , minute;
     public String date;
 
-    public OnSetTimeListener(EditText editText, Context ctx){
+    public OnSetTimeListener(EditText editText, InfoDetailActivity ctx) {
         this.editText = editText;
         this.editText.setOnFocusChangeListener(this);
-        this.myCalendar = Calendar.getInstance();
         this.context = ctx;
     }
 
@@ -35,6 +40,7 @@ public class OnSetTimeListener implements View.OnFocusChangeListener,
         // TODO Auto-generated method stub
         if(hasFocus){
             editText.setInputType(InputType.TYPE_NULL);
+            Calendar myCalendar = Calendar.getInstance();
             new DatePickerDialog(context, this,
                     myCalendar.get(Calendar.YEAR),
                     myCalendar.get(Calendar.MONTH),
@@ -47,13 +53,25 @@ public class OnSetTimeListener implements View.OnFocusChangeListener,
         // TODO Auto-generated method stub
         this.hour = hourOfDay;
         this.minute = minute;
-        this.editText.setText(String.format("%s %02d:%02d", date, hourOfDay, minute));
+        try {
+            //check Select Date >= CurrTime
+            Date selectTime = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.TRADITIONAL_CHINESE).parse(date + " " + hour + ":" + minute);
+            Date currTime = CommonUtils.getCurrentDate();
+            if (selectTime.before(currTime)) {
+                Snackbar.make(context.coordinatorLayout, "開始時間不可大於結束時間", Snackbar.LENGTH_LONG).show();
+                new TimePickerDialog(context, this, hour, minute, true).show();
+            } else
+                this.editText.setText(String.format("%s %02d:%02d", date, hourOfDay, minute));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         date = String.format("%d-%02d-%02d", year, monthOfYear + 1, dayOfMonth);
         Log.e("Date Set", date);
+        Calendar myCalendar = Calendar.getInstance();
         int hour = myCalendar.get(Calendar.HOUR_OF_DAY);
         int minute = myCalendar.get(Calendar.MINUTE);
         new TimePickerDialog(context, this, hour, minute, true).show();

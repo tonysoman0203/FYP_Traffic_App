@@ -1,12 +1,14 @@
 package com.example.tonyso.TrafficApp.adapter;
 
-import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -14,9 +16,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.tonyso.TrafficApp.InfoDetailActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
+import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
+import com.example.tonyso.TrafficApp.Tab_HistoryFragment;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -31,8 +36,9 @@ import java.util.List;
  */
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder> {
 
+    private static final String TAG = HistoryAdapter.class.getSimpleName();
     private final DisplayImageOptions imageOptions;
-    private Context context;
+    private Tab_HistoryFragment context;
     private LanguageSelector languageSelector;
     private SortedList<TimedBookMark> mSortedList;
 
@@ -41,9 +47,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
 
     private ImageLoader imageLoader;
 
-    public HistoryAdapter(Context context, List<TimedBookMark> historyList) {
+    public static final String INTENT_TAG_HISTORY_ITEM = "History Object";
+    private static final int HISTORY_VIEW_RECORD_REQUEST_CODE = 00001000;
+    private int position;
+
+    public HistoryAdapter(Tab_HistoryFragment context, List<TimedBookMark> historyList) {
         this.context = context;
-        this.languageSelector = LanguageSelector.getInstance(this.context);
+        this.languageSelector = LanguageSelector.getInstance(context.getContext());
         mSortedList = getmSortedList(historyList);
         imageLoader = ImageLoader.getInstance();
         imageOptions = new DisplayImageOptions.Builder()
@@ -100,7 +110,16 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         return sortedList;
     }
 
-    public class HistoryViewHolder extends ViewHolder implements View.OnClickListener {
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public class HistoryViewHolder extends ViewHolder implements View.OnClickListener, View.OnCreateContextMenuListener, View.OnLongClickListener {
+
 
         ImageView imageView;
         TextView time, roadName, district;
@@ -124,14 +143,50 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             timerContainer = (LinearLayout) itemView.findViewById(R.id.timerContainer);
             timerContainer.setVisibility(View.GONE);
             this.itemView.setOnClickListener(this);
+            this.itemView.setOnCreateContextMenuListener(this);
+            this.itemView.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            Log.e(HistoryAdapter.class.getName(), "OnClick at Postion " + getAdapterPosition());
+            Log.e(HistoryAdapter.class.getName(), "OnClick at Position " + getAdapterPosition());
+            Intent intent = new Intent(context.getContext(), InfoDetailActivity.class);
+            intent.putExtra(INTENT_TAG_HISTORY_ITEM, mSortedList.get(getAdapterPosition()).get_id());
+            intent.putExtra("type", InfoDetailActivity.VIEW_HISTORY_RECORD);
+            context.startActivityForResult(intent, HISTORY_VIEW_RECORD_REQUEST_CODE);
+        }
+
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            menu.add(Menu.NONE, R.id.bookmark_delete, Menu.NONE, context.getResources().getString(R.string.history_record_delete));
+            menu.add(Menu.NONE, R.id.bookmark_share, Menu.NONE, context.getResources().getString(R.string.popup_share));
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            setPosition(getAdapterPosition());
+            return false;
         }
     }
 
+    public int removeSelectedItem(Integer pos) {
+        mSortedList.beginBatchedUpdates();
+        try {
+            SQLiteHelper sqLiteHelper = new SQLiteHelper(context.getContext());
+            long success = sqLiteHelper.delete_bookmark(mSortedList.get(pos));
+            if (success != -1)
+                mSortedList.removeItemAt(pos);
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+        mSortedList.endBatchedUpdates();
+        notifyItemRemoved(pos);
+
+        int size = mSortedList.size();
+        return size;
+    }
+    
     @Override
     public HistoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tab_bookmark_recycleritem, null, false);

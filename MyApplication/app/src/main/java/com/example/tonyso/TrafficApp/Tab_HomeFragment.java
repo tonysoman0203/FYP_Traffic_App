@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.tonyso.TrafficApp.Singleton.XMLReader;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
-import com.example.tonyso.TrafficApp.rss.XMLReader;
 
 public class Tab_HomeFragment extends BaseFragment{
     // TODO: Rename parameter arguments, choose names that match

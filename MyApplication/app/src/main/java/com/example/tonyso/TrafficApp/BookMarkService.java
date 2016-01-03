@@ -49,6 +49,8 @@ public class BookMarkService extends Service {
                 timer = new Timer();
                 timer.scheduleAtFixedRate(remainTimeTask, 0, 60000);
             }
+        } else {
+            return super.onStartCommand(intent, flags, startId);
         }
         return super.onStartCommand(intent, flags, startId);
     }
