@@ -28,8 +28,6 @@ import com.example.tonyso.TrafficApp.listener.OnRemainingTimeListener;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
 
 import jp.wasabeef.recyclerview.animators.FadeInRightAnimator;
 
@@ -38,7 +36,7 @@ import jp.wasabeef.recyclerview.animators.FadeInRightAnimator;
  * A simple {@link Fragment} subclass.
  */
 public class Tab_BookMarkFragment extends BaseFragment
-        implements OnItemClickListener, Observer {
+        implements OnItemClickListener {
 
     private static final String TAG = Tab_BookMarkFragment.class.getName();
     RecyclerView recyclerView;
@@ -72,7 +70,7 @@ public class Tab_BookMarkFragment extends BaseFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         myApplication = (MyApplication) getActivity().getApplication();
-        myApplication.getTimeStatusObserver().addObserver(this);
+        bookmarkTimeStatusObserver = myApplication.getTimeStatusObserver();
     }
 
     public static Tab_BookMarkFragment newInstance(String title,int indicatorColor,int dividerColor,int icon){
@@ -119,6 +117,7 @@ public class Tab_BookMarkFragment extends BaseFragment
     @Override
     public void onPause() {
         super.onPause();
+//        if (bookmarkService != null)
         getActivity().stopService(bookmarkService);
 
     }
@@ -162,30 +161,25 @@ public class Tab_BookMarkFragment extends BaseFragment
                 for (TimedBookMark t : arrayList) {
                     if (t.getRemainTime() == 0) {
                         t.setIsTimeOver(true);
-                        sqLiteHelper.onUpdateTimeStatus(t);
+                        long success = sqLiteHelper.onUpdateTimeStatus(t);
                         sqLiteHelper.onUpdateBookMarkRemainingTime(arrayList);
                         onRemainingTimeListener.onRemainingTimeChanged(arrayList);
-                        arrayList.remove(t);
                         bookMarkAdapter.removeSelectedItem();
-                        isObserved = true;
+                        arrayList.remove(t);
+                        bookmarkTimeStatusObserver.setIsTimeOverChanged(true);
                         break;
                     } else {
-                        isObserved = false;
                         sqLiteHelper.onUpdateBookMarkRemainingTime(arrayList);
                         onRemainingTimeListener.onRemainingTimeChanged(arrayList);
                     }
-                    break;
+                }
+                if (arrayList.size() < 0) {
+                    setDatasets();
+                    LocalBroadcastManager.getInstance(context).unregisterReceiver(mBroadcastReceiver);
                 }
             }
         }
     };
-
-    @Override
-    public void update(Observable observable, Object data) {
-        if (isObserved) {
-            bookmarkTimeStatusObserver.setIsTimeOverChanged(isObserved);
-        }
-    }
 
     private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
@@ -197,6 +191,7 @@ public class Tab_BookMarkFragment extends BaseFragment
     private void setDatasets(){
         bookmarklist = getDataSets();
         int size = bookmarklist.size();
+        Log.d(TAG, "Bookmark list size is " + size);
         if (size <= 0) {
             recyclerView.setVisibility(View.GONE);
             msg.setVisibility(View.VISIBLE);
@@ -227,7 +222,7 @@ public class Tab_BookMarkFragment extends BaseFragment
                 getActivity().stopService(bookmarkService);
                 getActivity().startService(bookmarkService);
             }
-        }, 2000);
+        }, 3000);
         mSwipeRefreshLayout.setRefreshing(false);
     }
 

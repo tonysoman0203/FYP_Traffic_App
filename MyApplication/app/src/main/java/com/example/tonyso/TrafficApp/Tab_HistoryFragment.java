@@ -3,7 +3,6 @@ package com.example.tonyso.TrafficApp;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,6 +34,8 @@ public class Tab_HistoryFragment extends BaseFragment implements Observer {
     private HistoryAdapter historyAdapter;
     private View view;
     private TextView emptyView;
+    MyApplication myApplication;
+    BookmarkTimeStatusObserver bookmarkTimeStatusObserver;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -56,6 +57,9 @@ public class Tab_HistoryFragment extends BaseFragment implements Observer {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // TODO: Change Adapter to display your content
+        myApplication = (MyApplication) getActivity().getApplication();
+        myApplication.getTimeStatusObserver().addObserver(this);
+        bookmarkTimeStatusObserver = myApplication.getTimeStatusObserver();
     }
 
     @Override
@@ -69,6 +73,7 @@ public class Tab_HistoryFragment extends BaseFragment implements Observer {
 
     private void setHistoryAdapter() {
         historyList = getBookMarkHistoryList();
+        Log.d(TAG, "history LIst Size = " + historyList.size());
         if (historyList.size() <= 0) {
             setEmptyText("There is no History....");
         } else {
@@ -95,7 +100,7 @@ public class Tab_HistoryFragment extends BaseFragment implements Observer {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Snackbar.make(getView(), "I am Refreshing...Wait for while...", Snackbar.LENGTH_LONG).show();
+                    Log.e("What the Fuck", "What the fuck");
                 }
             }, 1000);
             mSwipeRefreshLayout.setRefreshing(false);
@@ -127,9 +132,7 @@ public class Tab_HistoryFragment extends BaseFragment implements Observer {
      * to supply the text it should use.
      */
     public void setEmptyText(CharSequence emptyText) {
-        if (emptyView != null) {
             emptyView.setText(emptyText);
-        }
     }
 
     @Override
@@ -160,7 +163,10 @@ public class Tab_HistoryFragment extends BaseFragment implements Observer {
 
     @Override
     public void update(Observable observable, Object data) {
-        setHistoryAdapter();
+        if (bookmarkTimeStatusObserver.isTimeOverChanged()) {
+            Log.e(TAG, "Update AR........ ");
+            setHistoryAdapter();
+        }
     }
 
 

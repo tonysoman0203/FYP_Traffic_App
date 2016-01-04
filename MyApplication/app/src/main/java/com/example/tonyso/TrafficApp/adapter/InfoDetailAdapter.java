@@ -29,6 +29,7 @@ import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 import com.example.tonyso.TrafficApp.utility.CommonUtils;
 import com.example.tonyso.TrafficApp.utility.DividerItemDecoration;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -68,6 +69,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private static final int VERIFIY_INPUT_DATE_FRONT_IS_BIGGER_THAN_END_VALUE = 100004;
 
     OnSetTimeListener startTimeListener, endTImeListener;
+    private GoogleApiClient googleApiClient;
 
     private InfoDetailAdapter(InfoDetailAdapter infoDetailAdapter) {
         this.context = infoDetailAdapter.getContext();
@@ -75,6 +77,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.coordinatorLayout = infoDetailAdapter.coordinatorLayout;
         this.route = infoDetailAdapter.route;
         this.type = infoDetailAdapter.type;
+        this.googleApiClient = infoDetailAdapter.googleApiClient;
         this.timedBookMark = infoDetailAdapter.timedBookMark;
         res = context.getResources();
         getObjectInstance();
@@ -146,6 +149,15 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void getObjectInstance() {
         languageSelector = LanguageSelector.getInstance(context);
         calendar = new GregorianCalendar();
+    }
+
+    public InfoDetailAdapter setGoogleApiClient(GoogleApiClient googleApiClient) {
+        this.googleApiClient = googleApiClient;
+        return this;
+    }
+
+    public GoogleApiClient getGoogleApiClient() {
+        return googleApiClient;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -255,7 +267,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void configNearItems(RecyclerView.ViewHolder holder, int pos) {
         RecyclerView recyclerView = ((NearPlaceViewHolder) holder).recyclerView;
         ProgressBar progressBar = ((NearPlaceViewHolder) holder).progressBar;
-        new FindNearLocationAsyncTask(this, context, recyclerView, progressBar, route.getLatLngs()).execute();
+        new FindNearLocationAsyncTask(this, context, recyclerView, progressBar, route.getLatLngs(), googleApiClient, route.getDescription()[0]).execute();
     }
 
     private void configBookmarkItem(final RecyclerView.ViewHolder holder,int p) {
@@ -415,7 +427,6 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private boolean checkInputField(RecyclerView.ViewHolder viewHolder) {
-        viewHolder = ((AddBookMarkViewHolder) viewHolder);
         if (TextUtils.isEmpty(((AddBookMarkViewHolder) viewHolder).routeWrapper.getEditText().toString())) {
             ((AddBookMarkViewHolder) viewHolder).routeWrapper.setError("Please Enter a route name...");
             return false;
@@ -440,7 +451,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        Log.e("GetRemainTime", "" + (int) ((end - start) / 60000));
+        Log.e(TAG + " GetRemainTime Method ", "" + (int) ((end - start) / 60000));
         return (int) ((end - start) / 60000);
     }
 

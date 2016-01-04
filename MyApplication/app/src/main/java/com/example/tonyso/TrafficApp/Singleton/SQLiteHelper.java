@@ -202,10 +202,10 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     }
 
     public List<TimedBookMark> getBookmarkHistory() {
-        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
+        List<TimedBookMark> bookMarks = new ArrayList<>();
         String sql = "Select * from " + BOOKMARK_TABLE_NAME + " where " + KEY_TIMEOVER + "=1";
         Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
-        List<TimedBookMark> bookMarks = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
                 TimedBookMark.Builder builder = new TimedBookMark.Builder();

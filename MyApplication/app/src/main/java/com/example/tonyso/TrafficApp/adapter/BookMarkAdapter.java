@@ -67,7 +67,6 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
                            Tab_BookMarkFragment tab_bookMarkFragment) {
         myDatasets = dataSets;
         addDatatoSortedList(myDatasets);
-
         this.frag = tab_bookMarkFragment;
         setOnItemClickListener(frag);
         imageLoader = ImageLoader.getInstance();
@@ -145,16 +144,11 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
 
     public void removeSelectedItem() {
         sortedList.beginBatchedUpdates();
-        SQLiteHelper sqLiteHelper = new SQLiteHelper(frag.getContext());
         try {
             for (int i = 0; i < sortedList.size(); i++) {
                 if (sortedList.get(i).getRemainTime() <= 0) {
-                    long success = sqLiteHelper.delete_bookmark(sortedList.get(i));
-                    if (success != -1) {
                         sortedList.removeItemAt(i);
                         notifyItemRemoved(i);
-                    }
-
                 }
             }
         } catch (Exception e) {

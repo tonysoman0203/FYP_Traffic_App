@@ -9,6 +9,7 @@ import android.widget.ProgressBar;
 import com.example.tonyso.TrafficApp.adapter.InfoDetailAdapter;
 import com.example.tonyso.TrafficApp.adapter.NearPlaceItemAdpater;
 import com.example.tonyso.TrafficApp.model.NearbyLocation;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.List;
 
@@ -21,16 +22,20 @@ public class FindNearLocationAsyncTask extends AsyncTask<Void, Void, List<Nearby
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private double[] latlng;
+    private GoogleApiClient mGoogleApiClient;
+    private String currLocation;
 
     public FindNearLocationAsyncTask(InfoDetailAdapter adapter,
                                      Context context,
                                      RecyclerView recyclerView,
-                                     ProgressBar progressBar, double[] latlng) {
+                                     ProgressBar progressBar, double[] latlng, GoogleApiClient googleApiClient, String s) {
         this.adapter = adapter;
         this.context = context;
         this.recyclerView = recyclerView;
         this.progressBar = progressBar;
         this.latlng = latlng;
+        this.mGoogleApiClient = googleApiClient;
+        this.currLocation = s;
     }
 
     @Override
@@ -45,17 +50,16 @@ public class FindNearLocationAsyncTask extends AsyncTask<Void, Void, List<Nearby
     }
 
     private List<NearbyLocation> findNearLocation() {
-        NearbyPlacesHandler service = new NearbyPlacesHandler("AIzaSyAlwq8W2lK64AMJe7dbTh4babKOGXlSi5Y");
-        List<NearbyLocation> findPlaces = service.findPlaces(latlng[0], latlng[1], "");
-        return findPlaces;
+        NearbyPlacesHandler service = new NearbyPlacesHandler(context.getString(R.string.place_api_server_key));
+        return service.findPlaces(latlng[0], latlng[1], "", currLocation);
     }
 
     @Override
-    protected void onPostExecute(List aVoid) {
+    protected void onPostExecute(List<NearbyLocation> aVoid) {
         super.onPostExecute(aVoid);
         progressBar.setIndeterminate(false);
         progressBar.setVisibility(View.GONE);
-        recyclerView.setAdapter(new NearPlaceItemAdpater(context, aVoid));
+        recyclerView.setAdapter(new NearPlaceItemAdpater(context, aVoid, mGoogleApiClient));
 
     }
 

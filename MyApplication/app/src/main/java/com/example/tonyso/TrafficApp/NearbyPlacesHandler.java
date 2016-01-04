@@ -10,8 +10,10 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -39,7 +41,7 @@ public class NearbyPlacesHandler {
         return getUrlContents(url);
     }
 
-    public List<NearbyLocation> findPlaces(double latitude, double longitude, String placeSpacification) {
+    public List<NearbyLocation> findPlaces(double latitude, double longitude, String placeSpacification, String currLocation) {
         String urlString = makeUrl(latitude, longitude, placeSpacification);
         try {
             String json = getJSON(urlString);
@@ -47,23 +49,49 @@ public class NearbyPlacesHandler {
             System.out.println(json);
             JSONObject object = new JSONObject(json);
             JSONArray array = object.getJSONArray("results");
-
-
             ArrayList<NearbyLocation> arrayList = new ArrayList<>();
-            for (int i = 0; i < array.length(); i++) {
+            for (int i = 0; i < 6; i++) {
                 try {
                     NearbyLocation place = NearbyLocation.jsonToPontoReferencia((JSONObject) array.get(i));
                     Log.v("Places Services ", "" + place);
                     arrayList.add(place);
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
+
+            for (int i = 0; i < arrayList.size(); i++) {
+                String distanceUrl = makeDistanceURL(currLocation, arrayList.get(i).getName());
+                try {
+                    json = getJSON(distanceUrl);
+                    Log.d("JSON Distance= ", json);
+                    arrayList.get(i).setDistanceInKm(NearbyLocation.getDistanceByJSON(json));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
             return arrayList;
         } catch (JSONException ex) {
             Logger.getLogger(NearbyPlacesHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
+
+    private String makeDistanceURL(String currentLocation, String destination) {
+        //http://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&sensor=false
+        StringBuilder url = new StringBuilder("http://maps.googleapis.com/maps/api/directions/json?");
+        try {
+            url.append("origin=" + URLEncoder.encode(currentLocation, "UTF-8"));
+            url.append("&");
+            url.append("destination=" + URLEncoder.encode(destination, "UTF-8"));
+            url.append("&sensor=false");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return url.toString();
+    }
+
 
     //https://maps.googleapis.com/maps/api/place/search/json?location=28.632808,77.218276&radius=500&types=atm&sensor=false&key=<key>
     private String makeUrl(double latitude, double longitude, String place) {

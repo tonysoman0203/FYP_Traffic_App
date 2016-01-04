@@ -1,9 +1,11 @@
 package com.example.tonyso.TrafficApp.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +14,17 @@ import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.model.NearbyLocation;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
+import com.google.android.gms.location.places.PlacePhotoMetadataResult;
+import com.google.android.gms.location.places.PlacePhotoResult;
+import com.google.android.gms.location.places.Places;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.display.SimpleBitmapDisplayer;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import java.util.List;
 
@@ -23,9 +35,23 @@ public class NearPlaceItemAdpater extends RecyclerView.Adapter<NearPlaceItemAdpa
 
     Context context;
     SortedList<NearbyLocation> sortedList;
+    GoogleApiClient mGoogleApiClient;
+    ViewHolder viewHolder;
+    PlacePhotoResult photoResult;
+    ImageLoader imageLoader;
+    DisplayImageOptions imageOptions;
 
-    public NearPlaceItemAdpater(Context context, final List<NearbyLocation> locationlist) {
+    public NearPlaceItemAdpater(Context context, final List<NearbyLocation> locationlist, GoogleApiClient mGoogleApiClient) {
         this.context = context;
+        this.mGoogleApiClient = mGoogleApiClient;
+        imageLoader = ImageLoader.getInstance();
+        imageOptions = new DisplayImageOptions.Builder()
+                .showImageForEmptyUri(R.drawable.ic_error_black_24dp)
+                .cacheInMemory(true)
+                .considerExifParams(true)
+                .displayer(new SimpleBitmapDisplayer())
+                .build();
+
         sortedList = new SortedList<NearbyLocation>(NearbyLocation.class, new SortedList.Callback<NearbyLocation>() {
             @Override
             public int compare(NearbyLocation o1, NearbyLocation o2) {
@@ -71,24 +97,93 @@ public class NearPlaceItemAdpater extends RecyclerView.Adapter<NearPlaceItemAdpa
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_traffic_info_detail_nearby_list_item, parent, false);
-        return new ViewHolder(view);
+        viewHolder = new ViewHolder(view);
+        return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        ImageLoader.getInstance().displayImage(sortedList.get(position).getIcon(), holder.imageView);
+    public void onBindViewHolder(final ViewHolder holder, int position) {
+        //https://maps.googleapis.com/maps/api/place/photo?maxwidth=[IMAGESIZE]&photoreference=[REFERENCEKEY]&sensor=false&key=[YOURKEYHERE]
+        StringBuilder urlString = new StringBuilder("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=");
+        urlString.append(sortedList.get(position).getPhotoReference());
+        urlString.append("&sensor=true&key=" + context.getResources().getString(R.string.place_api_server_key));
+        ImageLoader.getInstance().displayImage(urlString.toString(), holder.imageView, imageOptions, new ImageLoadingListener() {
+            @Override
+            public void onLoadingStarted(String imageUri, View view) {
+                holder.imageView.setImageResource(R.drawable.placeholder);
+            }
+
+            @Override
+            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                holder.imageView.setImageResource(R.drawable.placeholder);
+            }
+
+            @Override
+            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                holder.imageView.setImageBitmap(loadedImage);
+            }
+
+            @Override
+            public void onLoadingCancelled(String imageUri, View view) {
+                holder.imageView.setImageResource(R.drawable.placeholder);
+            }
+        });
         holder.title.setText(sortedList.get(position).getName());
-        //holder.Distance.setText(sortedList.get(position).getVicinity());
+        StringBuilder sb;
+        if (sortedList.get(position).getDistanceInKm().equals("NOT_FOUND")) {
+            holder.Distance.setText(context.getResources().getString(R.string.distance) + context.getString(R.string.notfound));
+        } else {
+            sb = new StringBuilder(context.getString(R.string.distance) + sortedList.get(position).getDistanceInKm());
+            holder.Distance.setText(sb.toString());
+        }
+
     }
+
+    private ResultCallback<PlacePhotoResult> mDisplayPhotoResultCallback
+            = new ResultCallback<PlacePhotoResult>() {
+        @Override
+        public void onResult(PlacePhotoResult placePhotoResult) {
+            if (!placePhotoResult.getStatus().isSuccess()) {
+                return;
+            }
+            photoResult = placePhotoResult;
+        }
+    };
+
+    /**
+     * Load a bitmap from the photos API asynchronously
+     * by using buffers and result callbacks.
+     */
+    private void placePhotosAsync(final ViewHolder viewHolder, String placeid) {
+        Places.GeoDataApi.getPlacePhotos(mGoogleApiClient, placeid)
+                .setResultCallback(new ResultCallback<PlacePhotoMetadataResult>() {
+                    @Override
+                    public void onResult(PlacePhotoMetadataResult photos) {
+                        if (!photos.getStatus().isSuccess()) {
+                            return;
+                        }
+                        PlacePhotoMetadataBuffer photoMetadataBuffer = photos.getPhotoMetadata();
+                        if (photoMetadataBuffer.getCount() > 0) {
+                            // Display the first bitmap in an ImageView in the size of the view
+                            photoMetadataBuffer.get(0)
+                                    .getScaledPhoto(mGoogleApiClient, viewHolder.imageView.getWidth(),
+                                            viewHolder.imageView.getHeight())
+                                    .setResultCallback(mDisplayPhotoResultCallback);
+                        }
+                        photoMetadataBuffer.release();
+                    }
+                });
+    }
+
 
     @Override
     public int getItemCount() {
-        Log.e("Size", "" + sortedList.size());
+        //Log.e("Size", "" + sortedList.size());
         return sortedList.size();
     }
 
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView imageView;
         TextView title, Distance;
 
@@ -97,7 +192,16 @@ public class NearPlaceItemAdpater extends RecyclerView.Adapter<NearPlaceItemAdpa
             title = (TextView) itemView.findViewById(R.id.txtNearLocationTitle);
             Distance = (TextView) itemView.findViewById(R.id.txtNearLocationDistance);
             imageView = (ImageView) itemView.findViewById(R.id.imgNearLocation);
+            itemView.setOnClickListener(this);
+        }
 
+        @Override
+        public void onClick(View v) {
+            Uri gmmIntentUri = Uri.parse("geo:" + sortedList.get(getAdapterPosition()).getLatitude() + "," + sortedList.get(getAdapterPosition()).getLongitude() + "?z=19");
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+            mapIntent.setPackage("com.google.android.apps.maps");
+            context.startActivity(mapIntent);
         }
     }
+
 }

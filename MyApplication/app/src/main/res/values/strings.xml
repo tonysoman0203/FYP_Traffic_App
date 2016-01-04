@@ -112,5 +112,7 @@
     <!-- TODO: Bookmark Text Here -->
     <string name="Minute">Minutes</string>
 
+    <string name="distance">Distance: </string>
+    <string name="notfound">NOT_FOUND</string>
 
 </resources>

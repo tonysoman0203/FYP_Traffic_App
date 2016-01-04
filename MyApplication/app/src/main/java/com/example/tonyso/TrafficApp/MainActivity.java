@@ -42,6 +42,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Places;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.Locale;
@@ -349,6 +350,8 @@ public class MainActivity extends BaseActivity
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
                 .build();
     }
 
@@ -420,24 +423,6 @@ public class MainActivity extends BaseActivity
         mResolvingError = false;
     }
 
-    @Override
-    public void onRefreshWeather(String s) {
-        TextView textView = (TextView)headerLayout.findViewById(R.id.txtTemperature);
-        textView.setText(s);
-    }
-
-    @Override
-    public void onRefreshIcon(String URL) {
-        CircleImageView imageView = (CircleImageView)headerLayout.findViewById(R.id.bgHeader);
-        imageLoader.displayImage(URL, imageView);
-    }
-
-    @Override
-    public void onRefreshLocation(String address) {
-        TextView textView = (TextView)navigationView.findViewById(R.id.txtLocation);
-        textView.setText(address);
-    }
-
     public static class ErrorDialogFragment extends DialogFragment {
         public ErrorDialogFragment() {
         }
@@ -469,6 +454,27 @@ public class MainActivity extends BaseActivity
             }
         }
     }
+
+
+    @Override
+    public void onRefreshWeather(String s) {
+        TextView textView = (TextView) headerLayout.findViewById(R.id.txtTemperature);
+        textView.setText(s);
+    }
+
+    @Override
+    public void onRefreshIcon(String URL) {
+        CircleImageView imageView = (CircleImageView) headerLayout.findViewById(R.id.bgHeader);
+        imageLoader.displayImage(URL, imageView);
+    }
+
+    @Override
+    public void onRefreshLocation(String address) {
+        TextView textView = (TextView) navigationView.findViewById(R.id.txtLocation);
+        textView.setText(address);
+    }
+
+
 
 
 }
