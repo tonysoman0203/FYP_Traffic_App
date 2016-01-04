@@ -51,6 +51,7 @@ public class GPSLocationFinder implements LocationListener {
             }
             if (addresses.size() > 0) {
                 String address  = addresses.get(1).getFeatureName();
+                Log.e("Test", "" + addresses.get(0).getLatitude() + "," + addresses.get(0).getLongitude());
                Log.e("Address",addresses.get(0).getFeatureName());
                 Log.e("Address",addresses.get(0).getCountryName());
                 weatherRefreshListener.onRefreshLocation(address);

@@ -16,7 +16,7 @@ public class ServiceCallHandler {
     private final String CompatibleActionLink = "CompatibleActionLink";
     Activity context;
     String link="",tmp="";
-
+    private static final String JSON = "http://maps.google.com/maps/api/place/search/json?location=40.717859";
     public ServiceCallHandler(Activity context) {
         this.context = context;
     }

@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -11,8 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.tonyso.TrafficApp.FindNearLocationAsyncTask;
 import com.example.tonyso.TrafficApp.InfoDetailActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
@@ -25,6 +28,7 @@ import com.example.tonyso.TrafficApp.listener.RecyclerViewListener;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 import com.example.tonyso.TrafficApp.utility.CommonUtils;
+import com.example.tonyso.TrafficApp.utility.DividerItemDecoration;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,7 +41,7 @@ import java.util.GregorianCalendar;
 public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements RecyclerViewListener {
 
 
-    private InfoDetailActivity context;
+    public InfoDetailActivity context;
     private int size;
     private CoordinatorLayout coordinatorLayout;
     private RouteCCTV route;
@@ -194,6 +198,18 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
+    public class NearPlaceViewHolder extends RecyclerView.ViewHolder {
+        ProgressBar progressBar;
+        RecyclerView recyclerView;
+
+        public NearPlaceViewHolder(View v2) {
+            super(v2);
+            progressBar = (ProgressBar) v2.findViewById(R.id.progressBar);
+            recyclerView = (RecyclerView) v2.findViewById(R.id.nearbyList);
+            recyclerView.addItemDecoration(new DividerItemDecoration(context.getResources().getDrawable(android.R.drawable.divider_horizontal_dim_dark), true, true));
+            recyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+        }
+    }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -205,13 +221,8 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 viewHolder = new ViewHolder(v1,this);
                 break;
             case TYPE_NEAR_ITEM:
-                View v2 = inflater.inflate(R.layout.item_traffic_info_detail_near, parent, false);
-                viewHolder = new RecyclerView.ViewHolder(v2) {
-                    @Override
-                    public String toString() {
-                        return super.toString();
-                    }
-                };
+                View v2 = inflater.inflate(R.layout.item_traffic_info_detatl_nearby, parent, false);
+                viewHolder = new NearPlaceViewHolder(v2);
                 break;
             case TYPE_NEAR_HEADER :case TYPE_BOOKMAKR_HEADER: case TYPE_SHARE_HEADER:
                 View vh = inflater.inflate(R.layout.item_traffic_info_detail_header, parent, false);
@@ -237,8 +248,14 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }else if (position == TYPE_BOOKMARK_ITEM){
             configBookmarkItem(holder,position);
         }else if (position == TYPE_NEAR_ITEM) {
-            //Near Locations....
+            configNearItems(holder, position);
         }
+    }
+
+    private void configNearItems(RecyclerView.ViewHolder holder, int pos) {
+        RecyclerView recyclerView = ((NearPlaceViewHolder) holder).recyclerView;
+        ProgressBar progressBar = ((NearPlaceViewHolder) holder).progressBar;
+        new FindNearLocationAsyncTask(this, context, recyclerView, progressBar, route.getLatLngs()).execute();
     }
 
     private void configBookmarkItem(final RecyclerView.ViewHolder holder,int p) {
@@ -461,4 +478,5 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
 }
+
 

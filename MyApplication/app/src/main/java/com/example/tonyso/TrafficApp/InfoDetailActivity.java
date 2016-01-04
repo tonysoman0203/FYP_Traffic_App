@@ -22,6 +22,8 @@ import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import jp.wasabeef.recyclerview.animators.FadeInAnimator;
+
 //import android.support.v7.graphics.Palette;
 
 public class InfoDetailActivity extends AppCompatActivity {
@@ -81,6 +83,12 @@ public class InfoDetailActivity extends AppCompatActivity {
                 .setTimedBookMark(bookMark)
                 .build();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
+        FadeInAnimator fadeInAnimator = new FadeInAnimator();
+        fadeInAnimator.setAddDuration(1000);
+        fadeInAnimator.setChangeDuration(1000);
+        fadeInAnimator.setMoveDuration(1000);
+        recyclerView.setItemAnimator(fadeInAnimator);
         recyclerView.setAdapter(infoDetailAdapter);
     }
 

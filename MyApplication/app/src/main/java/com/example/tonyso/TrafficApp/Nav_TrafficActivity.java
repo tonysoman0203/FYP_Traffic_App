@@ -104,7 +104,7 @@ public class Nav_TrafficActivity extends BaseActivity implements OnMapReadyCallb
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                removePreviousMarker();
+                //removePreviousMarker();
                 setMarker(mMap, position);
             }
 
@@ -114,7 +114,7 @@ public class Nav_TrafficActivity extends BaseActivity implements OnMapReadyCallb
             }
         });
     }
-    private void removePreviousMarker() {mMap.clear();}
+    //private void removePreviousMarker() {mMap.clear();}
 
     private void setRegionHashMap(String[] arr, String[] regionHashMap) {
         double[] tmp;
