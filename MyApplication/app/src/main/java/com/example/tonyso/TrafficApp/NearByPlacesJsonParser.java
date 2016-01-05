@@ -3,6 +3,7 @@ package com.example.tonyso.TrafficApp;
 import android.util.Log;
 
 import com.example.tonyso.TrafficApp.model.NearbyLocation;
+import com.google.android.gms.location.places.Place;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,10 +23,11 @@ import java.util.logging.Logger;
 /**
  * Created by soman on 2016/1/3.
  */
-public class NearbyPlacesHandler {
+public class NearByPlacesJsonParser {
+    static String TAG = NearbyLocation.class.getName();
     private String API_KEY;
 
-    public NearbyPlacesHandler(String API_KEY) {
+    public NearByPlacesJsonParser(String API_KEY) {
         this.API_KEY = API_KEY;
     }
 
@@ -52,7 +54,7 @@ public class NearbyPlacesHandler {
             ArrayList<NearbyLocation> arrayList = new ArrayList<>();
             for (int i = 0; i < 6; i++) {
                 try {
-                    NearbyLocation place = NearbyLocation.jsonToPontoReferencia((JSONObject) array.get(i));
+                    NearbyLocation place = getNearByLocation(array.getJSONObject(i));
                     Log.v("Places Services ", "" + place);
                     arrayList.add(place);
                 } catch (Exception e) {
@@ -65,7 +67,7 @@ public class NearbyPlacesHandler {
                 try {
                     json = getJSON(distanceUrl);
                     Log.d("JSON Distance= ", json);
-                    arrayList.get(i).setDistanceInKm(NearbyLocation.getDistanceByJSON(json));
+                    arrayList.get(i).setDistanceInKm(getDistanceByJSON(json));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -73,7 +75,7 @@ public class NearbyPlacesHandler {
 
             return arrayList;
         } catch (JSONException ex) {
-            Logger.getLogger(NearbyPlacesHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NearByPlacesJsonParser.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
@@ -91,7 +93,6 @@ public class NearbyPlacesHandler {
         }
         return url.toString();
     }
-
 
     //https://maps.googleapis.com/maps/api/place/search/json?location=28.632808,77.218276&radius=500&types=atm&sensor=false&key=<key>
     private String makeUrl(double latitude, double longitude, String place) {
@@ -119,7 +120,6 @@ public class NearbyPlacesHandler {
         return urlString.toString();
     }
 
-
     private String getUrlContents(String theUrl) {
         StringBuilder content = new StringBuilder();
 
@@ -129,12 +129,10 @@ public class NearbyPlacesHandler {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()), 8);
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                content.append(line + "\n");
+                content.append(line).append("\n");
             }
-
             bufferedReader.close();
         } catch (Exception e) {
-
             e.printStackTrace();
 
         }
@@ -142,4 +140,47 @@ public class NearbyPlacesHandler {
         return content.toString();
     }
 
+    private NearbyLocation getNearByLocation(JSONObject jsonObject) {
+        try {
+            NearbyLocation result = new NearbyLocation();
+            JSONObject geometry = (JSONObject) jsonObject.get("geometry");
+            JSONObject location = (JSONObject) geometry.get("location");
+            result.setLatitude((Double) location.get("lat"));
+            result.setLongitude((Double) location.get("lng"));
+            result.setIcon(jsonObject.getString("icon"));
+            result.setName(jsonObject.getString("name"));
+            result.setPlaceId(jsonObject.getString("place_id"));
+            if (!jsonObject.isNull("vicinity")) {
+                result.setVicinity(jsonObject.getString("vicinity"));
+            }
+            if (!jsonObject.isNull("photos")) {
+                JSONArray photos = jsonObject.getJSONArray("photos");
+                result.setPhotoReference(photos.getJSONObject(0).getString("photo_reference"));
+            }
+            return result;
+        } catch (JSONException ex) {
+            Logger.getLogger(Place.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    private String getDistanceByJSON(String jsonString) {
+        String status = null;
+        try {
+            final JSONObject jsonObject = new JSONObject(jsonString);
+            status = jsonObject.getString("status");
+            Log.e(TAG, status);
+            JSONArray routeArray = jsonObject.getJSONArray("routes");
+            JSONObject routes = routeArray.getJSONObject(0);
+            JSONArray newTempARr = routes.getJSONArray("legs");
+            JSONObject newDisTimeOb = newTempARr.getJSONObject(0);
+            JSONObject distOb = newDisTimeOb.getJSONObject("distance");
+            JSONObject timeOb = newDisTimeOb.getJSONObject("duration");
+            Log.i("Diatance :", distOb.getString("text"));
+            Log.i("Time :", timeOb.getString("text"));
+            return distOb.getString("text");
+        } catch (JSONException e) {
+            return status;
+        }
+    }
 }

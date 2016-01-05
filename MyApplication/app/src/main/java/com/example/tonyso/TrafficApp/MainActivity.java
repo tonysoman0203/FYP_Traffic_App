@@ -62,7 +62,16 @@ public class MainActivity extends BaseActivity
 
     private RssReader rssReader;
     public Handler rss_Handler;
-    private GoogleApiClient mGoogleApiClient;
+
+    public static GoogleApiClient getmGoogleApiClient() {
+        return mGoogleApiClient;
+    }
+
+    public void setmGoogleApiClient(GoogleApiClient mGoogleApiClient) {
+        this.mGoogleApiClient = mGoogleApiClient;
+    }
+
+    private static GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
@@ -353,6 +362,7 @@ public class MainActivity extends BaseActivity
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
                 .build();
+        setmGoogleApiClient(mGoogleApiClient);
     }
 
     protected void createLocationRequest() {

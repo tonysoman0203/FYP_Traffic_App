@@ -13,7 +13,7 @@ public class TimedBookMark implements Serializable {
     private  String routeImageKey;
     private  String[] regions;
     private int remainTime;
-    private  boolean isTimeOver;
+    private boolean isTimeOver;
     private double[] latLngs = null;
 
     public void setIsTimeOver(boolean isTimeOver) {

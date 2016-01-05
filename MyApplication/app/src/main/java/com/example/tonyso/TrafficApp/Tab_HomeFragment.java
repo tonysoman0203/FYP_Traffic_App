@@ -2,25 +2,33 @@ package com.example.tonyso.TrafficApp;
 
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.tonyso.TrafficApp.Singleton.XMLReader;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.PlaceLikelihood;
+import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
+import com.google.android.gms.location.places.Places;
 
 public class Tab_HomeFragment extends BaseFragment{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String TAG = Tab_HomeFragment.class.getName();
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
     private TextView textView;
-    XMLReader xmlReader;
+
+    private GoogleApiClient mGoogleApiClient;
 
     /**
      * Use this factory method to create a new instance of
@@ -65,26 +73,30 @@ public class Tab_HomeFragment extends BaseFragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        super.onCreateView(inflater,container,savedInstanceState);
+        super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_tab__home_,container,false);
+        mGoogleApiClient = MainActivity.getmGoogleApiClient();
         textView = (TextView)view.findViewById(R.id.testLabel);
-        //xmlReader = new XMLReader(this.getContext(),this);
-        //xmlReader.feedImageXml();
+        PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
+                .getCurrentPlace(mGoogleApiClient, null);
+        result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
+            @Override
+            public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
+                for (PlaceLikelihood placeLikelihood : likelyPlaces) {
+                    Log.i(TAG, String.format("Place '%s' has likelihood: %g",
+                            placeLikelihood.getPlace().getName(),
+                            placeLikelihood.getLikelihood()));
+                }
+                likelyPlaces.release();
+            }
+        });
         return view;
     }
+
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
     }
 
-
-//    @Override
-//    public void onXMLFetch(List<RouteCCTV> r) {
-//        StringBuffer temp = new StringBuffer();
-//        for (int i = 0 ;i<r.size();i++){
-//            temp.append(r.get(i).getLatLngs()[0]+" "+r.get(i).getLatLngs()[1]);
-//        }
-//        textView.setText(temp);
-//    }
 }

@@ -54,13 +54,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.HomeViewHolder
         String url = TRAFFIC_URL.concat(keys[position]).concat(JPG_FORMAT);
         //Log.e("URl",url);
         try {
-            /*PlaceHolder Error Fetch .... API
-            * See in http://square.github.io/picasso/javadoc/index.html
-            * */
-//            Picasso.Builder picasso = new Picasso.Builder(frag);
-//            picasso.memoryCache(new LruCache(frag));
-//
-            //Picasso.with(frag).load(url).into(imgview);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,9 +65,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.HomeViewHolder
         return keys.length;
     }
 
-    /**
-     * Created by TonySo on 18/9/2015.
-     */
     public class HomeViewHolder extends RecyclerView.ViewHolder{
         ImageView imgRoute;
 

@@ -15,7 +15,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.util.List;
 import java.util.Locale;
 
@@ -58,9 +57,6 @@ public class GPSLocationFinder implements LocationListener {
             } else {
                 Log.e(TAG,"No Address Found");
             }
-        }catch (ConnectException time) {
-            errorDialog.displayAlertDialog(time.getLocalizedMessage());
-            time.printStackTrace();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             errorDialog.displayAlertDialog(e.getLocalizedMessage());

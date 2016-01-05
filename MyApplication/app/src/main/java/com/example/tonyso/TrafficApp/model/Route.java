@@ -10,18 +10,15 @@ public class Route implements Serializable{
     protected String name;
     protected String sat_level;
     protected String ref_key; //RD659F
-    protected String imageURL;
 
-    public Route(int route_id, String name, String sat_level, String refkey, String imageURL) {
+    public Route(int route_id, String name, String sat_level, String refkey) {
         this.route_id = route_id;
         this.name = name;
         this.sat_level = sat_level;
         ref_key = refkey;
-        this.imageURL = imageURL;
     }
 
     public Route() {
-
     }
 
     public long getRoute_id() {
@@ -56,11 +53,4 @@ public class Route implements Serializable{
         this.ref_key = ref_key;
     }
 
-    public String getImageURL() {
-        return imageURL;
-    }
-
-    public void setImageURL(String imageURL) {
-        this.imageURL = imageURL;
-    }
 }

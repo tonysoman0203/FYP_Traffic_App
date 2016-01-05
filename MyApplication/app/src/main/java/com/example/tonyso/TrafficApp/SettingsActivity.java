@@ -15,7 +15,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -23,13 +22,14 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
+import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
 import com.example.tonyso.TrafficApp.utility.ShareStorage;
 import com.example.tonyso.TrafficApp.utility.StoreObject;
 
 import java.util.Locale;
 
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends BaseActivity {
     CoordinatorLayout coordinatorLayout;
     FloatingActionButton fab;
     static LanguageSelector languageSelector;

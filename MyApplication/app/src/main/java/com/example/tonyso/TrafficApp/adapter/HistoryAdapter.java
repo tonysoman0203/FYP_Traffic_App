@@ -183,8 +183,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         mSortedList.endBatchedUpdates();
         notifyItemRemoved(pos);
 
-        int size = mSortedList.size();
-        return size;
+        return mSortedList.size();
     }
     
     @Override

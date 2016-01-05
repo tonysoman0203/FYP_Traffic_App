@@ -8,4 +8,6 @@
 
     <color name="selected_overlay">#E0E0E0</color>
 
+    <color name="colorPrimary_alpha">#00009688</color>
+
 </resources>

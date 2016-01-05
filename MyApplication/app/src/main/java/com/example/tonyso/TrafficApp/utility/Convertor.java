@@ -6,10 +6,12 @@ package com.example.tonyso.TrafficApp.utility;
 public class Convertor {
     double N;
     double E;
+
     public Convertor (String N,String E){
         this.N = Double.parseDouble(N);
         this.E = Double.parseDouble(E);
     }
+
 
     public double[] output() {
         Transform transformer = new Transform();
