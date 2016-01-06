@@ -8,4 +8,6 @@ import android.support.v7.widget.RecyclerView;
 public interface RecyclerViewListener {
     void onRecyclerViewIndex(int tag,int pos);
     void onAddBookmarkClick(RecyclerView.ViewHolder viewHolder);
+
+    void onResetBookmakClick(RecyclerView.ViewHolder viewHolder);
 }

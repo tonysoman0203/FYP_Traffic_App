@@ -6,6 +6,8 @@
     card_view:cardElevation="5dp"
     card_view:cardPreventCornerOverlap="true"
     card_view:cardUseCompatPadding="true"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.tonyso.TrafficApp.MainActivity"
     card_view:cardCornerRadius="3dp">
 
     <RelativeLayout

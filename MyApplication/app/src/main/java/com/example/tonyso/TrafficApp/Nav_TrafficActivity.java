@@ -250,9 +250,9 @@ public class Nav_TrafficActivity extends BaseActivity implements OnMapReadyCallb
     @Override
     public boolean onMarkerClick(final Marker marker) {
         snackbar = Snackbar.make(coordinatorLayout,marker.getTitle(),Snackbar.LENGTH_INDEFINITE);
-        ViewGroup viewGroup = (ViewGroup) snackbar.getView();
+        ViewGroup view = (ViewGroup) snackbar.getView();
         //Get Route Object
-        viewGroup.setOnClickListener(new View.OnClickListener() {
+        view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final Intent intent = new Intent(getApplicationContext(), InfoDetailActivity.class);

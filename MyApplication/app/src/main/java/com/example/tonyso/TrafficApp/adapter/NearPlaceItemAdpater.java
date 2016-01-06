@@ -15,11 +15,7 @@ import android.widget.TextView;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.model.NearbyLocation;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
-import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import com.google.android.gms.location.places.PlacePhotoResult;
-import com.google.android.gms.location.places.Places;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -138,43 +134,6 @@ public class NearPlaceItemAdpater extends RecyclerView.Adapter<NearPlaceItemAdpa
         }
 
     }
-
-    private ResultCallback<PlacePhotoResult> mDisplayPhotoResultCallback
-            = new ResultCallback<PlacePhotoResult>() {
-        @Override
-        public void onResult(PlacePhotoResult placePhotoResult) {
-            if (!placePhotoResult.getStatus().isSuccess()) {
-                return;
-            }
-            photoResult = placePhotoResult;
-        }
-    };
-
-    /**
-     * Load a bitmap from the photos API asynchronously
-     * by using buffers and result callbacks.
-     */
-    private void placePhotosAsync(final ViewHolder viewHolder, String placeid) {
-        Places.GeoDataApi.getPlacePhotos(mGoogleApiClient, placeid)
-                .setResultCallback(new ResultCallback<PlacePhotoMetadataResult>() {
-                    @Override
-                    public void onResult(PlacePhotoMetadataResult photos) {
-                        if (!photos.getStatus().isSuccess()) {
-                            return;
-                        }
-                        PlacePhotoMetadataBuffer photoMetadataBuffer = photos.getPhotoMetadata();
-                        if (photoMetadataBuffer.getCount() > 0) {
-                            // Display the first bitmap in an ImageView in the size of the view
-                            photoMetadataBuffer.get(0)
-                                    .getScaledPhoto(mGoogleApiClient, viewHolder.imageView.getWidth(),
-                                            viewHolder.imageView.getHeight())
-                                    .setResultCallback(mDisplayPhotoResultCallback);
-                        }
-                        photoMetadataBuffer.release();
-                    }
-                });
-    }
-
 
     @Override
     public int getItemCount() {

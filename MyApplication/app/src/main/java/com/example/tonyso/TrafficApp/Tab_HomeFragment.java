@@ -1,20 +1,31 @@
 package com.example.tonyso.TrafficApp;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
+import com.example.tonyso.TrafficApp.adapter.HomeAdapter;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
+import com.example.tonyso.TrafficApp.model.Place;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import jp.wasabeef.recyclerview.animators.FadeInRightAnimator;
 
 public class Tab_HomeFragment extends BaseFragment{
     // TODO: Rename parameter arguments, choose names that match
@@ -26,9 +37,12 @@ public class Tab_HomeFragment extends BaseFragment{
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private TextView textView;
+    private RecyclerView mRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private GoogleApiClient mGoogleApiClient;
+
+    private List<Place> places;
 
     /**
      * Use this factory method to create a new instance of
@@ -64,25 +78,29 @@ public class Tab_HomeFragment extends BaseFragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mGoogleApiClient = MainActivity.getmGoogleApiClient();
         /*if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }*/
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
-        View view = inflater.inflate(R.layout.fragment_tab__home_,container,false);
-        mGoogleApiClient = MainActivity.getmGoogleApiClient();
-        textView = (TextView)view.findViewById(R.id.testLabel);
+    private void setPlaces() {
+        places = new ArrayList<>();
         PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
                 .getCurrentPlace(mGoogleApiClient, null);
         result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
             @Override
             public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
                 for (PlaceLikelihood placeLikelihood : likelyPlaces) {
+                    Place place = new Place().
+                            setPlaceId(placeLikelihood.getPlace().getId())
+                            .setAddress(placeLikelihood.getPlace().getAddress())
+                            .setLatlngs(placeLikelihood.getPlace().getLatLng())
+                            .setName(placeLikelihood.getPlace().getName())
+                            .setPhoneno(placeLikelihood.getPlace().getPhoneNumber())
+                            .build();
+                    places.add(place);
                     Log.i(TAG, String.format("Place '%s' has likelihood: %g",
                             placeLikelihood.getPlace().getName(),
                             placeLikelihood.getLikelihood()));
@@ -90,9 +108,41 @@ public class Tab_HomeFragment extends BaseFragment{
                 likelyPlaces.release();
             }
         });
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+        View view = inflater.inflate(R.layout.fragment_tab__home_, container, false);
+        setPlaces();
+        initializeUIView(view);
         return view;
     }
 
+    private void initializeUIView(View view) {
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.home_list);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshHomeLayout);
+        mSwipeRefreshLayout.setColorSchemeColors(Color.RED, Color.BLUE, Color.GREEN, Color.CYAN);
+        mSwipeRefreshLayout.setOnRefreshListener(mOnRefreshListener);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        mRecyclerView.setItemAnimator(new FadeInRightAnimator());
+        mRecyclerView.setAdapter(new HomeAdapter(this.getContext(), places));
+    }
+
+    private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                }
+
+            }, 5000);
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
+    };
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {

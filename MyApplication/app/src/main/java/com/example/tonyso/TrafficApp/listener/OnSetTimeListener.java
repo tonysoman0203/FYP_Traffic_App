@@ -58,7 +58,7 @@ public class OnSetTimeListener implements View.OnFocusChangeListener,
             Date selectTime = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.TRADITIONAL_CHINESE).parse(date + " " + hour + ":" + minute);
             Date currTime = CommonUtils.getCurrentDate();
             if (selectTime.before(currTime)) {
-                Snackbar.make(context.coordinatorLayout, "開始時間不可大於結束時間", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(view, "開始時間不可大於結束時間", Snackbar.LENGTH_LONG).show();
                 new TimePickerDialog(context, this, hour, minute, true).show();
             } else
                 this.editText.setText(String.format("%s %02d:%02d", date, hourOfDay, minute));
@@ -74,6 +74,7 @@ public class OnSetTimeListener implements View.OnFocusChangeListener,
         Calendar myCalendar = Calendar.getInstance();
         int hour = myCalendar.get(Calendar.HOUR_OF_DAY);
         int minute = myCalendar.get(Calendar.MINUTE);
-        new TimePickerDialog(context, this, hour, minute, true).show();
+        TimePickerDialog timePickerDialog = new TimePickerDialog(context, this, hour, minute, true);
+        timePickerDialog.show();
     }
 }

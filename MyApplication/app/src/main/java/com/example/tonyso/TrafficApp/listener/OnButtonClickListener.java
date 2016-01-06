@@ -30,7 +30,11 @@ public class OnButtonClickListener implements View.OnClickListener {
             case 4:
                 recyclerViewListener.onAddBookmarkClick(viewHolder);
                 break;
-            default:break;
+            case 5:
+                recyclerViewListener.onResetBookmakClick(viewHolder);
+                break;
+            default:
+                break;
         }
     }
 }
