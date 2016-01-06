@@ -1,5 +1,6 @@
 package com.example.tonyso.TrafficApp;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.Location;
@@ -17,9 +19,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -84,15 +88,13 @@ public class MainActivity extends BaseActivity
     private static final int FATEST_INTERVAL = 60000; // 5 sec
     private static final int DISPLACEMENT = 5; // 10 meters
     private String TAG = getClass().getSimpleName();
-
-    private ActionBarDrawerToggle toggle;
     private GPSLocationFinder gpsLocationFinder;
 
     Locale ZH_HANT = Locale.TRADITIONAL_CHINESE;
     Locale ENG = Locale.ENGLISH;
 
     private DrawerLayout drawer;
-    private FloatingActionButton fab;
+
     private NavigationView navigationView;
 
     BroadcastReceiver broadcastReceiver;
@@ -101,40 +103,49 @@ public class MainActivity extends BaseActivity
     CoordinatorLayout coordinatorLayout;
     //TabLayout tabLayout;
 
-    TextView txtCurrDate, txtCurrTime, lbllocation, lblWeather, lblDate, lblTime;
-
+    TextView txtCurrDate, txtCurrTime, lbllocation, lblWeather, lblDate, lblTime, textView;
     TabLayout tabLayout;
     View headerLayout;
     ImageLoader imageLoader;
+
+    public static MainActivity activity;
+    public static ActionBarDrawerToggle toggle;
+    public static FragmentManager fragmentManager;
+    public static FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-            init();
-            initToolBar();
-            initNavigationDrawer();
-            LabelFindViewById();
-            initRSSReader();
+        init();
+        initToolBar();
+        initNavigationDrawer();
+        LabelFindViewById();
+        initRSSReader();
+        setMainFragment();
+    }
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
+    private void setMainFragment() {
         int indicatorColor = this.getResources().getColor(R.color.colorAccent);
         int dividerColor = Color.WHITE;
-
-        fragmentManager.beginTransaction().replace(R.id.flcontent,
-                Tab_MainFragment.newInstance(getString(R.string.app_name),
-                        indicatorColor, dividerColor, tabLayout)).commit();
-
+        Tab_MainFragment fragment = Tab_MainFragment.newInstance(getString(R.string.app_name), indicatorColor, dividerColor, tabLayout);
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.flcontent, fragment);
+        fragmentTransaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        fragmentTransaction.addToBackStack(TAG);
+        fragmentTransaction.commit();
     }
 
     private void init() {
+        activity = MainActivity.this;
+        fragmentManager = getSupportFragmentManager();
         imageLoader = ImageLoader.getInstance();
-        tabLayout = (TabLayout)findViewById(R.id.tablayout);
+        tabLayout = (TabLayout) findViewById(R.id.tablayout);
         broadcastReceiver = myBroadCastReceiver;
         languageSelector = LanguageSelector.getInstance(this);
         rss_Handler = new Handler();
-        gpsLocationFinder = new GPSLocationFinder(this,this);
-        coordinatorLayout = (CoordinatorLayout)findViewById(R.id.coordinateLayoutMain);
+        gpsLocationFinder = new GPSLocationFinder(this, this);
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinateLayoutMain);
 
         if (CommonUtils.checkPlayServices(this, PLAY_SERVICES_RESOLUTION_REQUEST)) {
             buildGoogleApiClient();
@@ -148,18 +159,17 @@ public class MainActivity extends BaseActivity
                         .setAction("Action", null).show();
             }
         });
-        //initTabLayoutViewPager();
+
     }
 
 
-    private void initToolBar(){
+    private void initToolBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getString(R.string.app_name));
-
     }
 
-    private void initNavigationDrawer(){
+    private void initNavigationDrawer() {
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -168,7 +178,7 @@ public class MainActivity extends BaseActivity
         navigationView = (NavigationView) drawer.findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         headerLayout = navigationView.inflateHeaderView(R.layout.nav_header_main);
-
+        textView = (TextView) headerLayout.findViewById(R.id.txtLocation);
     }
 
 
@@ -180,22 +190,22 @@ public class MainActivity extends BaseActivity
         }
     };
 
-    private void setUpCountDownService(){
-        broadCastTimerIntent = new Intent(this,CountDownService.class);
+    private void setUpCountDownService() {
+        broadCastTimerIntent = new Intent(this, CountDownService.class);
         startService(broadCastTimerIntent);
     }
 
-    private void LabelFindViewById(){
-        lbllocation = (TextView)headerLayout.findViewById(R.id.lblCurrLocation);
-        lblWeather = (TextView)headerLayout.findViewById(R.id.lblTemp);
-        lblDate = (TextView)headerLayout.findViewById(R.id.lblDate);
-        lblTime = (TextView)headerLayout.findViewById(R.id.lblCurrTime);
-        txtCurrDate = (TextView)headerLayout.findViewById(R.id.txtDate);
-        txtCurrTime = (TextView)headerLayout.findViewById(R.id.txtCurrTime);
+    private void LabelFindViewById() {
+        lbllocation = (TextView) headerLayout.findViewById(R.id.lblCurrLocation);
+        lblWeather = (TextView) headerLayout.findViewById(R.id.lblTemp);
+        lblDate = (TextView) headerLayout.findViewById(R.id.lblDate);
+        lblTime = (TextView) headerLayout.findViewById(R.id.lblCurrTime);
+        txtCurrDate = (TextView) headerLayout.findViewById(R.id.txtDate);
+        txtCurrTime = (TextView) headerLayout.findViewById(R.id.txtCurrTime);
         lblTime.setText(getString(R.string.rss_CurrTime));
     }
 
-    private void initRSSReader(){
+    private void initRSSReader() {
         rssReader = new RssReader(this, this);
     }
 
@@ -214,7 +224,7 @@ public class MainActivity extends BaseActivity
 
         if (languageSelector.getLanguage().equals(MyApplication.Language.ZH_HANT)) {
             txtCurrDate.setText(CommonUtils.initDate(ZH_HANT));
-        }else{
+        } else {
             txtCurrDate.setText(CommonUtils.initDate(ENG));
         }
 
@@ -230,7 +240,21 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        int count = fragmentManager.getBackStackEntryCount();
+        Log.e(TAG, "On Back Stack Count: " + count);
+        if (count == 0) {
+            super.onBackPressed();
+            //additional code
+        } else {
+            Log.e(TAG, fragmentManager.getBackStackEntryAt(0).getName());
+            if (fragmentManager.getBackStackEntryAt(0).getName().equals(TAG)) {
+                tabLayout.setVisibility(View.VISIBLE);
+                fab.setVisibility(View.VISIBLE);
+                toolbar.setTitle(getString(R.string.app_name));
+                navigationView.setCheckedItem(0);
+            }
+            fragmentManager.popBackStack();
+        }
     }
 
     @Override
@@ -263,6 +287,18 @@ public class MainActivity extends BaseActivity
     }
 
     private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 mGoogleApiClient, mLocationRequest, gpsLocationFinder);
     }
@@ -293,18 +329,18 @@ public class MainActivity extends BaseActivity
             return true;
         }
         int id = item.getItemId();
-        switch (id){
+        switch (id) {
             case R.id.action_search:
-                Snackbar.make(coordinatorLayout,"Search button click"
-                        ,Snackbar.LENGTH_LONG).show();
+                Snackbar.make(coordinatorLayout, "Search button click"
+                        , Snackbar.LENGTH_LONG).show();
                 break;
             case R.id.action_settings:
-                Snackbar.make(coordinatorLayout,"Setting button click"
-                        ,Snackbar.LENGTH_LONG).show();
+                Snackbar.make(coordinatorLayout, "Setting button click"
+                        , Snackbar.LENGTH_LONG).show();
                 break;
             // Handle home button in non-drawer mode
             case android.R.id.home:
-                getSupportFragmentManager().popBackStackImmediate();
+                onBackPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -317,41 +353,48 @@ public class MainActivity extends BaseActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        Fragment fragment = null;
-        Class fragmentClass;
         Intent intent;
         if (id == R.id.nav_home) {
             tabLayout.setVisibility(View.VISIBLE);
             fab.setVisibility(View.VISIBLE);
-            fragmentClass = Tab_MainFragment.class;
-            try{
-                fragment = (Fragment) fragmentClass.newInstance();
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.flcontent, fragment).commit();
-            item.setChecked(true);
-            setTitle(getString(R.string.app_name));
+            setMainFragment();
+            toolbar.setTitle(getString(R.string.app_name));
             //fragmentManager.beginTransaction().replace(R.id.flcontent,tab_mainFragment ).commit();
         } else if (id == R.id.nav_traffic) {
-            intent = new Intent(this,Nav_TrafficActivity.class);
-            startActivity(intent);
+            tabLayout.setVisibility(View.GONE);
+            fab.setVisibility(View.GONE);
+            Nav_TrafficFragment nav_trafficFragment =
+                    Nav_TrafficFragment.newInstance(this.getResources().getString(R.string.nav_real_traffic));
+            changeFragment(nav_trafficFragment, true);
+            item.setChecked(true);
         } else if (id == R.id.nav_suggestion) {
 
         } else if (id == R.id.nav_setting) {
-            intent = new Intent(this,SettingsActivity.class);
+            intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_about) {
 
         } else if (id == R.id.nav_feedback) {
 
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public static void changeFragment(Fragment fragment, boolean doAddToBackStack) {
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.flcontent, fragment);
+        transaction.setCustomAnimations(android.R.anim.fade_out, android.R.anim.fade_in);
+        if (doAddToBackStack) {
+            transaction.addToBackStack(null);
+            toggle.setDrawerIndicatorEnabled(true);
+            toggle.syncState();
+        } else {
+            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            toggle.syncState();
+        }
+        transaction.commit();
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -375,6 +418,19 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void onConnected(Bundle bundle) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
@@ -480,11 +536,6 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void onRefreshLocation(String address) {
-        TextView textView = (TextView) navigationView.findViewById(R.id.txtLocation);
         textView.setText(address);
     }
-
-
-
-
 }

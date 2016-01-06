@@ -6,7 +6,7 @@ import android.support.v4.app.Fragment;
 /**
  * Created by TonySo on 1/10/2015.
  */
-public class BaseFragment extends Fragment {
+public class TabBaseFragment extends Fragment {
 
     private String title = "";
     private int indicatorColor = Color.BLUE;

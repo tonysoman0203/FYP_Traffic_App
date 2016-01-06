@@ -10,11 +10,13 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -79,15 +81,19 @@ public class InfoDetailActivity extends AppCompatActivity
 
     private static final String STATE_RESOLVING_ERROR = "resolving_error";
 
+    FragmentManager fm;
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(STATE_RESOLVING_ERROR, mResolvingError);
+
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        fm = getSupportFragmentManager();
         setContentView(R.layout.activity_traffic_info_detail_scrolling);
         mResolvingError = savedInstanceState != null
                 && savedInstanceState.getBoolean(STATE_RESOLVING_ERROR, false);
@@ -165,15 +171,34 @@ public class InfoDetailActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
+        int count = fm.getBackStackEntryCount();
+        Log.e(TAG, "On Back Stack Count:+ " + TAG + count);
+        if (count == 0) {
+            super.onBackPressed();
+            //additional code
+        } else {
+            fm.popBackStack();
+        }
     }
 
     private void setImageHeader() {
             ImageLoader.getInstance().displayImage("http://tdcctv.data.one.gov.hk/" + route.getRef_key() + ".JPG", imageRoute);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     /**
-     *  Getting Data From Previous Fragment {{@link Nav_TrafficActivity}}
+     *  Getting Data From Previous Fragment {{@link Nav_TrafficFragment}}
      */
     private void getDataFromIntent(){
         intent = getIntent();

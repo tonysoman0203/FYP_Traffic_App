@@ -22,7 +22,7 @@ import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
 import com.example.tonyso.TrafficApp.adapter.BookMarkAdapter;
-import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
+import com.example.tonyso.TrafficApp.baseclass.TabBaseFragment;
 import com.example.tonyso.TrafficApp.listener.OnItemClickListener;
 import com.example.tonyso.TrafficApp.listener.OnRemainingTimeListener;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
@@ -35,7 +35,7 @@ import jp.wasabeef.recyclerview.animators.FadeInRightAnimator;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class Tab_BookMarkFragment extends BaseFragment
+public class Tab_BookMarkFragment extends TabBaseFragment
         implements OnItemClickListener {
 
     private static final String TAG = Tab_BookMarkFragment.class.getName();
@@ -91,6 +91,7 @@ public class Tab_BookMarkFragment extends BaseFragment
         initializeView(v);
         //Setup SQLiteHelper for Data Retreival From SQLite
         setSqLiteHelper(getContext());
+        setDatasets();
         //Set BroadCastReceiver as observer to observer service;
         setBroadcastReceiver();
         return v;
@@ -100,7 +101,7 @@ public class Tab_BookMarkFragment extends BaseFragment
     public void onResume() {
         super.onResume();
         Log.i(TAG, "OnResume@" + TAG);
-        setDatasets();
+
         bookmarkService = new Intent(getActivity(), BookMarkService.class);
         bookmarkService.putExtra(LIST, bookmarklist);
         getActivity().startService(bookmarkService);
@@ -192,6 +193,7 @@ public class Tab_BookMarkFragment extends BaseFragment
         bookmarklist = getDataSets();
         int size = bookmarklist.size();
         Log.d(TAG, "Bookmark list size is " + size);
+        setBookMarkAdapter(bookmarklist);
         if (size <= 0) {
             recyclerView.setVisibility(View.GONE);
             msg.setVisibility(View.VISIBLE);
@@ -199,8 +201,6 @@ public class Tab_BookMarkFragment extends BaseFragment
         }else{
             recyclerView.setVisibility(View.VISIBLE);
             msg.setVisibility(View.GONE);
-            setBookMarkAdapter(bookmarklist);
-            onRemainingTimeListener = bookMarkAdapter;
         }
     }
 
@@ -229,6 +229,7 @@ public class Tab_BookMarkFragment extends BaseFragment
 
     private void setBookMarkAdapter(ArrayList<TimedBookMark> timedBookMarks) {
         bookMarkAdapter = new BookMarkAdapter(timedBookMarks, this);
+        onRemainingTimeListener = bookMarkAdapter;
         recyclerView.setAdapter(bookMarkAdapter);
     }
 
@@ -263,5 +264,25 @@ public class Tab_BookMarkFragment extends BaseFragment
                 break;
         }
         return super.onContextItemSelected(item);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
     }
 }

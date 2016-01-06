@@ -1,12 +1,9 @@
 package com.example.tonyso.TrafficApp.adapter;
 
 import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -15,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -25,7 +23,7 @@ import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
 import com.example.tonyso.TrafficApp.Tab_BookMarkFragment;
-import com.example.tonyso.TrafficApp.listener.OnButtonClickListener;
+import com.example.tonyso.TrafficApp.listener.OnInfoDetailMenuClickListener;
 import com.example.tonyso.TrafficApp.listener.OnSetTimeListener;
 import com.example.tonyso.TrafficApp.listener.RecyclerViewListener;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
@@ -164,33 +162,25 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        Button btnShare, btnNear, btnBookmark;
+        LinearLayout share, bookmark, near;
         InfoDetailAdapter infoDetailAdapter;
 
         public ViewHolder(View itemView, InfoDetailAdapter infoDetailAdapter) {
             super(itemView);
-            btnBookmark = (Button) itemView.findViewById(R.id.btnBookmark);
-            btnNear = (Button) itemView.findViewById(R.id.btnNear);
-            btnShare = (Button) itemView.findViewById(R.id.btnShare);
+            share = (LinearLayout) itemView.findViewById(R.id.shareLayout);
+            bookmark = (LinearLayout) itemView.findViewById(R.id.bookmarkLayout);
+            near = (LinearLayout) itemView.findViewById(R.id.nearLayout);
             this.infoDetailAdapter = infoDetailAdapter;
 
-            tintButton(btnBookmark);
-
             //setTag
-            btnNear.setTag(1);
-            btnBookmark.setTag(2);
-            btnShare.setTag(3);
+            near.setTag(1);
+            bookmark.setTag(2);
+            share.setTag(3);
 
             //Set Button Behavior
-            btnBookmark.setOnClickListener(new OnButtonClickListener(infoDetailAdapter, TYPE_BASE, this));
-            btnNear.setOnClickListener(new OnButtonClickListener(infoDetailAdapter, TYPE_BASE, this));
-            btnShare.setOnClickListener(new OnButtonClickListener(infoDetailAdapter, TYPE_BASE, this));
-        }
-
-        private void tintButton(@NonNull Button button) {
-            Drawable d = DrawableCompat.wrap(button.getCompoundDrawables()[1].getCurrent());
-            DrawableCompat.setTint(d, context.getResources().getColor(R.color.colorPrimary));
-            button.setBackground(d);
+            bookmark.setOnClickListener(new OnInfoDetailMenuClickListener(infoDetailAdapter, TYPE_BASE, this));
+            near.setOnClickListener(new OnInfoDetailMenuClickListener(infoDetailAdapter, TYPE_BASE, this));
+            share.setOnClickListener(new OnInfoDetailMenuClickListener(infoDetailAdapter, TYPE_BASE, this));
         }
     }
 
@@ -321,8 +311,8 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         ((AddBookMarkViewHolder)holder).btnAdd.setTag(4);
         ((AddBookMarkViewHolder)holder).btnReset.setTag(5);
 
-        ((AddBookMarkViewHolder) holder).btnAdd.setOnClickListener(new OnButtonClickListener(this, p, holder));
-        ((AddBookMarkViewHolder) holder).btnReset.setOnClickListener(new OnButtonClickListener(this, p, holder));
+        ((AddBookMarkViewHolder) holder).btnAdd.setOnClickListener(new OnInfoDetailMenuClickListener(this, p, holder));
+        ((AddBookMarkViewHolder) holder).btnReset.setOnClickListener(new OnInfoDetailMenuClickListener(this, p, holder));
     }
 
     @Override
@@ -438,7 +428,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     @Override
-    public void onResetBookmakClick(RecyclerView.ViewHolder viewHolder) {
+    public void onResetTimerClick(RecyclerView.ViewHolder viewHolder) {
         ((AddBookMarkViewHolder) viewHolder).startTimeWrapper.getEditText().setText("");
         ((AddBookMarkViewHolder) viewHolder).TargetTimeWrapper.getEditText().setText("");
     }

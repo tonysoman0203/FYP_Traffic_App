@@ -3,8 +3,7 @@ package com.example.tonyso.TrafficApp.adapter;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-
-import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
+import com.example.tonyso.TrafficApp.baseclass.TabBaseFragment;
 
 import java.util.LinkedList;
 
@@ -13,9 +12,9 @@ import java.util.LinkedList;
  */
 public class TabFragmentPagerAdapter extends FragmentPagerAdapter {
 
-    LinkedList<BaseFragment> fragments = null;
+    LinkedList<TabBaseFragment> fragments = null;
 
-    public TabFragmentPagerAdapter(FragmentManager fm, LinkedList<BaseFragment> fragments) {
+    public TabFragmentPagerAdapter(FragmentManager fm, LinkedList<TabBaseFragment> fragments) {
         super(fm);
         if (fragments == null) {
             this.fragments = new LinkedList<>();
@@ -25,7 +24,7 @@ public class TabFragmentPagerAdapter extends FragmentPagerAdapter {
     }
 
     @Override
-    public BaseFragment getItem(int position) {
+    public TabBaseFragment getItem(int position) {
         return fragments.get(position);
     }
 

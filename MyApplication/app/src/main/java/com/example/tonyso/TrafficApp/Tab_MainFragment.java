@@ -10,11 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.tonyso.TrafficApp.adapter.TabFragmentPagerAdapter;
-import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
+import com.example.tonyso.TrafficApp.baseclass.TabBaseFragment;
 
 import java.util.LinkedList;
 
-public class Tab_MainFragment extends BaseFragment {
+public class Tab_MainFragment extends TabBaseFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -75,7 +75,7 @@ public class Tab_MainFragment extends BaseFragment {
         // Inflate the layout for this fragment
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_tab__main, container, false);
-        LinkedList<BaseFragment>fragments = getFragments();
+        LinkedList<TabBaseFragment> fragments = getFragments();
         adapter = new TabFragmentPagerAdapter(getChildFragmentManager(), fragments);
         viewPager = (ViewPager)view.findViewById(R.id.viewpager);
         viewPager.setAdapter(adapter);
@@ -86,7 +86,7 @@ public class Tab_MainFragment extends BaseFragment {
         return view;
     }
 
-    private LinkedList<BaseFragment> getFragments(){
+    private LinkedList<TabBaseFragment> getFragments() {
         int indicatorColor = this.getResources().getColor(R.color.colorAccent);
         int dividerColor = Color.WHITE;
 
@@ -94,7 +94,7 @@ public class Tab_MainFragment extends BaseFragment {
         int ic_bookmark = R.drawable.ic_bookmark_white_48dp;
         int ic_history = R.drawable.ic_history_white_48dp;
 
-        LinkedList<BaseFragment> fragments = new LinkedList<>();
+        LinkedList<TabBaseFragment> fragments = new LinkedList<>();
         String home = getString(R.string.tab_Home);
         String bookmark = getString(R.string.tab_BookMarks);
         String history = getString(R.string.tab_History);

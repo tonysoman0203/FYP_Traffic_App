@@ -1,58 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginTop="5dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
 
     >
 
+    <!--<LinearLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:id="@+id/linearLayout2"-->
+    <!--android:layout_marginTop="0dp"-->
+    <!--android:layout_alignParentTop="true"-->
+    <!--android:layout_alignParentStart="true">-->
+
+    <!--<Button-->
+    <!--style="@style/PopupButtonStyle"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:background="@android:color/transparent"-->
+    <!--android:text="@string/popup_near"-->
+    <!--android:drawableTop="@drawable/ic_near_me_black_36dp"-->
+    <!--android:id="@+id/btnNear"-->
+    <!--android:backgroundTint="@color/colorPrimary"-->
+    <!--android:layout_weight="1" />-->
+
+    <!--<Button-->
+    <!--style="@style/PopupButtonStyle"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:id="@+id/btnBookmark"-->
+    <!--android:background="@android:color/transparent"-->
+    <!--android:text="@string/popup_add_bookMark"-->
+    <!--android:drawableTop="@drawable/ic_bookmark_black_36dp"-->
+    <!--android:backgroundTint="@color/colorPrimary"-->
+    <!--android:layout_alignTop="@+id/btnRouteMore"-->
+    <!--android:layout_toRightOf="@+id/map_snapshot_title"-->
+    <!--android:layout_toEndOf="@+id/map_snapshot_title"-->
+    <!--android:layout_weight="1" />-->
+
+    <!--<Button-->
+    <!--style="@style/PopupButtonStyle"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:id="@+id/btnShare"-->
+    <!--android:backgroundTint="@color/colorPrimary"-->
+    <!--android:background="@android:color/transparent"-->
+    <!--android:text="@string/popup_share"-->
+    <!--android:drawableTop="@drawable/ic_share_black_36dp"-->
+    <!--android:layout_alignTop="@+id/btnRouteMore"-->
+    <!--android:layout_toRightOf="@+id/map_snapshot_title"-->
+    <!--android:layout_toEndOf="@+id/map_snapshot_title"-->
+    <!--android:layout_weight="1" />-->
+
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/linearLayout2"
-        android:layout_marginTop="0dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true">
+        android:layout_weight="1"
+        android:gravity="center"
+        android:id="@+id/nearLayout">
 
-        <Button
-            style="@style/PopupButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:background="@android:color/transparent"
+        <ImageView
+            android:backgroundTint="@color/colorPrimary"
+            android:background="@drawable/ic_near_me_black_36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/popup_near"
-            android:drawableTop="@drawable/ic_near_me_black_36dp"
-            android:id="@+id/btnNear"
-            android:backgroundTint="@color/colorPrimary"
-            android:layout_weight="1" />
-
-        <Button
-        style="@style/PopupButtonStyle"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:id="@+id/btnBookmark"
-        android:background="@android:color/transparent"
-        android:text="@string/popup_add_bookMark"
-        android:drawableTop="@drawable/ic_bookmark_black_36dp"
-        android:backgroundTint="@color/colorPrimary"
-        android:layout_alignTop="@+id/btnRouteMore"
-        android:layout_toRightOf="@+id/map_snapshot_title"
-        android:layout_toEndOf="@+id/map_snapshot_title"
-        android:layout_weight="1" />
-
-        <Button
-            style="@style/PopupButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:id="@+id/btnShare"
-            android:backgroundTint="@color/colorPrimary"
-            android:background="@android:color/transparent"
-            android:text="@string/popup_share"
-            android:drawableTop="@drawable/ic_share_black_36dp"
-            android:layout_alignTop="@+id/btnRouteMore"
-            android:layout_toRightOf="@+id/map_snapshot_title"
-            android:layout_toEndOf="@+id/map_snapshot_title"
-            android:layout_weight="1" />
+            android:id="@+id/txtNearBy" />
 
     </LinearLayout>
-</RelativeLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:id="@+id/bookmarkLayout">
+
+        <ImageView
+            android:backgroundTint="@color/colorPrimary"
+            android:background="@drawable/ic_bookmark_black_36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView2" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/popup_add_bookMark"
+            android:id="@+id/txtBookmark" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:id="@+id/shareLayout">
+
+        <ImageView
+            android:backgroundTint="@color/colorPrimary"
+            android:background="@drawable/ic_share_white_36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView3" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/abc_shareactionprovider_share_with"
+            android:id="@+id/txtShareWith" />
+    </LinearLayout>
+
+    <!--</LinearLayout>-->
+</LinearLayout>

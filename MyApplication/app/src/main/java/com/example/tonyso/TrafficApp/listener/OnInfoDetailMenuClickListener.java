@@ -7,16 +7,16 @@ import android.view.View;
 /**
  * Created by soman on 2015/12/25.
  */
-public class OnButtonClickListener implements View.OnClickListener {
+public class OnInfoDetailMenuClickListener implements View.OnClickListener {
     RecyclerViewListener recyclerViewListener;
     int pos;
     RecyclerView.ViewHolder viewHolder;
 
-    public OnButtonClickListener(RecyclerViewListener recyclerViewListener, int adapterPosition, RecyclerView.ViewHolder viewHolder) {
+    public OnInfoDetailMenuClickListener(RecyclerViewListener recyclerViewListener, int adapterPosition, RecyclerView.ViewHolder viewHolder) {
         this.recyclerViewListener = recyclerViewListener;
         this.pos = adapterPosition;
         this.viewHolder = viewHolder;
-        Log.e(OnButtonClickListener.class.getName(),""+pos);
+        Log.e(OnInfoDetailMenuClickListener.class.getName(), "" + pos);
     }
 
 
@@ -31,7 +31,7 @@ public class OnButtonClickListener implements View.OnClickListener {
                 recyclerViewListener.onAddBookmarkClick(viewHolder);
                 break;
             case 5:
-                recyclerViewListener.onResetBookmakClick(viewHolder);
+                recyclerViewListener.onResetTimerClick(viewHolder);
                 break;
             default:
                 break;

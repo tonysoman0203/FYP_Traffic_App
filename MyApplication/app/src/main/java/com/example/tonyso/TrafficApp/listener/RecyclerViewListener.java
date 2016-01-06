@@ -9,5 +9,5 @@ public interface RecyclerViewListener {
     void onRecyclerViewIndex(int tag,int pos);
     void onAddBookmarkClick(RecyclerView.ViewHolder viewHolder);
 
-    void onResetBookmakClick(RecyclerView.ViewHolder viewHolder);
+    void onResetTimerClick(RecyclerView.ViewHolder viewHolder);
 }

@@ -27,8 +27,8 @@
         <item name="android:layout_marginLeft">0dp</item>
     </style>
 
-    <style name="BookMarkTextView" parent="Base.TextAppearance.AppCompat.Body2">
-        <item name="android:layout_margin">10dp</item>
+    <style name="BookMarkTextView" parent="TextAppearance.AppCompat">
+        <item name="android:layout_margin">3dp</item>
 
     </style>
 

@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
 import com.example.tonyso.TrafficApp.adapter.HistoryAdapter;
-import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
+import com.example.tonyso.TrafficApp.baseclass.TabBaseFragment;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import java.util.Observer;
 
 import jp.wasabeef.recyclerview.animators.FadeInRightAnimator;
 
-public class Tab_HistoryFragment extends BaseFragment implements Observer {
+public class Tab_HistoryFragment extends TabBaseFragment implements Observer {
 
     private static final String TAG = Tab_HistoryFragment.class.getSimpleName();
     private RecyclerView mRecyclerHistoryView;
@@ -36,7 +36,7 @@ public class Tab_HistoryFragment extends BaseFragment implements Observer {
     private TextView emptyView;
     MyApplication myApplication;
     BookmarkTimeStatusObserver bookmarkTimeStatusObserver;
-
+    SQLiteHelper sqLiteHelper;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -66,6 +66,7 @@ public class Tab_HistoryFragment extends BaseFragment implements Observer {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tab_history_list, container, false);
+        sqLiteHelper = new SQLiteHelper(this.getContext());
         initializeUIView(view);
         setHistoryAdapter();
         return view;
@@ -119,7 +120,7 @@ public class Tab_HistoryFragment extends BaseFragment implements Observer {
      * @return bookkmark History List with no item and size == 0
      */
     private List<TimedBookMark> getBookMarkHistoryList() {
-        SQLiteHelper sqLiteHelper = new SQLiteHelper(this.getContext());
+
         if (sqLiteHelper.getBookmarkHistory().size() > 0) {
             return sqLiteHelper.getBookmarkHistory();
         } else

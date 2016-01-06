@@ -1,9 +1,12 @@
 package com.example.tonyso.TrafficApp;
 
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,7 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.tonyso.TrafficApp.adapter.HomeAdapter;
-import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
+import com.example.tonyso.TrafficApp.baseclass.TabBaseFragment;
 import com.example.tonyso.TrafficApp.model.Place;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -27,7 +30,7 @@ import java.util.List;
 
 import jp.wasabeef.recyclerview.animators.FadeInRightAnimator;
 
-public class Tab_HomeFragment extends BaseFragment{
+public class Tab_HomeFragment extends TabBaseFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -62,7 +65,7 @@ public class Tab_HomeFragment extends BaseFragment{
         return fragment;
     }
 
-    public static Tab_HomeFragment newInstance(String title, int indicatorColor, int dividerColor,int icon){
+    public static Tab_HomeFragment newInstance(String title, int indicatorColor, int dividerColor, int icon) {
         Tab_HomeFragment baseFragment = new Tab_HomeFragment();
         baseFragment.setTitle(title);
         baseFragment.setDividerColor(dividerColor);
@@ -87,6 +90,16 @@ public class Tab_HomeFragment extends BaseFragment{
 
     private void setPlaces() {
         places = new ArrayList<>();
+        if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
                 .getCurrentPlace(mGoogleApiClient, null);
         result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
