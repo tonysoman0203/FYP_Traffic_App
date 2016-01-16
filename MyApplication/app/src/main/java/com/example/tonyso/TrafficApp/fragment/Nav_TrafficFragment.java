@@ -5,6 +5,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -29,7 +30,6 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 
 import com.example.tonyso.TrafficApp.InfoDetailActivity;
-import com.example.tonyso.TrafficApp.MainActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
@@ -113,6 +113,9 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
         if (getArguments() != null) {
             Title = getArguments().getString(ARG_Title);
         }
+
+        //Getting Instance
+        getInstance();
     }
 
     @Nullable
@@ -125,11 +128,6 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
         }
         try {
             view = inflater.inflate(R.layout.content_traffic_monitoring, container, false);
-            //InitUIComponents
-            initUIComponents(view);
-            //Getting Instance
-            getInstance();
-            onSpinnerItemSelected();
         } catch (InflateException e) {
             e.printStackTrace();
         }
@@ -139,27 +137,28 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setFragmentToolbar();
+        //InitUIComponents
+        initUIComponents(view);
+        setSpinnerProperty();
+        onSpinnerItemSelected();
     }
 
     private void initUIComponents(View view) {
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         //Sync Map
         mapFragment.getMapAsync(this);
-
-        setFragmentToolbar();
         setHasOptionsMenu(true);
         this.coordinatorLayout = (CoordinatorLayout) getActivity().findViewById(R.id.coordinateLayoutMain);
         snackbar = Snackbar.make(coordinatorLayout, "Click on one Marker....", Snackbar.LENGTH_INDEFINITE);
         snackbar.show();
         // Spinner to let user select different district to see RouteCCTV
         spinner = (Spinner) view.findViewById(R.id.spinner);
-        setSpinnerProperty();
     }
 
     private void setFragmentToolbar() {
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         toolbar.setTitle(Title);
-        MainActivity.activity.setSupportActionBar(toolbar);
     }
 
     private void getInstance() {
@@ -264,24 +263,25 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
             markerOptions.title(desc);
             Marker marker = mMap.addMarker(markerOptions);
             markerSet.put(marker.getId(), false);
+
+            for (RouteSpeedMap speedMap : speedMaps) {
+                String locationDesc = speedMap.getName();
+                Log.e(TAG, locationDesc);
+                double[] temp = speedMap.getLatLng();
+                Log.e(TAG, "" + temp[0] + " " + temp[1]);
+                LatLng latLng1 = new LatLng(speedMap.getLatLng()[0], speedMap.getLatLng()[1]);
+                markerOptions = new MarkerOptions();
+                markerOptions.position(latLng1);
+                markerOptions.title(locationDesc);
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                speedMapSet.put(locationDesc, speedMap);
+                marker = mMap.addMarker(markerOptions);
+                markerSet.put(marker.getId(), false);
+            }
         }
 
-        for (RouteSpeedMap speedMap : speedMaps) {
-            String locationDesc = speedMap.getName();
-            Log.e(TAG, locationDesc);
-            double[] temp = speedMap.getLatLng();
-            Log.e(TAG, "" + temp[0] + " " + temp[1]);
-            LatLng latLng1 = new LatLng(speedMap.getLatLng()[0], speedMap.getLatLng()[1]);
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng1);
-            markerOptions.title(locationDesc);
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-            speedMapSet.put(locationDesc, speedMap);
-            Marker marker = mMap.addMarker(markerOptions);
-            markerSet.put(marker.getId(), false);
-        }
 
-        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(markerSet, getContext()));
+        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(markerSet, getContext(), speedMapSet));
         mMap.setOnMarkerClickListener(this);
     }
 
@@ -342,6 +342,7 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onMapClick(LatLng latLng) {
+
     }
 
     @Override
@@ -354,6 +355,11 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
     public void onResume() {
         super.onResume();
         Log.e(TAG, "On Resume Frag");
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -374,7 +380,7 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.e(TAG, "On Destory Frag");
+        Log.e(TAG, "onDestroy Frag");
     }
 
     @Override
@@ -419,10 +425,13 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
         private final Hashtable<String, Boolean> markerSet;
         private Context context;
         private View view;
+        private Hashtable<String, RouteSpeedMap> hashtable;
 
-        public CustomInfoWindowAdapter(Hashtable<String, Boolean> markerSet, Context context) {
+        public CustomInfoWindowAdapter(Hashtable<String, Boolean> markerSet,
+                                       Context context, Hashtable<String, RouteSpeedMap> speedMapSet) {
             this.markerSet = markerSet;
             this.context = context;
+            this.hashtable = speedMapSet;
         }
 
         @Override
@@ -434,8 +443,25 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
         public View getInfoContents(Marker marker) {
             view = getActivity().getLayoutInflater().inflate(R.layout.item_map_image, null);
             ImageView img = (ImageView) view.findViewById(R.id.imgMapImage);
-            RouteCCTV routeCCTV = roadCCTVMap.get(marker.getTitle());
-            String url = TRAFFIC_URL + routeCCTV.getRef_key() + JPG;
+            RouteCCTV routeCCTV = (roadCCTVMap.get(marker.getTitle()) == null) ? null : roadCCTVMap.get(marker.getTitle());
+            RouteSpeedMap speedMap;
+            if (hashtable.get(marker.getTitle()) == null) {
+                speedMap = null;
+            } else {
+                speedMap = hashtable.get(marker.getTitle());
+            }
+
+            String url = "";
+            //Compare Two String
+
+            if (routeCCTV != null) {
+                url = TRAFFIC_URL + routeCCTV.getRef_key() + JPG;
+                Log.d(TAG, url);
+            } else if (speedMap != null) {
+                url = TRAFFIC_SPEED_MAP + speedMap.getRef_key() +
+                        (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH) ? EN : TC) + PNG;
+                Log.d(TAG, url);
+            }
 
             boolean isImageLoaded = markerSet.get(marker.getId());
             if (isImageLoaded) {

@@ -6,15 +6,18 @@ import java.io.Serializable;
  * Created by TonySo on 31/10/15.
  */
 public class RouteCCTV extends Route implements Serializable{
-    private String[] description = null;
-    private String[] region = null;
+    protected String[] description = null;
+    protected String[] region = null;
     private double[] latLngs = null;
+    static public final String TYPE_CCTV = "cctv";
+
     private RouteCCTV(Builder builder) {
         route_id = builder.id;
         ref_key = builder.key;
         this.description = builder.description;
         this.region = builder.region;
         this.latLngs = builder.latLngs;
+        this.type = builder.type;
     }
 
     public static class Builder {
@@ -23,6 +26,7 @@ public class RouteCCTV extends Route implements Serializable{
         private String [] description;
         private String[] region;
         private double[] latLngs;
+        private String type;
 
         public RouteCCTV build(){
             return new RouteCCTV(this);
@@ -70,6 +74,15 @@ public class RouteCCTV extends Route implements Serializable{
 
         public Builder setLatLngs(double[] latLngs) {
             this.latLngs = latLngs;
+            return this;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public Builder setType(String type) {
+            this.type = type;
             return this;
         }
     }

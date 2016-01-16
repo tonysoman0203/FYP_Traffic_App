@@ -8,25 +8,25 @@
                     android:icon="@drawable/ic_terrain_white_48dp"
                     android:orderInCategory="200"
                     android:title="@string/terrain"
-                    app:showAsAction="always"
+                    app:showAsAction="ifRoom"
                     />
                 <item android:id="@+id/nav_traffic_satelite"
                     android:icon="@drawable/ic_satellite_white_48dp"
                     android:orderInCategory="300"
                     android:title="@string/nav_traffic_satelite"
-                    app:showAsAction="always"
+                    app:showAsAction="ifRoom"
                     />
                 <item android:id="@+id/nav_traffic_traffic"
                     android:icon="@drawable/ic_traffic_white_48dp"
                     android:orderInCategory="100"
                     android:title="@string/nav_traffic_traffic"
-                    app:showAsAction="always"
+                    app:showAsAction="ifRoom"
                     />
                 <item android:id="@+id/nav_traffic_default"
                     android:icon="@drawable/ic_map_white_24dp"
                     android:orderInCategory="100"
                     android:title="@string/nav_map_default"
-                    app:showAsAction="always"
+                    app:showAsAction="ifRoom"
                 />
 
 </menu>

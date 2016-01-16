@@ -108,39 +108,40 @@ public class XMLReader {
         parser.require(XmlPullParser.START_TAG, ns, Speed);
         int id = 0;
         String[] regions = new String[2];
-        String location;
-        String key = null;
-        double[] coordinate = new double[2];
+        String[] description = new String[2];
+        String key;
+        double[] coordinate;
         RouteSpeedMap routeSpeedMap = new RouteSpeedMap();
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
             String name = parser.getName();
-            if (name.equals(IMAGE_KEY)) {
-                key = readKey(parser);
-                routeSpeedMap.setRef_key(key);
-            } else if (name.equals(IMAGE_ENG_REGION)) {
-                regions[0] = readRegion(parser, IMAGE_ENG_REGION);
-            } else if (name.equals(IMAGE_CHI_REGION)) {
-                regions[1] = readRegion(parser, IMAGE_CHI_REGION);
-            } else if (name.equals(Location_SPec)) {
-                location = readLocation(parser, Location_SPec);
-                routeSpeedMap.setName(location);
-            } else if (name.equals(IMAGE_COORDINATE)) {
-                coordinate = readCoordinate(parser);
-                routeSpeedMap.setLatLng(coordinate);
+            switch (name) {
+                case IMAGE_KEY:
+                    key = readKey(parser);
+                    routeSpeedMap.setRef_key(key);
+                    break;
+                case IMAGE_ENG_REGION:
+                    regions[0] = readRegion(parser, IMAGE_ENG_REGION);
+                    break;
+                case IMAGE_CHI_REGION:
+                    regions[1] = readRegion(parser, IMAGE_CHI_REGION);
+                    break;
+                case IMAGE_ENG_DESC:
+                    description[0] = readDesc(parser, IMAGE_ENG_DESC);
+                    break;
+                case IMAGE_CHI_DESC:
+                    description[1] = readDesc(parser, IMAGE_CHI_DESC);
+                    break;
+                case IMAGE_COORDINATE:
+                    coordinate = readCoordinate(parser);
+                    routeSpeedMap.setLatLng(coordinate);
+                    break;
             }
             id++;
         }
-        return routeSpeedMap.setRegions(regions).build(id);
-    }
-
-    private String readLocation(XmlResourceParser parser, String key) throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, ns, key);
-        String region = readText(parser);
-        parser.require(XmlPullParser.END_TAG, ns, key);
-        return region;
+        return routeSpeedMap.setRegions(regions).setDescription(description).build(id);
     }
 
     public List<RouteCCTV> getImageXML(){
@@ -192,24 +193,31 @@ public class XMLReader {
                 continue;
             }
             String name = parser.getName();
-            if (name.equals(IMAGE_KEY)) {
-                key = readKey(parser);
-                builder.setKey(key);
-            } else if (name.equals(IMAGE_ENG_REGION)) {
-                regions[0] = readRegion(parser,IMAGE_ENG_REGION);
-            } else if (name.equals(IMAGE_CHI_REGION)) {
-                regions[1] = readRegion(parser,IMAGE_CHI_REGION);
-            } else if (name.equals(IMAGE_ENG_DESC)) {
-                description[0] = readDesc(parser,IMAGE_ENG_DESC);
-            } else if (name.equals(IMAGE_CHI_DESC)) {
-                description[1] = readDesc(parser,IMAGE_CHI_DESC);
-            } else if (name.equals(IMAGE_COORDINATE)){
-                coordinate = readCoordinate(parser);
-                builder.setLatLngs(coordinate);
+            switch (name) {
+                case IMAGE_KEY:
+                    key = readKey(parser);
+                    builder.setKey(key);
+                    break;
+                case IMAGE_ENG_REGION:
+                    regions[0] = readRegion(parser, IMAGE_ENG_REGION);
+                    break;
+                case IMAGE_CHI_REGION:
+                    regions[1] = readRegion(parser, IMAGE_CHI_REGION);
+                    break;
+                case IMAGE_ENG_DESC:
+                    description[0] = readDesc(parser, IMAGE_ENG_DESC);
+                    break;
+                case IMAGE_CHI_DESC:
+                    description[1] = readDesc(parser, IMAGE_CHI_DESC);
+                    break;
+                case IMAGE_COORDINATE:
+                    coordinate = readCoordinate(parser);
+                    builder.setLatLngs(coordinate);
+                    break;
             }
             id++;
         }
-        return builder.setDescription(description).setRegion(regions).build();
+        return builder.setDescription(description).setRegion(regions).setType(RouteCCTV.TYPE_CCTV).build();
     }
 
     private double[] readCoordinate(XmlResourceParser parser) throws IOException, XmlPullParserException {

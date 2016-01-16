@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_id": "hkbu-traffic-fyp",
+    "project_number": "649022348275",
+    "name": "HKBU Traffic FYP"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:649022348275:android:99482257560039b9",
+        "client_id": "android:com.example.tonyso.myapplication",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.example.tonyso.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}

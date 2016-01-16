@@ -4,7 +4,9 @@ package com.example.tonyso.TrafficApp.model;
  * Created by soman on 2015/11/1.
  */
 public class RouteSpeedMap extends RouteCCTV {
+    static final public String TYPE_Speed_Map = "SpeedMap";
     private String[] regions;
+    private String[] description;
 
     public RouteSpeedMap() {
     }
@@ -13,14 +15,21 @@ public class RouteSpeedMap extends RouteCCTV {
         this.route_id = id;
         this.latLng = routeSpeedMap.latLng;
         this.route_id = routeSpeedMap.route_id;
-        this.regions = routeSpeedMap.regions;
+        this.region = routeSpeedMap.regions;
         this.name = routeSpeedMap.name;
         this.ref_key = routeSpeedMap.ref_key;
-        this.type = "SpeedMap";
+        this.description = routeSpeedMap.description;
+        this.type = TYPE_Speed_Map;
     }
 
-    public String[] getRegions() {
-        return regions;
+    @Override
+    public String[] getDescription() {
+        return description;
+    }
+
+    public RouteSpeedMap setDescription(String[] description) {
+        this.description = description;
+        return this;
     }
 
     public RouteSpeedMap setRegions(String[] regions) {

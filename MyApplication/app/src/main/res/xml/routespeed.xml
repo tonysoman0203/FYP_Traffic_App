@@ -2,7 +2,8 @@
 <Route>
     <Speed>
         <key>TIS_S1_</key>
-        <location_Spec>大埔道南行近沙田馬場</location_Spec>
+        <english-description>Tai Po Road southbound near Sha Tin Racecourse</english-description>
+        <chinese-description>大埔道南行近沙田馬場</chinese-description>
         <coordinate>839405.76 829500.77</coordinate>
         <english-region>Shatin &amp; Ma On Shan</english-region>
         <chinese-region>沙田及馬鞍山</chinese-region>
@@ -10,7 +11,8 @@
 
     <Speed>
         <key>TIS_S2_</key>
-        <location_Spec>大老山隧道公路南行近石門</location_Spec>
+        <english-description>Tate’s Cairn Highway southbound near Shek Mun</english-description>
+        <chinese-description>大老山隧道公路南行近石門</chinese-description>
         <coordinate>839740.36 827835.46</coordinate>
         <english-region>Shatin &amp; Ma On Shan</english-region>
         <chinese-region>沙田及馬鞍山</chinese-region>
@@ -18,7 +20,8 @@
 
     <Speed>
         <key>TIS_S3_</key>
-        <location_Spec>吐露港公路南行近科學園</location_Spec>
+        <english-description>Tolo Highway southbound near the Science Park</english-description>
+        <chinese-description>吐露港公路南行近科學園</chinese-description>
         <coordinate>839366.62 831956.75</coordinate>
         <english-region>Shatin &amp; Ma On Shan</english-region>
         <chinese-region>沙田及馬鞍山</chinese-region>
@@ -26,7 +29,8 @@
 
     <Speed>
         <key>TIS_S4_</key>
-        <location_Spec>新田公路南行近錦繡花園</location_Spec>
+        <english-description>San Tin Highway near Fairview Park</english-description>
+        <chinese-description>新田公路南行近錦繡花園</chinese-description>
         <coordinate>823591.61 836073.4</coordinate>
         <english-region>Tai Po North &amp; Yuen Long</english-region>
         <chinese-region>大埔，北區及元朗</chinese-region>
@@ -34,7 +38,8 @@
 
     <Speed>
         <key>TIS_S5_</key>
-        <location_Spec>屯門公路南行近井財街</location_Spec>
+        <english-description>Tuen Mun Road near Tseng Choi Street</english-description>
+        <chinese-description>屯門公路南行近井財街</chinese-description>
         <coordinate>815710.37 829102.02</coordinate>
         <english-region>Tuen Mun &amp; Tin Shui Wai</english-region>
         <chinese-region>屯門及天水圍</chinese-region>
