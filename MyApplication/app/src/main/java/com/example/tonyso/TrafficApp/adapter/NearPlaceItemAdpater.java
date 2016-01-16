@@ -51,7 +51,7 @@ public class NearPlaceItemAdpater extends RecyclerView.Adapter<NearPlaceItemAdpa
         sortedList = new SortedList<NearbyLocation>(NearbyLocation.class, new SortedList.Callback<NearbyLocation>() {
             @Override
             public int compare(NearbyLocation o1, NearbyLocation o2) {
-                return o1.getName().compareTo(o2.getName());
+                return o1.getName().toString().compareTo(o2.getName().toString());
             }
 
             @Override
@@ -156,7 +156,7 @@ public class NearPlaceItemAdpater extends RecyclerView.Adapter<NearPlaceItemAdpa
 
         @Override
         public void onClick(View v) {
-            Uri gmmIntentUri = Uri.parse("geo:" + sortedList.get(getAdapterPosition()).getLatitude() + "," + sortedList.get(getAdapterPosition()).getLongitude() + "?z=19");
+            Uri gmmIntentUri = Uri.parse("geo:" + sortedList.get(getAdapterPosition()).getLatlngs().latitude + "," + sortedList.get(getAdapterPosition()).getLatlngs().longitude + "?z=19");
             Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
             mapIntent.setPackage("com.google.android.apps.maps");
             context.startActivity(mapIntent);

@@ -1,4 +1,4 @@
-package com.example.tonyso.TrafficApp.Singleton;
+package com.example.tonyso.TrafficApp.utility;
 
 import android.content.Context;
 import android.content.res.XmlResourceParser;
@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
-import com.example.tonyso.TrafficApp.utility.Convertor;
+import com.example.tonyso.TrafficApp.model.RouteSpeedMap;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -19,7 +19,6 @@ import java.util.List;
  * Created by soman on 2015/10/30.
  */
 public class XMLReader {
-    Context context;
     private static final String TAG = XMLReader.class.getSimpleName();
     private static final String IMAGE_LIST_TITLEt = "image-list";
     private static final String image ="image";
@@ -30,8 +29,11 @@ public class XMLReader {
     private static final String IMAGE_CHI_DESC = "chinese-description";
     private static final String IMAGE_COORDINATE = "coordinate";
     private static final String ns = null;
-
+    private static final String ROUTE = "Route";
+    private static final String Speed = "Speed";
+    private static final String Location_SPec = "location_Spec";
     public static XMLReader reader = null;
+    Context context;
 
     private XMLReader(Context context) {
         this.context = context;
@@ -57,30 +59,110 @@ public class XMLReader {
                 '}';
     }
 
+    public List<RouteSpeedMap> getRouteImageSpeedMap() {
+        List<RouteSpeedMap> speedMaps = null;
+        try {
+            Log.e(TAG, "Start Fetching Route Speed Map");
+            speedMaps = fetchSpeedMap();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            Log.e(TAG, "Fetching Route Speed Map Complete with the size=" + speedMaps.size());
+            return speedMaps;
+        }
+    }
+
+    private List<RouteSpeedMap> fetchSpeedMap() {
+        XmlResourceParser parser = createXMLParser(R.xml.routespeed);
+        List<RouteSpeedMap> speedMaps = new ArrayList<>();
+        try {
+            parser.next();
+            parser.next();
+            return readSpeedMap(parser, speedMaps);
+        } catch (XmlPullParserException | IOException e) {
+            e.printStackTrace();
+        } finally {
+            parser.close();
+        }
+        return speedMaps;
+    }
+
+    private List<RouteSpeedMap> readSpeedMap(XmlResourceParser parser, List<RouteSpeedMap> speedMaps) throws IOException, XmlPullParserException {
+        while (parser.next() != XmlPullParser.END_DOCUMENT) {
+            if (parser.getEventType() != XmlPullParser.START_TAG) {
+                continue;
+            }
+            String name = parser.getName();
+            Log.e(TAG, name);
+            // Starts by looking for the entry tag
+            if (name.equals(Speed)) {
+                speedMaps.add(readSpeed(parser));
+            } else {
+                skip(parser);
+            }
+        }
+        return speedMaps;
+    }
+
+    private RouteSpeedMap readSpeed(XmlResourceParser parser) throws IOException, XmlPullParserException {
+        parser.require(XmlPullParser.START_TAG, ns, Speed);
+        int id = 0;
+        String[] regions = new String[2];
+        String location;
+        String key = null;
+        double[] coordinate = new double[2];
+        RouteSpeedMap routeSpeedMap = new RouteSpeedMap();
+        while (parser.next() != XmlPullParser.END_TAG) {
+            if (parser.getEventType() != XmlPullParser.START_TAG) {
+                continue;
+            }
+            String name = parser.getName();
+            if (name.equals(IMAGE_KEY)) {
+                key = readKey(parser);
+                routeSpeedMap.setRef_key(key);
+            } else if (name.equals(IMAGE_ENG_REGION)) {
+                regions[0] = readRegion(parser, IMAGE_ENG_REGION);
+            } else if (name.equals(IMAGE_CHI_REGION)) {
+                regions[1] = readRegion(parser, IMAGE_CHI_REGION);
+            } else if (name.equals(Location_SPec)) {
+                location = readLocation(parser, Location_SPec);
+                routeSpeedMap.setName(location);
+            } else if (name.equals(IMAGE_COORDINATE)) {
+                coordinate = readCoordinate(parser);
+                routeSpeedMap.setLatLng(coordinate);
+            }
+            id++;
+        }
+        return routeSpeedMap.setRegions(regions).build(id);
+    }
+
+    private String readLocation(XmlResourceParser parser, String key) throws IOException, XmlPullParserException {
+        parser.require(XmlPullParser.START_TAG, ns, key);
+        String region = readText(parser);
+        parser.require(XmlPullParser.END_TAG, ns, key);
+        return region;
+    }
+
     public List<RouteCCTV> getImageXML(){
         return fetchImageXML();
     }
 
-    private  List<RouteCCTV> fetchImageXML(){
-        XmlResourceParser parser = createXMLParser();
+    private List<RouteCCTV> fetchImageXML() {
+        XmlResourceParser parser = createXMLParser(R.xml.imagelist);
         List<RouteCCTV> list = new ArrayList<>();
         try {
             parser.next();
             parser.next();
             return readFeed(parser,list);
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (XmlPullParserException | IOException e) {
             e.printStackTrace();
         } finally {
-
             parser.close();
         }
         return list;
     }
 
-    private List readFeed(XmlResourceParser parser,List list) throws IOException, XmlPullParserException {
-        List entries = list;
+    private List<RouteCCTV> readFeed(XmlResourceParser parser, List<RouteCCTV> list) throws IOException, XmlPullParserException {
         //parser.require(XmlPullParser.START_TAG, ns, image);
         while (parser.next() != XmlPullParser.END_DOCUMENT) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -89,12 +171,12 @@ public class XMLReader {
             String name = parser.getName();
             // Starts by looking for the entry tag
             if (name.equals(image)) {
-                entries.add(readImage(parser));
+                list.add(readImage(parser));
             } else {
                 skip(parser);
             }
         }
-        return entries;
+        return list;
     }
 
     private RouteCCTV readImage(XmlResourceParser parser) throws IOException, XmlPullParserException {
@@ -103,7 +185,7 @@ public class XMLReader {
         String [] regions = new String[2];
         String [] description = new String[2];
         String key = null;
-        double[] coordinate = new double[2];
+        double[] coordinate;
         RouteCCTV.Builder builder = new RouteCCTV.Builder();
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -189,8 +271,7 @@ public class XMLReader {
         }
 }
 
-    private XmlResourceParser createXMLParser(){
-        XmlResourceParser xpp = context.getResources().getXml(R.xml.imagelist);
-        return xpp;
+    private XmlResourceParser createXMLParser(int src) {
+        return context.getResources().getXml(src);
     }
 }

@@ -10,6 +10,7 @@ import com.example.tonyso.TrafficApp.adapter.InfoDetailAdapter;
 import com.example.tonyso.TrafficApp.adapter.NearPlaceItemAdpater;
 import com.example.tonyso.TrafficApp.model.NearbyLocation;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class FindNearLocationAsyncTask extends AsyncTask<Void, Void, List<Nearby
     private Context context;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
-    private double[] latlng;
+    private LatLng latlng;
     private GoogleApiClient mGoogleApiClient;
     private String currLocation;
 
@@ -33,7 +34,7 @@ public class FindNearLocationAsyncTask extends AsyncTask<Void, Void, List<Nearby
         this.context = context;
         this.recyclerView = recyclerView;
         this.progressBar = progressBar;
-        this.latlng = latlng;
+        this.latlng = new LatLng(latlng[0], latlng[1]);
         this.mGoogleApiClient = googleApiClient;
         this.currLocation = s;
     }
@@ -51,7 +52,7 @@ public class FindNearLocationAsyncTask extends AsyncTask<Void, Void, List<Nearby
 
     private List<NearbyLocation> findNearLocation() {
         NearByPlacesJsonParser service = new NearByPlacesJsonParser(context.getString(R.string.place_api_server_key));
-        return service.findPlaces(latlng[0], latlng[1], "", currLocation);
+        return service.findPlaces(latlng.latitude, latlng.longitude, "", currLocation);
     }
 
     @Override

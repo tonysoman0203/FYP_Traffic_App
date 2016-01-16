@@ -10,15 +10,36 @@ public class Route implements Serializable{
     protected String name;
     protected String sat_level;
     protected String ref_key; //RD659F
+    protected double[] latLng;
+    protected String type;
 
-    public Route(int route_id, String name, String sat_level, String refkey) {
+    public Route(int route_id, String name, String sat_level, String refkey, double[] latLng) {
         this.route_id = route_id;
         this.name = name;
         this.sat_level = sat_level;
         ref_key = refkey;
+        this.latLng = latLng;
     }
 
     public Route() {
+    }
+
+    public double[] getLatLng() {
+        return latLng;
+    }
+
+    public Route setLatLng(double[] latLng) {
+        this.latLng = latLng;
+        return this;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public Route setType(String type) {
+        this.type = type;
+        return this;
     }
 
     public long getRoute_id() {
@@ -52,5 +73,4 @@ public class Route implements Serializable{
     public void setRef_key(String ref_key) {
         this.ref_key = ref_key;
     }
-
 }

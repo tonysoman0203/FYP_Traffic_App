@@ -1,18 +1,17 @@
-package com.example.tonyso.TrafficApp.Singleton;
+package com.example.tonyso.TrafficApp.utility;
 
 import android.content.Context;
 import android.util.Log;
 
 import com.example.tonyso.TrafficApp.MyApplication;
-import com.example.tonyso.TrafficApp.utility.ShareStorage;
 
 /**
  * Created by SMK338 on 03/08/2015.
  */
 public class LanguageSelector {
-    Context context;
 //    SharedPreferences langPref;
     public static LanguageSelector languageSelector = null;
+    Context context;
 
     private LanguageSelector(Context context) {
         this.context = context;
@@ -27,7 +26,7 @@ public class LanguageSelector {
                 }
             }
         }
-        Log.d(LanguageSelector.class.getName(), "Using Same Instance of " + languageSelector);
+        Log.d(LanguageSelector.class.getName(), "Using Same Instance");
         return languageSelector;
     }
 

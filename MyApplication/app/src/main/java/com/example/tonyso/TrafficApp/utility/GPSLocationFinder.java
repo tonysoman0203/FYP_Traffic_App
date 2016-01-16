@@ -1,6 +1,5 @@
-package com.example.tonyso.TrafficApp.location;
+package com.example.tonyso.TrafficApp.utility;
 
-import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -8,8 +7,6 @@ import android.util.Log;
 
 import com.example.tonyso.TrafficApp.MainActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
-import com.example.tonyso.TrafficApp.Singleton.ErrorDialog;
-import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.model.LatLng;
@@ -30,11 +27,29 @@ public class GPSLocationFinder implements LocationListener {
     LanguageSelector languageSelector ;
     WeatherRefreshListener weatherRefreshListener;
 
-    public GPSLocationFinder(Context c, WeatherRefreshListener weatherRefreshListener) {
-        this.context = (MainActivity) c;
-        languageSelector = LanguageSelector.getInstance(this.context);
+    public GPSLocationFinder() {
+    }
+
+    private GPSLocationFinder(GPSLocationFinder gpsLocationFinder) {
+        this.context = gpsLocationFinder.context;
+        this.mLocation = gpsLocationFinder.mLocation;
+        this.errorDialog = ErrorDialog.getInstance(this.context);
+        this.languageSelector = LanguageSelector.getInstance(this.context);
+        this.weatherRefreshListener = gpsLocationFinder.weatherRefreshListener;
+    }
+
+    public GPSLocationFinder build() {
+        return new GPSLocationFinder(this);
+    }
+
+    public GPSLocationFinder setContext(MainActivity context) {
+        this.context = context;
+        return this;
+    }
+
+    public GPSLocationFinder setWeatherRefreshListener(WeatherRefreshListener weatherRefreshListener) {
         this.weatherRefreshListener = weatherRefreshListener;
-        errorDialog = ErrorDialog.getInstance(context);
+        return this;
     }
 
     public void convertLatLongToAddress(Location location, Locale locale) {
@@ -59,7 +74,7 @@ public class GPSLocationFinder implements LocationListener {
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            errorDialog.displayAlertDialog(e.getLocalizedMessage());
+            //
             e.printStackTrace();
         }
 

@@ -9,7 +9,7 @@
     <string name="rss_Location">現時位置： </string>
     <string name="rss_Temperature">現時氣溫：</string>
     <string name="rss_Weather">現時天氣： </string>
-    <string name="search">搜尋：</string>
+    <string name="search">搜尋</string>
     <string name="rss_CurrTime">現在時間： </string>
 
     <string name="OK_BUTTON">確定</string>
@@ -53,5 +53,6 @@
     <string name="language_alert">你已經選擇 %s. 請重新選擇。</string>
     <string name="Minute">分鐘</string>
     <string name="notfound">未能提供</string>
+    <string name="route_speed_image">顯示行車速度屏嗎？</string>
 
 </resources>

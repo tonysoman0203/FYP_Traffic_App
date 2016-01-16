@@ -1,4 +1,4 @@
-package com.example.tonyso.TrafficApp;
+package com.example.tonyso.TrafficApp.fragment;
 
 
 import android.graphics.Color;
@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.adapter.TabFragmentPagerAdapter;
 import com.example.tonyso.TrafficApp.baseclass.TabBaseFragment;
 
@@ -19,14 +20,17 @@ public class Tab_MainFragment extends TabBaseFragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    static TabLayout tabLayout;
+    ViewPager viewPager;
+    TabFragmentPagerAdapter adapter;
+    LinkedList<TabBaseFragment> fragments;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
-    public static TabLayout tabLayout;
-    ViewPager viewPager;
-    TabFragmentPagerAdapter adapter;
+    public Tab_MainFragment() {
+        // Required empty public constructor
+    }
 
     /**
      * Use this factory method to create a new instance of
@@ -46,18 +50,14 @@ public class Tab_MainFragment extends TabBaseFragment {
         return fragment;
     }
 
-    public static Tab_MainFragment newInstance(String title,int indicatorColor,int dividerColor,TabLayout tabLayout){
+    public static Tab_MainFragment newInstance(String title, int indicatorColor, int dividerColor, TabLayout tab) {
         Tab_MainFragment f = new Tab_MainFragment();
         f.setTitle(title);
         f.setIndicatorColor(indicatorColor);
         f.setDividerColor(dividerColor);
-        Tab_MainFragment.tabLayout = tabLayout;
+        tabLayout = tab;
 
         return f;
-    }
-
-    public Tab_MainFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -75,7 +75,7 @@ public class Tab_MainFragment extends TabBaseFragment {
         // Inflate the layout for this fragment
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_tab__main, container, false);
-        LinkedList<TabBaseFragment> fragments = getFragments();
+        fragments = getFragments();
         adapter = new TabFragmentPagerAdapter(getChildFragmentManager(), fragments);
         viewPager = (ViewPager)view.findViewById(R.id.viewpager);
         viewPager.setAdapter(adapter);
@@ -91,14 +91,15 @@ public class Tab_MainFragment extends TabBaseFragment {
         int dividerColor = Color.WHITE;
 
         int ic_home = R.drawable.ic_home_white_48dp;
+        String near = getString(R.string.tab_Home);
+
         int ic_bookmark = R.drawable.ic_bookmark_white_48dp;
         int ic_history = R.drawable.ic_history_white_48dp;
 
         LinkedList<TabBaseFragment> fragments = new LinkedList<>();
-        String home = getString(R.string.tab_Home);
         String bookmark = getString(R.string.tab_BookMarks);
         String history = getString(R.string.tab_History);
-        fragments.add(Tab_HomeFragment.newInstance(home, indicatorColor, dividerColor, ic_home));
+        fragments.add(Tab_Home_Fragment.newInstance(near, indicatorColor, dividerColor, ic_home));
         fragments.add(Tab_BookMarkFragment.newInstance(bookmark, indicatorColor, dividerColor, ic_bookmark));
         fragments.add(Tab_HistoryFragment.newInstance(history, indicatorColor, dividerColor, ic_history));
         return fragments;
@@ -107,7 +108,6 @@ public class Tab_MainFragment extends TabBaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //initTabLayoutViewPager(view);
     }
 
 

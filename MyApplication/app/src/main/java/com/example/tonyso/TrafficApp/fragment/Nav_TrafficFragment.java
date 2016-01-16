@@ -1,9 +1,11 @@
-package com.example.tonyso.TrafficApp;
+package com.example.tonyso.TrafficApp.fragment;
 
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -23,23 +25,34 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
-import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
-import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
+import com.example.tonyso.TrafficApp.InfoDetailActivity;
+import com.example.tonyso.TrafficApp.MainActivity;
+import com.example.tonyso.TrafficApp.MyApplication;
+import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
+import com.example.tonyso.TrafficApp.model.RouteSpeedMap;
+import com.example.tonyso.TrafficApp.utility.LanguageSelector;
+import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -50,34 +63,37 @@ import java.util.Map;
 public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
         GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
 
-    public static final String TAG = Nav_TrafficFragment.class.getName();
+    private static final String TAG = Nav_TrafficFragment.class.getName();
     private static final String TRAFFIC_URL = "http://tdcctv.data.one.gov.hk/";
+    private static final String TRAFFIC_SPEED_MAP = "http://resource.data.one.gov.hk/td/";
+    private static final String TC = "TC";
+    private static final String EN = "EN";
+
     private static final String JPG = ".JPG";
+    private static final String PNG = ".png";
 
     private static final String ARG_Title = "title";
-    private String Title = "";
-
-    private SupportMapFragment mapFragment;
-    private GoogleMap mMap;
-    private List<RouteCCTV> routeList;
-    private LanguageSelector languageSelector;
     Map<String, RouteCCTV> roadCCTVMap = new HashMap<>();
     Map<String, LatLng> regionMap = new HashMap<>();
+    Hashtable<String, Boolean> markerSet = new Hashtable<>();
+    Hashtable<String, RouteSpeedMap> speedMapSet = new Hashtable<>();
     SQLiteHelper sqLiteHelper;
     Snackbar snackbar;
-
-    //Spinner Test
-    private Spinner spinner;
-
     CoordinatorLayout coordinatorLayout;
     String[] arr, latlng;
-
     boolean isTrafficOn;
     Toolbar toolbar;
     ImageLoader imageLoader;
     View view;
-
-    Bundle bundle;
+    DisplayImageOptions displayImageOptions;
+    MyApplication myApplication;
+    private String Title = "";
+    private SupportMapFragment mapFragment;
+    private GoogleMap mMap;
+    private List<RouteCCTV> routeList;
+    private LanguageSelector languageSelector;
+    //Spinner Test
+    private Spinner spinner;
 
     public Nav_TrafficFragment() {
 
@@ -113,10 +129,9 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
             initUIComponents(view);
             //Getting Instance
             getInstance();
-            //Sync Map
-            mapFragment.getMapAsync(this);
             onSpinnerItemSelected();
         } catch (InflateException e) {
+            e.printStackTrace();
         }
         return view;
     }
@@ -128,6 +143,9 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
 
     private void initUIComponents(View view) {
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        //Sync Map
+        mapFragment.getMapAsync(this);
+
         setFragmentToolbar();
         setHasOptionsMenu(true);
         this.coordinatorLayout = (CoordinatorLayout) getActivity().findViewById(R.id.coordinateLayoutMain);
@@ -145,10 +163,17 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
     }
 
     private void getInstance() {
+
         imageLoader = ImageLoader.getInstance();
+        displayImageOptions = new DisplayImageOptions.Builder()
+                .showStubImage(R.drawable.ic_launcher)        //    Display Stub Image
+                .showImageForEmptyUri(R.drawable.ic_launcher)    //    If Empty image found
+                .cacheInMemory()
+                .cacheOnDisc().bitmapConfig(Bitmap.Config.RGB_565)
+                .build();
         sqLiteHelper = new SQLiteHelper(this.getContext());
         languageSelector = LanguageSelector.getInstance(this.getContext());
-        MyApplication myApplication = (MyApplication) getActivity().getApplication();
+        myApplication = (MyApplication) getActivity().getApplication();
         routeList = myApplication.list;
     }
 
@@ -201,6 +226,8 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
         if (p == 0) return;
         String name = arr[p];
         List<RouteCCTV> selectedRoute = new ArrayList<>();
+        List<RouteSpeedMap> speedMaps = myApplication.speedMaps;
+
         for (int i = 0; i < routeList.size(); i++) {
             String d;
             if (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH)) {
@@ -212,6 +239,7 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
                 selectedRoute.add(routeList.get(i));
             }
         }
+
         //Get the Latlng first and set the map;
         LatLng latLng = regionMap.get(name);
         CameraUpdate center = CameraUpdateFactory.newLatLng(latLng);
@@ -224,7 +252,6 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
             RouteCCTV routeCCTV = selectedRoute.get(count);
             String desc;
             LatLng latlng = new LatLng(selectedRoute.get(count).getLatLngs()[0], selectedRoute.get(count).getLatLngs()[1]);
-            //LatLng location = new LatLng(latlng[0],latlng[1]);
             if (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH)) {
                 desc = routeCCTV.getDescription()[0];
                 roadCCTVMap.put(desc, routeCCTV);
@@ -235,8 +262,26 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(latlng);
             markerOptions.title(desc);
-            mMap.addMarker(markerOptions);
+            Marker marker = mMap.addMarker(markerOptions);
+            markerSet.put(marker.getId(), false);
         }
+
+        for (RouteSpeedMap speedMap : speedMaps) {
+            String locationDesc = speedMap.getName();
+            Log.e(TAG, locationDesc);
+            double[] temp = speedMap.getLatLng();
+            Log.e(TAG, "" + temp[0] + " " + temp[1]);
+            LatLng latLng1 = new LatLng(speedMap.getLatLng()[0], speedMap.getLatLng()[1]);
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng1);
+            markerOptions.title(locationDesc);
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+            speedMapSet.put(locationDesc, speedMap);
+            Marker marker = mMap.addMarker(markerOptions);
+            markerSet.put(marker.getId(), false);
+        }
+
+        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(markerSet, getContext()));
         mMap.setOnMarkerClickListener(this);
     }
 
@@ -276,6 +321,7 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
         if (ActivityCompat.checkSelfPermission(this.getContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -289,6 +335,8 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
+
+
         mMap.setMyLocationEnabled(true);
     }
 
@@ -332,7 +380,7 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Log.e(TAG, "On Destory View");
+        Log.e(TAG, "On Destroy View");
     }
 
     @Override
@@ -342,7 +390,9 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
     }
 
     @Override
-    public boolean onMarkerClick(final Marker marker) {
+    public boolean onMarkerClick(Marker marker) {
+        final Marker m = marker;
+        marker.showInfoWindow();
         snackbar = Snackbar.make(coordinatorLayout,marker.getTitle(),Snackbar.LENGTH_INDEFINITE);
         ViewGroup view = (ViewGroup) snackbar.getView();
         //Get Route Object
@@ -350,7 +400,7 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
             @Override
             public void onClick(View v) {
                 final Intent intent = new Intent(getActivity(), InfoDetailActivity.class);
-                final String title = marker.getTitle();
+                final String title = m.getTitle();
                 Log.e(TAG, title);
                 intent.putExtra("key", title);
                 intent.putExtra(title, roadCCTVMap.get(title));
@@ -365,4 +415,70 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
         return true;
     }
 
+    private class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
+        private final Hashtable<String, Boolean> markerSet;
+        private Context context;
+        private View view;
+
+        public CustomInfoWindowAdapter(Hashtable<String, Boolean> markerSet, Context context) {
+            this.markerSet = markerSet;
+            this.context = context;
+        }
+
+        @Override
+        public View getInfoWindow(Marker marker) {
+            return null;
+        }
+
+        @Override
+        public View getInfoContents(Marker marker) {
+            view = getActivity().getLayoutInflater().inflate(R.layout.item_map_image, null);
+            ImageView img = (ImageView) view.findViewById(R.id.imgMapImage);
+            RouteCCTV routeCCTV = roadCCTVMap.get(marker.getTitle());
+            String url = TRAFFIC_URL + routeCCTV.getRef_key() + JPG;
+
+            boolean isImageLoaded = markerSet.get(marker.getId());
+            if (isImageLoaded) {
+                imageLoader.displayImage(url, img, displayImageOptions);
+            } else {
+                isImageLoaded = true;
+                markerSet.put(marker.getId(), isImageLoaded);
+                imageLoader.displayImage(url, img, displayImageOptions, new CustomImageLoadingListener(marker));
+            }
+
+            return view;
+        }
+    }
+
+    private class CustomImageLoadingListener implements ImageLoadingListener {
+
+        private Marker marker;
+
+        public CustomImageLoadingListener(Marker markerToRefresh) {
+            this.marker = markerToRefresh;
+        }
+
+        @Override
+        public void onLoadingStarted(String imageUri, View view) {
+
+        }
+
+        @Override
+        public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+
+        }
+
+        @Override
+        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+            if (marker != null && marker.isInfoWindowShown()) {
+                marker.hideInfoWindow();
+                marker.showInfoWindow();
+            }
+        }
+
+        @Override
+        public void onLoadingCancelled(String imageUri, View view) {
+
+        }
+    }
 }

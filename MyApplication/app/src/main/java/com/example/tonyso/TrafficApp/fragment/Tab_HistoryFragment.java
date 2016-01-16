@@ -1,22 +1,28 @@
-package com.example.tonyso.TrafficApp;
+package com.example.tonyso.TrafficApp.fragment;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
+import com.example.tonyso.TrafficApp.BookmarkTimeStatusObserver;
+import com.example.tonyso.TrafficApp.InfoDetailActivity;
+import com.example.tonyso.TrafficApp.MyApplication;
+import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.adapter.HistoryAdapter;
 import com.example.tonyso.TrafficApp.baseclass.TabBaseFragment;
+import com.example.tonyso.TrafficApp.listener.OnItemClickListener;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
+import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,18 +31,34 @@ import java.util.Observer;
 
 import jp.wasabeef.recyclerview.animators.FadeInRightAnimator;
 
-public class Tab_HistoryFragment extends TabBaseFragment implements Observer {
+public class Tab_HistoryFragment extends TabBaseFragment implements Observer, OnItemClickListener {
 
+    public static final String INTENT_TAG_HISTORY_ITEM = "History Object";
     private static final String TAG = Tab_HistoryFragment.class.getSimpleName();
+    private static final int HISTORY_VIEW_RECORD_REQUEST_CODE = 00001000;
+    MyApplication myApplication;
+    BookmarkTimeStatusObserver bookmarkTimeStatusObserver;
+    SQLiteHelper sqLiteHelper;
     private RecyclerView mRecyclerHistoryView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private List<TimedBookMark> historyList = new ArrayList<>();
     private HistoryAdapter historyAdapter;
     private View view;
     private TextView emptyView;
-    MyApplication myApplication;
-    BookmarkTimeStatusObserver bookmarkTimeStatusObserver;
-    SQLiteHelper sqLiteHelper;
+    private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Log.e("What the Fuck", "What the fuck");
+                    setHistoryAdapter();
+                }
+            }, 1000);
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
+    };
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -53,6 +75,7 @@ public class Tab_HistoryFragment extends TabBaseFragment implements Observer {
         baseFragment.setIndicatorColor(indicatorColor);
         return baseFragment;
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,8 +100,10 @@ public class Tab_HistoryFragment extends TabBaseFragment implements Observer {
         Log.d(TAG, "history LIst Size = " + historyList.size());
         if (historyList.size() <= 0) {
             setEmptyText("There is no History....");
+            mRecyclerHistoryView.setVisibility(View.GONE);
         } else {
             emptyView.setVisibility(View.GONE);
+            mRecyclerHistoryView.setVisibility(View.VISIBLE);
             historyAdapter = new HistoryAdapter(this, historyList);
             mRecyclerHistoryView.setAdapter(historyAdapter);
         }
@@ -92,21 +117,8 @@ public class Tab_HistoryFragment extends TabBaseFragment implements Observer {
         mSwipeRefreshLayout.setOnRefreshListener(mOnRefreshListener);
         mRecyclerHistoryView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         mRecyclerHistoryView.setItemAnimator(new FadeInRightAnimator());
-        registerForContextMenu(mRecyclerHistoryView);
+        //registerForContextMenu(mRecyclerHistoryView);
     }
-
-    private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
-        @Override
-        public void onRefresh() {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    Log.e("What the Fuck", "What the fuck");
-                }
-            }, 1000);
-            mSwipeRefreshLayout.setRefreshing(false);
-        }
-    };
 
     @Override
     public void onDetach() {
@@ -136,39 +148,44 @@ public class Tab_HistoryFragment extends TabBaseFragment implements Observer {
             emptyView.setText(emptyText);
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        int position = -1;
-        try {
-            position = historyAdapter.getPosition();
-        } catch (Exception e) {
-            Log.d(TAG, e.getLocalizedMessage(), e);
-            return super.onContextItemSelected(item);
-        }
-        switch (item.getItemId()) {
-            case R.id.bookmark_delete:
-                // do your stuff
-                Log.e(TAG, item.getTitle() + "Click in Context Menu");
-                if (historyAdapter.removeSelectedItem(position) > 0) {
-                    break;
-                } else
-                    setHistoryAdapter();
-                break;
-            case R.id.bookmark_share:
-                // do your stuff
-                Log.e(TAG, item.getTitle() + "Click in Context Menu");
-                break;
-        }
-        return super.onContextItemSelected(item);
-    }
 
     @Override
     public void update(Observable observable, Object data) {
         if (bookmarkTimeStatusObserver.isTimeOverChanged()) {
             Log.e(TAG, "Update AR........ ");
             setHistoryAdapter();
+            //historyAdapter.notifyItemInserted(historyAdapter.getItemCount()-1);
         }
     }
 
 
+    @Override
+    public void onClick(int position, boolean isLongClick) {
+        final Snackbar snackbar = Snackbar.make(getView(), "One Item is Deleted....", Snackbar.LENGTH_SHORT);
+        if (isLongClick) {
+            if (historyAdapter.removeSelectedItem(position) > 0) {
+                snackbar.setAction("Dismiss...", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        snackbar.dismiss();
+                    }
+                });
+                snackbar.show();
+            } else {
+                snackbar.setAction("Dismiss...", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        snackbar.dismiss();
+                    }
+                });
+                snackbar.show();
+                setHistoryAdapter();
+            }
+        } else {
+            Intent intent = new Intent(getContext(), InfoDetailActivity.class);
+            intent.putExtra(INTENT_TAG_HISTORY_ITEM, historyAdapter.getmSortedList().get(position).get_id());
+            intent.putExtra("type", InfoDetailActivity.VIEW_HISTORY_RECORD);
+            startActivityForResult(intent, HISTORY_VIEW_RECORD_REQUEST_CODE);
+        }
+    }
 }

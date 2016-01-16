@@ -20,12 +20,14 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
-import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
-import com.example.tonyso.TrafficApp.adapter.HistoryAdapter;
 import com.example.tonyso.TrafficApp.adapter.InfoDetailAdapter;
+import com.example.tonyso.TrafficApp.fragment.Nav_TrafficFragment;
+import com.example.tonyso.TrafficApp.fragment.Tab_BookMarkFragment;
+import com.example.tonyso.TrafficApp.fragment.Tab_HistoryFragment;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
+import com.example.tonyso.TrafficApp.utility.LanguageSelector;
+import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -49,39 +51,33 @@ public class InfoDetailActivity extends AppCompatActivity
     private static final int REQUEST_RESOLVE_ERROR = 1001;
     // Unique tag for the error dialog fragment
     private static final String DIALOG_ERROR = "dialog_error";
-    // Bool to track whether the app is already resolving an error
-    private boolean mResolvingError = false;
-
+    private static final int RECYCLER_VIEW_SIZE = 3;
+    private static final String STATE_RESOLVING_ERROR = "resolving_error";
+    public CoordinatorLayout coordinatorLayout;
     //UI Components.....
     Toolbar toolbar;
     FloatingActionButton fab;
     CollapsingToolbarLayout collapsingToolbarLayout;
+    //Variable
     ImageView imageRoute;
     TextView txtSubtitle,title;
-    //Variable
-
     String imageKey;
     Intent intent;
     RouteCCTV route;
     Bitmap routeImg =null;
-
     //Instance
     LanguageSelector languageSelector;
-
     //Action
     RecyclerView recyclerView;
-    private static final int RECYCLER_VIEW_SIZE = 3;
     InfoDetailAdapter infoDetailAdapter;
-    public CoordinatorLayout coordinatorLayout;
     SQLiteHelper sqLiteHelper;
     TimedBookMark bookMark;
     String type = "Add_ROUTE";
 
     GoogleApiClient mGoogleApiClient;
-
-    private static final String STATE_RESOLVING_ERROR = "resolving_error";
-
     FragmentManager fm;
+    // Bool to track whether the app is already resolving an error
+    private boolean mResolvingError = false;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -220,7 +216,7 @@ public class InfoDetailActivity extends AppCompatActivity
                     break;
                 case VIEW_HISTORY_RECORD:
                     type = intent_type;
-                    bookMark = sqLiteHelper.getBookmark(intent.getIntExtra(HistoryAdapter.INTENT_TAG_HISTORY_ITEM, -1));
+                    bookMark = sqLiteHelper.getBookmark(intent.getIntExtra(Tab_HistoryFragment.INTENT_TAG_HISTORY_ITEM, -1));
                     if (bookMark != null) {
                         route = new RouteCCTV.Builder()
                                 .setId(bookMark.get_id())
@@ -287,25 +283,6 @@ public class InfoDetailActivity extends AppCompatActivity
         mResolvingError = false;
     }
 
-    /* A fragment to display an error dialog */
-    public static class ErrorDialogFragment extends DialogFragment {
-        public ErrorDialogFragment() {
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Get the error code and retrieve the appropriate dialog
-            int errorCode = this.getArguments().getInt(DIALOG_ERROR);
-            return GoogleApiAvailability.getInstance().getErrorDialog(
-                    this.getActivity(), errorCode, REQUEST_RESOLVE_ERROR);
-        }
-
-        @Override
-        public void onDismiss(DialogInterface dialog) {
-            ((InfoDetailActivity) getActivity()).onDialogDismissed();
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_RESOLVE_ERROR) {
@@ -332,6 +309,25 @@ public class InfoDetailActivity extends AppCompatActivity
     protected void onStop() {
         mGoogleApiClient.disconnect();
         super.onStop();
+    }
+
+    /* A fragment to display an error dialog */
+    public static class ErrorDialogFragment extends DialogFragment {
+        public ErrorDialogFragment() {
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Get the error code and retrieve the appropriate dialog
+            int errorCode = this.getArguments().getInt(DIALOG_ERROR);
+            return GoogleApiAvailability.getInstance().getErrorDialog(
+                    this.getActivity(), errorCode, REQUEST_RESOLVE_ERROR);
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            ((InfoDetailActivity) getActivity()).onDialogDismissed();
+        }
     }
 
 }

@@ -1,14 +1,12 @@
 package com.example.tonyso.TrafficApp.adapter;
 
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -16,13 +14,14 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.tonyso.TrafficApp.InfoDetailActivity;
+import com.cocosw.bottomsheet.BottomSheet;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
-import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
-import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
-import com.example.tonyso.TrafficApp.Tab_HistoryFragment;
+import com.example.tonyso.TrafficApp.fragment.Tab_HistoryFragment;
+import com.example.tonyso.TrafficApp.listener.OnItemClickListener;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
+import com.example.tonyso.TrafficApp.utility.LanguageSelector;
+import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -37,22 +36,21 @@ import java.util.List;
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder> {
 
     private static final String TAG = HistoryAdapter.class.getSimpleName();
-    private final DisplayImageOptions imageOptions;
-    private Tab_HistoryFragment context;
-    private LanguageSelector languageSelector;
-    private SortedList<TimedBookMark> mSortedList;
-
     private static final String TRAFFIC_URL = "http://tdcctv.data.one.gov.hk/";
     private static final String JPG = ".JPG";
-
+    private final DisplayImageOptions imageOptions;
+    SortedList<TimedBookMark> mSortedList;
+    private Tab_HistoryFragment context;
+    private LanguageSelector languageSelector;
     private ImageLoader imageLoader;
 
-    public static final String INTENT_TAG_HISTORY_ITEM = "History Object";
-    private static final int HISTORY_VIEW_RECORD_REQUEST_CODE = 00001000;
+
     private int position;
+    private OnItemClickListener onItemClickListener;
 
     public HistoryAdapter(Tab_HistoryFragment context, List<TimedBookMark> historyList) {
         this.context = context;
+        this.onItemClickListener = context;
         this.languageSelector = LanguageSelector.getInstance(context.getContext());
         mSortedList = getmSortedList(historyList);
         imageLoader = ImageLoader.getInstance();
@@ -61,6 +59,14 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 .considerExifParams(true)
                 .displayer(new SimpleBitmapDisplayer())
                 .build();
+    }
+
+    public SortedList<TimedBookMark> getmSortedList() {
+        return mSortedList;
+    }
+
+    public void setmSortedList(SortedList<TimedBookMark> mSortedList) {
+        this.mSortedList = mSortedList;
     }
 
     private SortedList<TimedBookMark> getmSortedList(List<TimedBookMark> historylist) {
@@ -118,58 +124,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         this.position = position;
     }
 
-    public class HistoryViewHolder extends ViewHolder implements View.OnClickListener, View.OnCreateContextMenuListener, View.OnLongClickListener {
-
-
-        ImageView imageView;
-        TextView time, roadName, district;
-        ProgressBar progressBar;
-        View itemView;
-        LinearLayout timerContainer;
-
-        public HistoryViewHolder(View itemView) {
-            super(itemView);
-            //initializeLayout
-            initializeLayout(itemView);
-        }
-
-        private void initializeLayout(View itemView) {
-            this.itemView = itemView;
-            imageView = (ImageView) itemView.findViewById(R.id.bkImage);
-            time = (TextView) itemView.findViewById(R.id.bkTime);
-            roadName = (TextView) itemView.findViewById(R.id.txtRoadName);
-            district = (TextView) itemView.findViewById(R.id.txtDistrict);
-            progressBar = (ProgressBar) itemView.findViewById(R.id.bkprogressbar);
-            timerContainer = (LinearLayout) itemView.findViewById(R.id.timerContainer);
-            timerContainer.setVisibility(View.GONE);
-            this.itemView.setOnClickListener(this);
-            this.itemView.setOnCreateContextMenuListener(this);
-            this.itemView.setOnLongClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            Log.e(HistoryAdapter.class.getName(), "OnClick at Position " + getAdapterPosition());
-            Intent intent = new Intent(context.getContext(), InfoDetailActivity.class);
-            intent.putExtra(INTENT_TAG_HISTORY_ITEM, mSortedList.get(getAdapterPosition()).get_id());
-            intent.putExtra("type", InfoDetailActivity.VIEW_HISTORY_RECORD);
-            context.startActivityForResult(intent, HISTORY_VIEW_RECORD_REQUEST_CODE);
-        }
-
-
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(Menu.NONE, R.id.bookmark_delete, Menu.NONE, context.getResources().getString(R.string.history_record_delete));
-            menu.add(Menu.NONE, R.id.bookmark_share, Menu.NONE, context.getResources().getString(R.string.popup_share));
-        }
-
-        @Override
-        public boolean onLongClick(View v) {
-            setPosition(getAdapterPosition());
-            return false;
-        }
-    }
-
     public int removeSelectedItem(Integer pos) {
         mSortedList.beginBatchedUpdates();
         try {
@@ -182,14 +136,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         }
         mSortedList.endBatchedUpdates();
         notifyItemRemoved(pos);
-
         return mSortedList.size();
     }
-    
+
     @Override
     public HistoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tab_bookmark_recycleritem, null, false);
-        HistoryViewHolder historyViewHolder = new HistoryViewHolder(view);
+        HistoryViewHolder historyViewHolder = new HistoryViewHolder(view, onItemClickListener);
         return historyViewHolder;
     }
 
@@ -231,10 +184,74 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         });
     }
 
-
     @Override
     public int getItemCount() {
         return mSortedList.size();
+    }
+
+    public class HistoryViewHolder extends ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+
+
+        ImageView imageView;
+        TextView time, roadName, district;
+        ProgressBar progressBar;
+        View itemView;
+        LinearLayout timerContainer;
+        OnItemClickListener onItemClickListener;
+
+        public HistoryViewHolder(View itemView, OnItemClickListener onItemClickListener) {
+            super(itemView);
+            //initializeLayout
+            this.onItemClickListener = onItemClickListener;
+            initializeLayout(itemView);
+
+        }
+
+        private void initializeLayout(View itemView) {
+            this.itemView = itemView;
+            imageView = (ImageView) itemView.findViewById(R.id.bkImage);
+            time = (TextView) itemView.findViewById(R.id.bkTime);
+            roadName = (TextView) itemView.findViewById(R.id.txtRoadName);
+            district = (TextView) itemView.findViewById(R.id.txtDistrict);
+            progressBar = (ProgressBar) itemView.findViewById(R.id.bkprogressbar);
+            timerContainer = (LinearLayout) itemView.findViewById(R.id.timerContainer);
+            timerContainer.setVisibility(View.GONE);
+            this.itemView.setOnClickListener(this);
+            this.itemView.setOnLongClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.e(HistoryAdapter.class.getName(), "OnClick at Position " + getAdapterPosition());
+            onItemClickListener.onClick(getAdapterPosition(), false);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            new BottomSheet.Builder(context.getActivity()).title("title").sheet(R.menu.bookmark_menu).listener(new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case R.id.bookmark_delete:
+                            onItemClickListener.onClick(getAdapterPosition(), true);
+                            break;
+                        case R.id.bookmark_share:
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }).show();
+            return true;
+        }
+
+
+//        @Override
+//        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+//            menu.add(Menu.NONE, R.id.bookmark_delete, Menu.NONE, context.getResources().getString(R.string.history_record_delete));
+//            menu.add(Menu.NONE, R.id.bookmark_share, Menu.NONE, context.getResources().getString(R.string.popup_share));
+//        }
+
     }
 
 

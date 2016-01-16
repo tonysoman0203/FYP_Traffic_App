@@ -1,5 +1,6 @@
 package com.example.tonyso.TrafficApp.baseclass;
 
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.support.v4.app.Fragment;
 
@@ -41,4 +42,9 @@ public class TabBaseFragment extends Fragment {
         this.icon = icon;
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
+    }
 }

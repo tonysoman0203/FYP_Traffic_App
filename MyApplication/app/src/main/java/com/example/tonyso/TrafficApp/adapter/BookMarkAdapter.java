@@ -1,26 +1,26 @@
 package com.example.tonyso.TrafficApp.adapter;
 
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.cocosw.bottomsheet.BottomSheet;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
-import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
-import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
-import com.example.tonyso.TrafficApp.Tab_BookMarkFragment;
+import com.example.tonyso.TrafficApp.fragment.Tab_BookMarkFragment;
 import com.example.tonyso.TrafficApp.listener.OnItemClickListener;
 import com.example.tonyso.TrafficApp.listener.OnRemainingTimeListener;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
+import com.example.tonyso.TrafficApp.utility.LanguageSelector;
+import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -37,31 +37,17 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         implements OnRemainingTimeListener {
 
     public static final String TAG = BookMarkAdapter.class.getSimpleName();
-    List<TimedBookMark> myDatasets;
-    SortedList<TimedBookMark> sortedList;
-
-    Tab_BookMarkFragment frag;
     private static String TRAFFIC_URL = "http://tdcctv.data.one.gov.hk/";
     private static String JPG = ".JPG";
+    List<TimedBookMark> myDatasets;
+    SortedList<TimedBookMark> sortedList;
+    Tab_BookMarkFragment frag;
+    ViewHolder viewHolderInstance;
+    OnItemClickListener onItemClickListener;
     private ImageLoader imageLoader;
     private DisplayImageOptions imageOptions;
     private LanguageSelector languageSelector;
-    ViewHolder viewHolderInstance;
-    OnItemClickListener onItemClickListener;
-
     private int position;
-
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
-    }
 
     public BookMarkAdapter(List<TimedBookMark> dataSets,
                            Tab_BookMarkFragment tab_bookMarkFragment) {
@@ -77,6 +63,18 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
                 .displayer(new SimpleBitmapDisplayer())
                 .build();
         languageSelector = LanguageSelector.getInstance(frag.getContext());
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
     private void addDatatoSortedList(List<TimedBookMark> myDatasets) {
@@ -142,59 +140,9 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         notifyItemRemoved(pos);
     }
 
-    public void removeSelectedItem() {
-        sortedList.beginBatchedUpdates();
-        try {
-            for (int i = 0; i < sortedList.size(); i++) {
-                if (sortedList.get(i).getRemainTime() <= 0) {
-                        sortedList.removeItemAt(i);
-                        notifyItemRemoved(i);
-                }
-            }
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
-        }
-        sortedList.endBatchedUpdates();
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
-            View.OnCreateContextMenuListener
-    {
-        ImageView imageView;
-        TextView time, roadName, remainTime, district;
-        ProgressBar progressBar;
-        View itemView;
-        OnItemClickListener onItemClickListener;
-
-        public ViewHolder(View itemView, OnItemClickListener onItemClickListener) {
-            super(itemView);
-            this.itemView = itemView;
-            imageView = (ImageView)itemView.findViewById(R.id.bkImage);
-            time = (TextView)itemView.findViewById(R.id.bkTime);
-            remainTime = (TextView)itemView.findViewById(R.id.txtRemainTIme);
-            roadName = (TextView)itemView.findViewById(R.id.txtRoadName);
-            district = (TextView)itemView.findViewById(R.id.txtDistrict);
-            progressBar = (ProgressBar)itemView.findViewById(R.id.bkprogressbar);
-
-            this.onItemClickListener = onItemClickListener;
-
-            this.itemView.setOnClickListener(this);
-            this.itemView.setOnCreateContextMenuListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            Log.d(TAG, "ItemView Click at @ At POS " + getAdapterPosition());
-            if (onItemClickListener != null) {
-                onItemClickListener.onClick(v, getAdapterPosition());
-            }
-        }
-
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(Menu.NONE, R.id.bookmark_delete, Menu.NONE, frag.getResources().getString(R.string.bookmark_delete));
-            menu.add(Menu.NONE, R.id.bookmark_share, Menu.NONE, frag.getResources().getString(R.string.popup_share));
-        }
+    public void removeItemWithoutSQLite(int i) {
+        sortedList.removeItemAt(i);
+        notifyItemRemoved(i);
     }
 
     @Override
@@ -203,7 +151,6 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         viewHolderInstance = new ViewHolder(view,onItemClickListener);
         return viewHolderInstance;
     }
-
 
     @Override
     public void onBindViewHolder(final BookMarkAdapter.ViewHolder holder, final int position) {
@@ -244,23 +191,59 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
 
             }
         });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                setPosition(holder.getAdapterPosition());
-                return false;
-            }
-        });
-    }
-
-    @Override
-    public void onViewRecycled(ViewHolder holder) {
-        holder.itemView.setOnLongClickListener(null);
-        super.onViewRecycled(holder);
     }
 
     @Override
     public int getItemCount() {
         return sortedList.size();
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+        ImageView imageView;
+        TextView time, roadName, remainTime, district;
+        ProgressBar progressBar;
+        View itemView;
+        OnItemClickListener onItemClickListener;
+
+        public ViewHolder(View itemView, OnItemClickListener onItemClickListener) {
+            super(itemView);
+            this.itemView = itemView;
+            imageView = (ImageView) itemView.findViewById(R.id.bkImage);
+            time = (TextView) itemView.findViewById(R.id.bkTime);
+            remainTime = (TextView) itemView.findViewById(R.id.txtRemainTIme);
+            roadName = (TextView) itemView.findViewById(R.id.txtRoadName);
+            district = (TextView) itemView.findViewById(R.id.txtDistrict);
+            progressBar = (ProgressBar) itemView.findViewById(R.id.bkprogressbar);
+
+            this.onItemClickListener = onItemClickListener;
+
+            this.itemView.setOnClickListener(this);
+            this.itemView.setOnLongClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.d(TAG, "ItemView Click at @ At POS " + getAdapterPosition());
+            onItemClickListener.onClick(getAdapterPosition(), false);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            new BottomSheet.Builder(frag.getActivity()).title("title").sheet(R.menu.bookmark).listener(new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case R.id.bookmark_delete:
+                            onItemClickListener.onClick(position, true);
+                            break;
+                        case R.id.bookmark_share:
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }).show();
+            return true;
+        }
     }
 }

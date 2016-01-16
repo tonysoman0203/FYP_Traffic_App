@@ -19,7 +19,6 @@ public class OnInfoDetailMenuClickListener implements View.OnClickListener {
         Log.e(OnInfoDetailMenuClickListener.class.getName(), "" + pos);
     }
 
-
     @Override
     public void onClick(View v) {
         int tag = (Integer) v.getTag();
@@ -37,4 +36,15 @@ public class OnInfoDetailMenuClickListener implements View.OnClickListener {
                 break;
         }
     }
+
+
+    public interface RecyclerViewListener {
+        void onRecyclerViewIndex(int tag, int pos);
+
+        void onAddBookmarkClick(RecyclerView.ViewHolder viewHolder);
+
+        void onResetTimerClick(RecyclerView.ViewHolder viewHolder);
+    }
 }
+
+

@@ -1,4 +1,4 @@
-package com.example.tonyso.TrafficApp.Singleton;
+package com.example.tonyso.TrafficApp.utility;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -13,12 +13,12 @@ import java.util.HashMap;
  */
 public class ErrorDialog {
 
-    public static class Type{
-        public static final int CONNECTION_TIMEOUT = 10001;
-    }
-
-    Context context;
     public static ErrorDialog ourInstance = null;
+    Context context;
+
+    private ErrorDialog(Context context) {
+        this.context = context;
+    }
 
     public static ErrorDialog getInstance(Context context){
         if (ourInstance == null){
@@ -32,8 +32,22 @@ public class ErrorDialog {
         return ourInstance;
     }
 
-    private ErrorDialog(Context context){
-        this.context = context;
+    public static HashMap<String, String> loadMessageListZH() {
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put(Tag.PROCESSING_MSG, Message.Processing_msg_zh);
+        //hashMap.put(Tag.PROCESSING_OPTOUT_MSG, Message.Processing_optout_msg_zh);
+        hashMap.put(Tag.PROCESSING_SUBMIT_FEEDBACK_MSG, Message.Processing_submit_feedback_msg_zh);
+        //hashMap.put(Tag.PROCESSING_VERF_MSG, Message.Processing_verf_msg_zh);
+        return hashMap;
+    }
+
+    public static HashMap<String, String> loadMessageListEN() {
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put(Tag.PROCESSING_MSG, Message.Processing_msg);
+        //hashMap.put(Tag.PROCESSING_OPTOUT_MSG, Message.Processing_optout_msg);
+        hashMap.put(Tag.PROCESSING_SUBMIT_FEEDBACK_MSG, Message.Processing_submit_feedback_msg);
+        //hashMap.put(Tag.PROCESSING_VERF_MSG, Message.Processing_verf_msg);
+        return hashMap;
     }
 
     public void displayAlertDialog(String msg){processErrorMessage(msg);}
@@ -55,22 +69,8 @@ public class ErrorDialog {
         alertDialog.show();
     }
 
-    public static HashMap<String, String> loadMessageListZH() {
-        HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put(Tag.PROCESSING_MSG, Message.Processing_msg_zh);
-        //hashMap.put(Tag.PROCESSING_OPTOUT_MSG, Message.Processing_optout_msg_zh);
-        hashMap.put(Tag.PROCESSING_SUBMIT_FEEDBACK_MSG, Message.Processing_submit_feedback_msg_zh);
-        //hashMap.put(Tag.PROCESSING_VERF_MSG, Message.Processing_verf_msg_zh);
-        return hashMap;
-    }
-
-    public static HashMap<String, String> loadMessageListEN() {
-        HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put(Tag.PROCESSING_MSG, Message.Processing_msg);
-        //hashMap.put(Tag.PROCESSING_OPTOUT_MSG, Message.Processing_optout_msg);
-        hashMap.put(Tag.PROCESSING_SUBMIT_FEEDBACK_MSG, Message.Processing_submit_feedback_msg);
-        //hashMap.put(Tag.PROCESSING_VERF_MSG, Message.Processing_verf_msg);
-        return hashMap;
+    public static class Type {
+        public static final int CONNECTION_TIMEOUT = 10001;
     }
 
     /*public static String getMessageByTag(String tag, Context context) {

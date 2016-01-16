@@ -1,4 +1,4 @@
-package com.example.tonyso.TrafficApp;
+package com.example.tonyso.TrafficApp.fragment;
 
 
 import android.content.BroadcastReceiver;
@@ -15,17 +15,21 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
+import com.example.tonyso.TrafficApp.BookMarkService;
+import com.example.tonyso.TrafficApp.BookmarkTimeStatusObserver;
+import com.example.tonyso.TrafficApp.InfoDetailActivity;
+import com.example.tonyso.TrafficApp.MyApplication;
+import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.adapter.BookMarkAdapter;
 import com.example.tonyso.TrafficApp.baseclass.TabBaseFragment;
 import com.example.tonyso.TrafficApp.listener.OnItemClickListener;
 import com.example.tonyso.TrafficApp.listener.OnRemainingTimeListener;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
+import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
 
 import java.util.ArrayList;
 
@@ -38,6 +42,12 @@ import jp.wasabeef.recyclerview.animators.FadeInRightAnimator;
 public class Tab_BookMarkFragment extends TabBaseFragment
         implements OnItemClickListener {
 
+    // Intent for Counting Remaining Time: Tag
+    public static final String LIST = "list";
+    //Request Code for Activity Result
+    public static final int EDIT_BOOKMARK_REQUEST_CODE = 2000;
+    public static final int EDIT_BOOKMARK_RESULT_CODE = 2001;
+    public static final String TYPE_EDIT_BOOKMARK = "Edit_bookmark_action";
     private static final String TAG = Tab_BookMarkFragment.class.getName();
     RecyclerView recyclerView;
     BookMarkAdapter bookMarkAdapter;
@@ -47,30 +57,50 @@ public class Tab_BookMarkFragment extends TabBaseFragment
     SwipeRefreshLayout mSwipeRefreshLayout;
     BroadcastReceiver broadcastReceiver;
     OnRemainingTimeListener onRemainingTimeListener;
-
-    // Intent for Counting Remaining Time: Tag
-    public static final String LIST = "list";
     Intent bookmarkService;
-
-    //Request Code for Activity Result
-    public static final int EDIT_BOOKMARK_REQUEST_CODE = 2000;
-    public static final int EDIT_BOOKMARK_RESULT_CODE = 2001;
-    public static final String TYPE_EDIT_BOOKMARK = "Edit_bookmark_action";
-
     BookmarkTimeStatusObserver bookmarkTimeStatusObserver;
     MyApplication myApplication;
 
     boolean isObserved = false;
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.e(TAG, "Receive Broadcast:CheckSum= " + intent.getIntExtra(BookMarkService.CHECK_SUM_WITH_DATA, BookMarkService.CHECK_SUM_WITHOUT_DATA));
+            if (intent.getSerializableExtra(BookMarkService.MESSAGE) != null) {
+                ArrayList<TimedBookMark> arrayList = (ArrayList<TimedBookMark>) intent.getSerializableExtra(BookMarkService.MESSAGE);
+                for (int i = 0; i < arrayList.size(); i++) {
+                    TimedBookMark t = arrayList.get(i);
+                    if (t.getRemainTime() == 0) {
+                        t.setIsTimeOver(true);
+                        sqLiteHelper.onUpdateTimeStatus(t);
+                        sqLiteHelper.onUpdateBookMarkRemainingTime(arrayList);
+                        onRemainingTimeListener.onRemainingTimeChanged(arrayList);
+                        bookMarkAdapter.removeItemWithoutSQLite(i);
+                        arrayList.remove(t);
+                        bookmarkTimeStatusObserver.setIsTimeOverChanged(true);
+                        break;
+                    } else {
+                        sqLiteHelper.onUpdateBookMarkRemainingTime(arrayList);
+                        onRemainingTimeListener.onRemainingTimeChanged(arrayList);
+                    }
+                }
+                Log.e(TAG, "" + arrayList.size());
+                if (arrayList.size() <= 0) {
+                    setDatasets();
+                    LocalBroadcastManager.getInstance(context).unregisterReceiver(mBroadcastReceiver);
+                }
+            }
+        }
+    };
+    private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+            refreshItems();
+        }
+    };
 
     public Tab_BookMarkFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        myApplication = (MyApplication) getActivity().getApplication();
-        bookmarkTimeStatusObserver = myApplication.getTimeStatusObserver();
     }
 
     public static Tab_BookMarkFragment newInstance(String title,int indicatorColor,int dividerColor,int icon){
@@ -82,6 +112,12 @@ public class Tab_BookMarkFragment extends TabBaseFragment
         return f;
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        myApplication = (MyApplication) getActivity().getApplication();
+        bookmarkTimeStatusObserver = myApplication.getTimeStatusObserver();
+    }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
@@ -92,6 +128,8 @@ public class Tab_BookMarkFragment extends TabBaseFragment
         //Setup SQLiteHelper for Data Retreival From SQLite
         setSqLiteHelper(getContext());
         setDatasets();
+        bookmarkService = new Intent(getActivity(), BookMarkService.class);
+        bookmarkService.putExtra(LIST, bookmarklist);
         //Set BroadCastReceiver as observer to observer service;
         setBroadcastReceiver();
         return v;
@@ -102,9 +140,8 @@ public class Tab_BookMarkFragment extends TabBaseFragment
         super.onResume();
         Log.i(TAG, "OnResume@" + TAG);
 
-        bookmarkService = new Intent(getActivity(), BookMarkService.class);
-        bookmarkService.putExtra(LIST, bookmarklist);
-        getActivity().startService(bookmarkService);
+        if (bookmarklist.size() > 0)
+            getActivity().startService(bookmarkService);
 
     }
 
@@ -118,9 +155,9 @@ public class Tab_BookMarkFragment extends TabBaseFragment
     @Override
     public void onPause() {
         super.onPause();
-//        if (bookmarkService != null)
-        getActivity().stopService(bookmarkService);
-
+        if (bookmarkService != null)
+            getActivity().stopService(bookmarkService);
+        sqLiteHelper.onUpdateBookMarkRemainingTime(bookmarklist);
     }
 
     @Override
@@ -128,7 +165,8 @@ public class Tab_BookMarkFragment extends TabBaseFragment
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == EDIT_BOOKMARK_REQUEST_CODE) {
             if (resultCode == EDIT_BOOKMARK_RESULT_CODE) {
-                refreshItems();
+                //refreshItems();
+                bookMarkAdapter.notifyDataSetChanged();
             }
         }
     }
@@ -141,7 +179,7 @@ public class Tab_BookMarkFragment extends TabBaseFragment
         recyclerView.setItemAnimator(new FadeInRightAnimator());
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         //new for menu
-        registerForContextMenu(recyclerView);
+        //registerForContextMenu(recyclerView);
         msg= (TextView)v.findViewById(R.id.txtBookMarkMsg);
     }
 
@@ -152,42 +190,6 @@ public class Tab_BookMarkFragment extends TabBaseFragment
     private void setBroadcastReceiver() {
         broadcastReceiver = mBroadcastReceiver;
     }
-
-    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.e(TAG, "Receive Broadcast:CheckSum= " + intent.getIntExtra(BookMarkService.CHECK_SUM_WITH_DATA, BookMarkService.CHECK_SUM_WITHOUT_DATA));
-            if (intent.getSerializableExtra(BookMarkService.MESSAGE) != null) {
-                ArrayList<TimedBookMark> arrayList = (ArrayList<TimedBookMark>) intent.getSerializableExtra(BookMarkService.MESSAGE);
-                for (TimedBookMark t : arrayList) {
-                    if (t.getRemainTime() == 0) {
-                        t.setIsTimeOver(true);
-                        long success = sqLiteHelper.onUpdateTimeStatus(t);
-                        sqLiteHelper.onUpdateBookMarkRemainingTime(arrayList);
-                        onRemainingTimeListener.onRemainingTimeChanged(arrayList);
-                        bookMarkAdapter.removeSelectedItem();
-                        arrayList.remove(t);
-                        bookmarkTimeStatusObserver.setIsTimeOverChanged(true);
-                        break;
-                    } else {
-                        sqLiteHelper.onUpdateBookMarkRemainingTime(arrayList);
-                        onRemainingTimeListener.onRemainingTimeChanged(arrayList);
-                    }
-                }
-                if (arrayList.size() < 0) {
-                    setDatasets();
-                    LocalBroadcastManager.getInstance(context).unregisterReceiver(mBroadcastReceiver);
-                }
-            }
-        }
-    };
-
-    private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
-        @Override
-        public void onRefresh() {
-            refreshItems();
-        }
-    };
 
     private void setDatasets(){
         bookmarklist = getDataSets();
@@ -235,35 +237,16 @@ public class Tab_BookMarkFragment extends TabBaseFragment
 
 
     @Override
-    public void onClick(View v, int position) {
-        Intent editIntent = new Intent(getActivity(), InfoDetailActivity.class);
-        editIntent.putExtra(SQLiteHelper.getKeyId(), bookmarklist.get(position).get_id());
-        editIntent.putExtra("type", TYPE_EDIT_BOOKMARK);
-        startActivityForResult(editIntent, Tab_BookMarkFragment.EDIT_BOOKMARK_REQUEST_CODE);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        int position = -1;
-        try {
-            position = bookMarkAdapter.getPosition();
-        } catch (Exception e) {
-            Log.d(TAG, e.getLocalizedMessage(), e);
-            return super.onContextItemSelected(item);
+    public void onClick(final int position, boolean isLongClick) {
+        if (isLongClick) {
+            bookMarkAdapter.removeSelectedItem(position);
+            setDatasets();
+        } else {
+            Intent editIntent = new Intent(getActivity(), InfoDetailActivity.class);
+            editIntent.putExtra(SQLiteHelper.getKeyId(), bookmarklist.get(position).get_id());
+            editIntent.putExtra("type", TYPE_EDIT_BOOKMARK);
+            startActivityForResult(editIntent, Tab_BookMarkFragment.EDIT_BOOKMARK_REQUEST_CODE);
         }
-        switch (item.getItemId()) {
-            case R.id.bookmark_delete:
-                // do your stuff
-                Log.e(TAG, item.getTitle() + "Click in Context Menu");
-                bookMarkAdapter.removeSelectedItem(position);
-                setDatasets();
-                break;
-            case R.id.bookmark_share:
-                // do your stuff
-                Log.e(TAG, item.getTitle() + "Click in Context Menu");
-                break;
-        }
-        return super.onContextItemSelected(item);
     }
 
     @Override

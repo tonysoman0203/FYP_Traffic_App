@@ -1,6 +1,7 @@
 package com.example.tonyso.TrafficApp;
 
 import android.Manifest;
+import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -35,12 +36,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
-import com.example.tonyso.TrafficApp.Singleton.RssReader;
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
+import com.example.tonyso.TrafficApp.fragment.FeedBackFragment;
+import com.example.tonyso.TrafficApp.fragment.Nav_TrafficFragment;
+import com.example.tonyso.TrafficApp.fragment.Tab_MainFragment;
 import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
-import com.example.tonyso.TrafficApp.location.GPSLocationFinder;
 import com.example.tonyso.TrafficApp.utility.CommonUtils;
+import com.example.tonyso.TrafficApp.utility.GPSLocationFinder;
+import com.example.tonyso.TrafficApp.utility.LanguageSelector;
+import com.example.tonyso.TrafficApp.utility.RssReader;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -59,69 +63,92 @@ public class MainActivity extends BaseActivity
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, WeatherRefreshListener {
 
-    LanguageSelector languageSelector;
-
-    private Toolbar toolbar;
-//    private RecyclerView.LayoutManager layoutManager;
-
-    private RssReader rssReader;
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
+    private static final String DIALOG_ERROR = "dialog_error";
+    private static final int UPDATE_INTERVAL = 10000; // 10 sec
+    private static final int FATEST_INTERVAL = 60000; // 5 sec
+    private static final int DISPLACEMENT = 5; // 10 meters
+    public static boolean mResolvingError = false;
+    public static MainActivity activity;
+    public static ActionBarDrawerToggle toggle;
+    public static FragmentManager fragmentManager;
+    public static FloatingActionButton fab;
+    private static GoogleApiClient mGoogleApiClient;
+    private static int REQUEST_RESOLVE_ERROR = 1001;
     public Handler rss_Handler;
+    LanguageSelector languageSelector;
+    Locale ZH_HANT = Locale.TRADITIONAL_CHINESE;
+    Locale ENG = Locale.ENGLISH;
+    BroadcastReceiver broadcastReceiver;
+    Intent broadCastTimerIntent;
+    CoordinatorLayout coordinatorLayout;
+    TextView txtCurrDate, txtCurrTime, lbllocation, lblWeather, lblDate, lblTime, textView;
+    TabLayout tabLayout;
+    View headerLayout;
+    ImageLoader imageLoader;
+    MyApplication myApplication;
+    private Toolbar toolbar;
+    private RssReader rssReader;
+    private LocationRequest mLocationRequest;
+    // boolean flag to toggle periodic location updates
+    private boolean mRequestingLocationUpdates = false;
+    private String TAG = getClass().getSimpleName();
+    private GPSLocationFinder gpsLocationFinder;
+    private DrawerLayout drawer;
+    private NavigationView navigationView;
+    private BroadcastReceiver myBroadCastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String currtime = intent.getStringExtra(CountDownService.MESSAGE);
+            txtCurrTime.setText(currtime);
+        }
+    };
 
     public static GoogleApiClient getmGoogleApiClient() {
         return mGoogleApiClient;
     }
 
     public void setmGoogleApiClient(GoogleApiClient mGoogleApiClient) {
-        this.mGoogleApiClient = mGoogleApiClient;
+        MainActivity.mGoogleApiClient = mGoogleApiClient;
     }
 
-    private static GoogleApiClient mGoogleApiClient;
-    private LocationRequest mLocationRequest;
+    public static void changeFragment(Fragment fragment, boolean doAddToBackStack) {
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.flcontent, fragment);
+        transaction.setCustomAnimations(android.R.anim.fade_out, android.R.anim.fade_in);
+        if (doAddToBackStack) {
+            transaction.addToBackStack(null);
+            toggle.setDrawerIndicatorEnabled(true);
+            toggle.syncState();
+        } else {
+            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            toggle.syncState();
+        }
+        transaction.commit();
+    }
 
-    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
-    public static boolean mResolvingError = false;
-    // boolean flag to toggle periodic location updates
-    private boolean mRequestingLocationUpdates = false;
-    private static int REQUEST_RESOLVE_ERROR = 1001;
-    private static final String DIALOG_ERROR = "dialog_error";
-    private static final int UPDATE_INTERVAL = 10000; // 10 sec
-    private static final int FATEST_INTERVAL = 60000; // 5 sec
-    private static final int DISPLACEMENT = 5; // 10 meters
-    private String TAG = getClass().getSimpleName();
-    private GPSLocationFinder gpsLocationFinder;
-
-    Locale ZH_HANT = Locale.TRADITIONAL_CHINESE;
-    Locale ENG = Locale.ENGLISH;
-
-    private DrawerLayout drawer;
-
-    private NavigationView navigationView;
-
-    BroadcastReceiver broadcastReceiver;
-
-    Intent broadCastTimerIntent;
-    CoordinatorLayout coordinatorLayout;
-    //TabLayout tabLayout;
-
-    TextView txtCurrDate, txtCurrTime, lbllocation, lblWeather, lblDate, lblTime, textView;
-    TabLayout tabLayout;
-    View headerLayout;
-    ImageLoader imageLoader;
-
-    public static MainActivity activity;
-    public static ActionBarDrawerToggle toggle;
-    public static FragmentManager fragmentManager;
-    public static FloatingActionButton fab;
+    public static void onDialogDismissed() {
+        mResolvingError = false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        myApplication = (MyApplication) getApplication();
         init();
+
+        if (CommonUtils.checkPlayServices(this, PLAY_SERVICES_RESOLUTION_REQUEST)) {
+            buildGoogleApiClient();
+            createLocationRequest();
+        } else {
+            Log.e(TAG, "Cannot Connect to Google Play Services");
+        }
+
         initToolBar();
         initNavigationDrawer();
         LabelFindViewById();
-        initRSSReader();
         setMainFragment();
     }
 
@@ -132,25 +159,28 @@ public class MainActivity extends BaseActivity
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.flcontent, fragment);
         fragmentTransaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-        fragmentTransaction.addToBackStack(TAG);
+        //fragmentTransaction.addToBackStack(TAG);
         fragmentTransaction.commit();
     }
 
     private void init() {
         activity = MainActivity.this;
+        initRSSReader();
+
         fragmentManager = getSupportFragmentManager();
         imageLoader = ImageLoader.getInstance();
         tabLayout = (TabLayout) findViewById(R.id.tablayout);
         broadcastReceiver = myBroadCastReceiver;
         languageSelector = LanguageSelector.getInstance(this);
-        rss_Handler = new Handler();
-        gpsLocationFinder = new GPSLocationFinder(this, this);
+
+        gpsLocationFinder = new GPSLocationFinder()
+                .setContext(this)
+                .setWeatherRefreshListener(this)
+                .build();
+
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinateLayoutMain);
 
-        if (CommonUtils.checkPlayServices(this, PLAY_SERVICES_RESOLUTION_REQUEST)) {
-            buildGoogleApiClient();
-            createLocationRequest();
-        }
+
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,6 +192,11 @@ public class MainActivity extends BaseActivity
 
     }
 
+    private void initRSSReader() {
+        rssReader = new RssReader(this, this);
+        rss_Handler = new Handler();
+        rssReader.FeedRss();
+    }
 
     private void initToolBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -181,15 +216,6 @@ public class MainActivity extends BaseActivity
         textView = (TextView) headerLayout.findViewById(R.id.txtLocation);
     }
 
-
-    private BroadcastReceiver myBroadCastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String currtime = intent.getStringExtra(CountDownService.MESSAGE);
-            txtCurrTime.setText(currtime);
-        }
-    };
-
     private void setUpCountDownService() {
         broadCastTimerIntent = new Intent(this, CountDownService.class);
         startService(broadCastTimerIntent);
@@ -205,10 +231,6 @@ public class MainActivity extends BaseActivity
         lblTime.setText(getString(R.string.rss_CurrTime));
     }
 
-    private void initRSSReader() {
-        rssReader = new RssReader(this, this);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -220,6 +242,7 @@ public class MainActivity extends BaseActivity
     protected void onResume() {
         super.onResume();
         Log.i(MainActivity.class.getName(), "OnResume------@");
+        toolbar.setTitle(getString(R.string.app_name));
         CommonUtils.checkPlayServices(this, PLAY_SERVICES_RESOLUTION_REQUEST);
 
         if (languageSelector.getLanguage().equals(MyApplication.Language.ZH_HANT)) {
@@ -228,7 +251,6 @@ public class MainActivity extends BaseActivity
             txtCurrDate.setText(CommonUtils.initDate(ENG));
         }
 
-        rssReader.FeedRss();
 
         if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
             startLocationUpdates();
@@ -246,13 +268,14 @@ public class MainActivity extends BaseActivity
             super.onBackPressed();
             //additional code
         } else {
-            Log.e(TAG, fragmentManager.getBackStackEntryAt(0).getName());
-            if (fragmentManager.getBackStackEntryAt(0).getName().equals(TAG)) {
-                tabLayout.setVisibility(View.VISIBLE);
+//            Log.e(TAG, fragmentManager.getBackStackEntryAt(0).getName());
+//            if (fragmentManager.getBackStackEntryAt(0).getName().equals(TAG)) {
+//
+//            }
+            tabLayout.setVisibility(View.VISIBLE);
                 fab.setVisibility(View.VISIBLE);
                 toolbar.setTitle(getString(R.string.app_name));
-                navigationView.setCheckedItem(0);
-            }
+            navigationView.getMenu().getItem(0).setChecked(true);
             fragmentManager.popBackStack();
         }
     }
@@ -334,10 +357,6 @@ public class MainActivity extends BaseActivity
                 Snackbar.make(coordinatorLayout, "Search button click"
                         , Snackbar.LENGTH_LONG).show();
                 break;
-            case R.id.action_settings:
-                Snackbar.make(coordinatorLayout, "Setting button click"
-                        , Snackbar.LENGTH_LONG).show();
-                break;
             // Handle home button in non-drawer mode
             case android.R.id.home:
                 onBackPressed();
@@ -371,30 +390,17 @@ public class MainActivity extends BaseActivity
 
         } else if (id == R.id.nav_setting) {
             intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
+            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
         } else if (id == R.id.nav_about) {
 
         } else if (id == R.id.nav_feedback) {
-
+            FragmentManager fm = getSupportFragmentManager();
+            FeedBackFragment fg = FeedBackFragment.newInstance("Feedback Form");
+            fg.show(fm, "fragment_edit_name");
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    public static void changeFragment(Fragment fragment, boolean doAddToBackStack) {
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.flcontent, fragment);
-        transaction.setCustomAnimations(android.R.anim.fade_out, android.R.anim.fade_in);
-        if (doAddToBackStack) {
-            transaction.addToBackStack(null);
-            toggle.setDrawerIndicatorEnabled(true);
-            toggle.syncState();
-        } else {
-            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            toggle.syncState();
-        }
-        transaction.commit();
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -438,6 +444,7 @@ public class MainActivity extends BaseActivity
             Log.d(TAG, String.valueOf(mLastLocation.getLongitude()));
             Log.d(TAG, "Speed: " + mLastLocation.getSpeed());
             Log.d(TAG + "getAccuracy: ", String.valueOf(mLastLocation.getAccuracy()));
+
             if (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH)) {
                 gpsLocationFinder.convertLatLongToAddress(mLastLocation,ENG);
             }else{
@@ -474,6 +481,7 @@ public class MainActivity extends BaseActivity
             mResolvingError = true;
         }
     }
+
     private void showErrorDialog(int errorCode) {
         // Create a fragment for the error dialog
         ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
@@ -485,8 +493,35 @@ public class MainActivity extends BaseActivity
 
     }
 
-    public static void onDialogDismissed() {
-        mResolvingError = false;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_RESOLVE_ERROR) {
+            mResolvingError = false;
+            if (resultCode == RESULT_OK) {
+                // Make sure the app is not already connected or attempting to connect
+                if (!mGoogleApiClient.isConnecting() &&
+                        !mGoogleApiClient.isConnected()) {
+                    mGoogleApiClient.connect();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onRefreshWeather(String s) {
+        TextView textView = (TextView) headerLayout.findViewById(R.id.txtTemperature);
+        textView.setText(s);
+    }
+
+    @Override
+    public void onRefreshIcon(String URL) {
+        CircleImageView imageView = (CircleImageView) headerLayout.findViewById(R.id.bgHeader);
+        imageLoader.displayImage(URL, imageView);
+    }
+
+    @Override
+    public void onRefreshLocation(String address) {
+        textView.setText(address);
     }
 
     public static class ErrorDialogFragment extends DialogFragment {
@@ -505,37 +540,5 @@ public class MainActivity extends BaseActivity
         public void onDismiss(DialogInterface dialog) {
             onDialogDismissed();
         }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_RESOLVE_ERROR) {
-            mResolvingError = false;
-            if (resultCode == RESULT_OK) {
-                // Make sure the app is not already connected or attempting to connect
-                if (!mGoogleApiClient.isConnecting() &&
-                        !mGoogleApiClient.isConnected()) {
-                    mGoogleApiClient.connect();
-                }
-            }
-        }
-    }
-
-
-    @Override
-    public void onRefreshWeather(String s) {
-        TextView textView = (TextView) headerLayout.findViewById(R.id.txtTemperature);
-        textView.setText(s);
-    }
-
-    @Override
-    public void onRefreshIcon(String URL) {
-        CircleImageView imageView = (CircleImageView) headerLayout.findViewById(R.id.bgHeader);
-        imageLoader.displayImage(URL, imageView);
-    }
-
-    @Override
-    public void onRefreshLocation(String address) {
-        textView.setText(address);
     }
 }

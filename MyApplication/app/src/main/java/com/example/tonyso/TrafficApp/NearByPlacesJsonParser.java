@@ -3,7 +3,8 @@ package com.example.tonyso.TrafficApp;
 import android.util.Log;
 
 import com.example.tonyso.TrafficApp.model.NearbyLocation;
-import com.google.android.gms.location.places.Place;
+import com.example.tonyso.TrafficApp.model.Place;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,14 +32,6 @@ public class NearByPlacesJsonParser {
         this.API_KEY = API_KEY;
     }
 
-    public String getAPI_KEY() {
-        return API_KEY;
-    }
-
-    public void setAPI_KEY(String API_KEY) {
-        this.API_KEY = API_KEY;
-    }
-
     protected String getJSON(String url) {
         return getUrlContents(url);
     }
@@ -63,7 +56,7 @@ public class NearByPlacesJsonParser {
             }
 
             for (int i = 0; i < arrayList.size(); i++) {
-                String distanceUrl = makeDistanceURL(currLocation, arrayList.get(i).getName());
+                String distanceUrl = makeDistanceURL(currLocation, String.valueOf(arrayList.get(i).getName()));
                 try {
                     json = getJSON(distanceUrl);
                     Log.d("JSON Distance= ", json);
@@ -145,8 +138,7 @@ public class NearByPlacesJsonParser {
             NearbyLocation result = new NearbyLocation();
             JSONObject geometry = (JSONObject) jsonObject.get("geometry");
             JSONObject location = (JSONObject) geometry.get("location");
-            result.setLatitude((Double) location.get("lat"));
-            result.setLongitude((Double) location.get("lng"));
+            result.setLatlngs(new LatLng((Double) location.get("lat"), (Double) location.get("lng")));
             result.setIcon(jsonObject.getString("icon"));
             result.setName(jsonObject.getString("name"));
             result.setPlaceId(jsonObject.getString("place_id"));
@@ -157,7 +149,7 @@ public class NearByPlacesJsonParser {
                 JSONArray photos = jsonObject.getJSONArray("photos");
                 result.setPhotoReference(photos.getJSONObject(0).getString("photo_reference"));
             }
-            return result;
+            return result.build();
         } catch (JSONException ex) {
             Logger.getLogger(Place.class.getName()).log(Level.SEVERE, null, ex);
         }

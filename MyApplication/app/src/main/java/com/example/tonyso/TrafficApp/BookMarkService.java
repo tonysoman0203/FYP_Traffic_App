@@ -6,6 +6,7 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.example.tonyso.TrafficApp.adapter.InfoDetailAdapter;
+import com.example.tonyso.TrafficApp.fragment.Tab_BookMarkFragment;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 import com.example.tonyso.TrafficApp.utility.CommonUtils;
 
@@ -14,14 +15,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class BookMarkService extends Service {
-    ArrayList<TimedBookMark> timedBookMarkArrayList;
-    LocalBroadcastManager localBroadcastManager;
-    RemainTimeTask remainTimeTask;
-
     static final public String CURR_TIME_RESULT = "com.example.tonyso.myapplication.BookmarkService.RESULT";
     static final public String MESSAGE = "com.example.tonyso.myapplication.BookmarkService.MSG";
     static final public String CHECK_SUM_WITH_DATA = "com.example.tonyso.myapplication.BookmarkService.CHECK_SUM";
     static final public int CHECK_SUM_WITHOUT_DATA = -1;
+    ArrayList<TimedBookMark> timedBookMarkArrayList;
+    LocalBroadcastManager localBroadcastManager;
+    RemainTimeTask remainTimeTask;
     Timer timer;
 
     public BookMarkService() {
@@ -58,13 +58,17 @@ public class BookMarkService extends Service {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
+
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (timer != null)
+        if (timer != null) {
+
             timer.cancel();
+        }
+
     }
 
     @Override
@@ -111,4 +115,5 @@ public class BookMarkService extends Service {
             localBroadcastManager.sendBroadcast(intent);
         }
     }
+
 }

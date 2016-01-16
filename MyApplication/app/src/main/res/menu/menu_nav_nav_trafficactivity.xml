@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".Nav_TrafficFragment"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    tools:context=".fragment.Nav_TrafficFragment">
 
                 <item android:id="@+id/nav_traffic_terrain"
-                    android:title="@string/terrain"
-                    android:orderInCategory="200"
-                    app:showAsAction="always"
                     android:icon="@drawable/ic_terrain_white_48dp"
+                    android:orderInCategory="200"
+                    android:title="@string/terrain"
+                    app:showAsAction="always"
                     />
                 <item android:id="@+id/nav_traffic_satelite"
-                    android:title="@string/nav_traffic_satelite"
-                    android:orderInCategory="300"
-                    app:showAsAction="always"
                     android:icon="@drawable/ic_satellite_white_48dp"
+                    android:orderInCategory="300"
+                    android:title="@string/nav_traffic_satelite"
+                    app:showAsAction="always"
                     />
                 <item android:id="@+id/nav_traffic_traffic"
-                    android:title="@string/nav_traffic_traffic"
-                    android:orderInCategory="100"
-                    app:showAsAction="always"
                     android:icon="@drawable/ic_traffic_white_48dp"
+                    android:orderInCategory="100"
+                    android:title="@string/nav_traffic_traffic"
+                    app:showAsAction="always"
                     />
                 <item android:id="@+id/nav_traffic_default"
-                    android:title="@string/nav_map_default"
-                    android:orderInCategory="100"
-                    app:showAsAction="always"
                     android:icon="@drawable/ic_map_white_24dp"
+                    android:orderInCategory="100"
+                    android:title="@string/nav_map_default"
+                    app:showAsAction="always"
                 />
 
 </menu>

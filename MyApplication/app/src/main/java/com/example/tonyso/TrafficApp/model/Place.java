@@ -1,5 +1,7 @@
 package com.example.tonyso.TrafficApp.model;
 
+import android.graphics.Bitmap;
+
 import com.google.android.gms.maps.model.LatLng;
 
 /**
@@ -10,21 +12,53 @@ public class Place {
     String placeId;
     CharSequence name;
     LatLng latlngs;
+    String type;
     CharSequence address;
     CharSequence phoneno;
+    String lastUpdateTime;
+    Bitmap bitmap;
 
     public Place() {
     }
 
-    private Place(Place place) {
+    public Place(Place place) {
         this.placeId = place.placeId;
         this.name = place.name;
         this.latlngs = place.latlngs;
         this.address = place.address;
         this.phoneno = place.phoneno;
+        this.lastUpdateTime = place.lastUpdateTime;
+        this.type = place.type;
     }
 
-    public Place build() {
+
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public Place setType(String type) {
+        this.type = type;
+        return this;
+    }
+
+    public String getLastUpdateTime() {
+        return lastUpdateTime;
+    }
+
+    public Place setLastUpdateTime(String lastUpdateTime) {
+        this.lastUpdateTime = lastUpdateTime;
+        return this;
+    }
+
+    protected Place build() {
         return new Place(this);
     }
 

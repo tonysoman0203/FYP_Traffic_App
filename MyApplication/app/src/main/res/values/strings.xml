@@ -115,4 +115,7 @@
     <string name="distance">Distance: </string>
     <string name="notfound">NOT_FOUND</string>
 
+    <string name="lastUpdatedTime">Last Updated At:</string>
+
+    <string name="route_speed_image">Display Speed Image ?</string>
 </resources>

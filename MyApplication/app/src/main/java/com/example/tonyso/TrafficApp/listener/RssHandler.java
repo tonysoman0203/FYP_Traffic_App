@@ -8,9 +8,9 @@ import android.util.Log;
 
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
-import com.example.tonyso.TrafficApp.Singleton.ErrorDialog;
-import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.model.Weather;
+import com.example.tonyso.TrafficApp.utility.ErrorDialog;
+import com.example.tonyso.TrafficApp.utility.LanguageSelector;
 
 import org.xml.sax.helpers.DefaultHandler;
 import org.xmlpull.v1.XmlPullParser;
@@ -24,6 +24,7 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 //import java.io.InputStream;
 //import java.io.InputStreamReader;
@@ -31,23 +32,17 @@ import java.util.ArrayList;
 @SuppressLint("SimpleDateFormat")
 public class RssHandler extends DefaultHandler {
 
+    private static final String TAG = RssHandler.class.getSimpleName();
     private final String item = "item";
+    int id = 0;
     private String desc = "";
-
     private String tagName ="";
-
     private Rss_Listener listener;
-
     private XmlPullParserFactory xmlPullParserFactory;
     private XmlPullParser xmlPullParser;
-
-    private static final String TAG = RssHandler.class.getSimpleName();
-
     private ArrayList<Weather>weathers;
-
     private ErrorDialog errorDialog;
     private HttpURLConnection connection;
-    int id = 0;
     private LanguageSelector languageSelector ;
 
     public RssHandler(ErrorDialog errorDialog, LanguageSelector languageSelector) {
@@ -163,8 +158,6 @@ public class RssHandler extends DefaultHandler {
 
     }
 
-
-
     private String getWeatherIcon(String description){
        this.desc = description;
         if (description.contains("<img ")){
@@ -184,6 +177,11 @@ public class RssHandler extends DefaultHandler {
             return img;
         }
         return this.desc;
+    }
+
+
+    public interface Rss_Listener {
+        void ParsedInfo(List list);
     }
 
 }

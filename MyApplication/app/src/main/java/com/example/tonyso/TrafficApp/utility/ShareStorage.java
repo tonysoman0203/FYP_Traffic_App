@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.util.Base64;
 
 import com.example.tonyso.TrafficApp.MyApplication;
-import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -37,16 +36,16 @@ public class ShareStorage {
             case StorageType.SHARED_PREFERENCE:
                 String key = storeObject.getKey();
                 if (storeObject.getValue() instanceof Integer) {
-                    String encrypt_value = encryption(String.valueOf((Integer) storeObject.getValue()));
+                    String encrypt_value = encryption(String.valueOf(storeObject.getValue()));
                     sharedPreferences.edit().putString(key, encrypt_value).apply();
                 } else if (storeObject.getValue() instanceof String) {
-                    String encrypt_value = encryption(String.valueOf((String) storeObject.getValue()));
+                    String encrypt_value = encryption(String.valueOf(storeObject.getValue()));
                     sharedPreferences.edit().putString(key, encrypt_value).apply();
                 } else if (storeObject.getValue() instanceof Long) {
-                    String encrypt_value = encryption(String.valueOf((Long) storeObject.getValue()));
+                    String encrypt_value = encryption(String.valueOf(storeObject.getValue()));
                     sharedPreferences.edit().putString(key, encrypt_value).apply();
                 } else if (storeObject.getValue() instanceof Boolean) {
-                    String encrypt_value = encryption(String.valueOf((Boolean) storeObject.getValue()));
+                    String encrypt_value = encryption(String.valueOf(storeObject.getValue()));
                     sharedPreferences.edit().putString(key, encrypt_value).apply();
                 } else {
                     return;

@@ -1,4 +1,4 @@
-package com.example.tonyso.TrafficApp.Singleton;
+package com.example.tonyso.TrafficApp.utility;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -19,13 +19,9 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "bookmark.db";
     public static final int OLD_VERSION = 1;
     public static final int NEW_VERSION = 2;
-    private static SQLiteDatabase database;
     private static final String BOOKMARK_TABLE_NAME = "Bookmark";
-
-    public static String getKeyId() {
-        return KEY_ID;
-    }
-
+    //Drop Table
+    public static final String DROP_TABLE = "DROP TABLE IF EXISTS " + BOOKMARK_TABLE_NAME;
     private static final String KEY_ID = "_id";
     private static final String KEY_ROUTE_NAME = "Route";
     private static final String KEY_ROUTE_NAME_ZH = "Route_ZH";
@@ -53,12 +49,14 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                     KEY_LAT + " TEXT," +
                     KEY_LNG + " TEXT," +
                     KEY_TIMEOVER + " boolean NOT NULL default 0);";
-
-    //Drop Table
-    public static final String DROP_TABLE = "DROP TABLE IF EXISTS " + BOOKMARK_TABLE_NAME;
+    private static SQLiteDatabase database;
 
     public SQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, OLD_VERSION);
+    }
+
+    public static String getKeyId() {
+        return KEY_ID;
     }
 
     public static SQLiteDatabase getDatabase(Context context) {

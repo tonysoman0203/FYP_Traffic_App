@@ -3,77 +3,68 @@ package com.example.tonyso.TrafficApp.model;
 /**
  * Created by soman on 2016/1/3.
  */
-public class NearbyLocation {
-    private String icon;
-    private String name;
+public class NearbyLocation extends Place {
     private String vicinity;
-    private Double latitude;
-    private Double longitude;
-    private String placeId;
     private String distanceInKm;
     private String photoReference;
+    private String icon;
 
-    public String getDistanceInKm() {
-        return distanceInKm;
+    private NearbyLocation(NearbyLocation nearbyLocation) {
+        this.name = nearbyLocation.name;
+        this.distanceInKm = nearbyLocation.distanceInKm;
+        this.icon = nearbyLocation.icon;
+        this.vicinity = nearbyLocation.vicinity;
+        this.photoReference = nearbyLocation.photoReference;
+        this.lastUpdateTime = nearbyLocation.lastUpdateTime;
+        this.placeId = nearbyLocation.placeId;
+        this.name = nearbyLocation.name;
+        this.latlngs = nearbyLocation.latlngs;
+        this.address = nearbyLocation.address;
+        this.phoneno = nearbyLocation.phoneno;
+        this.lastUpdateTime = nearbyLocation.lastUpdateTime;
+        this.type = nearbyLocation.type;
     }
 
-    public void setDistanceInKm(String distanceInKm) {
-        this.distanceInKm = distanceInKm;
+    public NearbyLocation() {
+    }
+
+    public NearbyLocation build() {
+        return new NearbyLocation(this);
     }
 
     public String getIcon() {
         return icon;
     }
 
-    public void setIcon(String icon) {
+    public NearbyLocation setIcon(String icon) {
         this.icon = icon;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return this;
     }
 
     public String getVicinity() {
         return vicinity;
     }
 
-    public void setVicinity(String vicinity) {
+    public NearbyLocation setVicinity(String vicinity) {
         this.vicinity = vicinity;
+        return this;
     }
 
-    public Double getLatitude() {
-        return latitude;
+    public String getDistanceInKm() {
+        return distanceInKm;
     }
 
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public void setPlaceId(String placeId) {
-        this.placeId = placeId;
-    }
-
-    public String getPlaceId() {
-        return placeId;
-    }
-
-    public void setPhotoReference(String photoReference) {
-        this.photoReference = photoReference;
+    public NearbyLocation setDistanceInKm(String distanceInKm) {
+        this.distanceInKm = distanceInKm;
+        return this;
     }
 
     public String getPhotoReference() {
         return photoReference;
+    }
+
+    public NearbyLocation setPhotoReference(String photoReference) {
+        this.photoReference = photoReference;
+        return this;
     }
 }

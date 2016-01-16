@@ -21,8 +21,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.tonyso.TrafficApp.Singleton.LanguageSelector;
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
+import com.example.tonyso.TrafficApp.utility.LanguageSelector;
 import com.example.tonyso.TrafficApp.utility.ShareStorage;
 import com.example.tonyso.TrafficApp.utility.StoreObject;
 
@@ -30,9 +30,9 @@ import java.util.Locale;
 
 
 public class SettingsActivity extends BaseActivity {
+    static LanguageSelector languageSelector;
     CoordinatorLayout coordinatorLayout;
     FloatingActionButton fab;
-    static LanguageSelector languageSelector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

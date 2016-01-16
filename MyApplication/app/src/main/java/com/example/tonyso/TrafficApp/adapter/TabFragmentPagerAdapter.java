@@ -16,11 +16,7 @@ public class TabFragmentPagerAdapter extends FragmentPagerAdapter {
 
     public TabFragmentPagerAdapter(FragmentManager fm, LinkedList<TabBaseFragment> fragments) {
         super(fm);
-        if (fragments == null) {
-            this.fragments = new LinkedList<>();
-        }else{
-            this.fragments = fragments;
-        }
+        this.fragments = fragments;
     }
 
     @Override

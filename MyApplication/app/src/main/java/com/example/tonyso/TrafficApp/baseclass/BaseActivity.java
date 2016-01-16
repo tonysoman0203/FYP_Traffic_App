@@ -1,15 +1,15 @@
 package com.example.tonyso.TrafficApp.baseclass;
 
+import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.tonyso.TrafficApp.MyApplication;
-import com.example.tonyso.TrafficApp.Singleton.SQLiteHelper;
-import com.example.tonyso.TrafficApp.Singleton.XMLReader;
-import com.example.tonyso.TrafficApp.model.RouteCCTV;
+import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
 import com.example.tonyso.TrafficApp.utility.ShareStorage;
 import com.example.tonyso.TrafficApp.utility.StoreObject;
+import com.example.tonyso.TrafficApp.utility.XMLReader;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -26,7 +26,7 @@ import java.util.Locale;
  */
 public class BaseActivity extends AppCompatActivity {
 
-    String currLang;
+    //String currLang;
     public static SQLiteDatabase sqLiteDatabase;
     public static SQLiteHelper sqLiteHelper;
 
@@ -35,7 +35,8 @@ public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         MyApplication myApplication = (MyApplication) getApplication();
         storeUserLanuguage();
-        myApplication.list = loadCache();
+        myApplication.list = loadCache("ImageList");
+        myApplication.speedMaps = loadCache("SpeedMap");
         initImageLoader();
         //initialize SQLLite
         //sqLiteDatabase = SQLiteHelper.getDatabase(this);
@@ -43,16 +44,16 @@ public class BaseActivity extends AppCompatActivity {
         sqLiteDatabase = SQLiteHelper.getDatabase(this);
     }
 
-    public List<RouteCCTV> loadCache() {
+    public List loadCache(String tag) {
         XMLReader xmlReader = XMLReader.getInstance(this);
-        return xmlReader.getImageXML();
+        if (tag.equals("ImageList"))
+            return xmlReader.getImageXML();
+        else
+            return xmlReader.getRouteImageSpeedMap();
     }
 
     //SetDefaultUserLanguage in FirstLaunch
     private void storeUserLanuguage() {
-//        langPref = getSharedPreferences(MyApplication.STATIC_DATA_TAG,0).edit();
-//        langPref.putString(MyApplication.Language_Locale, MyApplication.getAppLocale(this));
-//        langPref.apply();
         String lang2 = (String) ShareStorage.retrieveData(MyApplication.Language_UserPref,
                 ShareStorage.DataType.STRING, ShareStorage.SP.PrivateData, getBaseContext()).getValue();
         String lang = "";
@@ -64,7 +65,7 @@ public class BaseActivity extends AppCompatActivity {
                     new StoreObject<>(false, MyApplication.Language_UserPref,
                             lang), ShareStorage.SP.PrivateData, getBaseContext());
         }
-        currLang = lang;
+        MyApplication.CURR_LANG = lang;
     }
 
     private void initStaticData(){
@@ -113,5 +114,10 @@ public class BaseActivity extends AppCompatActivity {
         super.onRestart();
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        getResources().updateConfiguration(newConfig, getResources().getDisplayMetrics());
+    }
 
 }
