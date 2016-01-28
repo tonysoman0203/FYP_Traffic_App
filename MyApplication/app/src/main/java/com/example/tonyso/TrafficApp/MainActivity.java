@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
@@ -38,13 +39,14 @@ import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
 import com.example.tonyso.TrafficApp.fragment.FeedBackFragment;
+import com.example.tonyso.TrafficApp.fragment.NavTrafficSuggestFragment;
 import com.example.tonyso.TrafficApp.fragment.Nav_TrafficFragment;
 import com.example.tonyso.TrafficApp.fragment.Tab_MainFragment;
 import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
+import com.example.tonyso.TrafficApp.location.GPSLocationFinder;
+import com.example.tonyso.TrafficApp.rss_xml_feed.RssReader;
 import com.example.tonyso.TrafficApp.utility.CommonUtils;
-import com.example.tonyso.TrafficApp.utility.GPSLocationFinder;
 import com.example.tonyso.TrafficApp.utility.LanguageSelector;
-import com.example.tonyso.TrafficApp.utility.RssReader;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -387,10 +389,19 @@ public class MainActivity extends BaseActivity
             changeFragment(nav_trafficFragment, true);
             item.setChecked(true);
         } else if (id == R.id.nav_suggestion) {
-
+            tabLayout.setVisibility(View.GONE);
+            fab.setVisibility(View.GONE);
+            NavTrafficSuggestFragment frag = NavTrafficSuggestFragment.newInstance(getString(R.string.title_routeSuggest));
+            changeFragment(frag, true);
+            item.setChecked(true);
         } else if (id == R.id.nav_setting) {
             intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+            } else {
+                startActivity(intent);
+                overridePendingTransition(R.anim.bs_list_layout_anim_in, R.anim.bs_list_item_in);
+            }
         } else if (id == R.id.nav_about) {
 
         } else if (id == R.id.nav_feedback) {

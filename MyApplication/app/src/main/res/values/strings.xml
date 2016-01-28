@@ -118,4 +118,14 @@
     <string name="lastUpdatedTime">Last Updated At:</string>
 
     <string name="route_speed_image">Display Speed Image ?</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="title_routeSuggest">RouteSuggestion</string>
+    <string name="route_suggest_begin">Origin</string>
+    <string name="route_suggest_end">Destination</string>
+    <string name="route_suggestion_current">Current Location</string>
+    <string name="txtLocationLabel">Please Choose Origin &amp; Destination Point to port a graph </string>
+    <string name="route_suggest_btnSubmit">Confirm </string>
+    <string name="route_suggest_btnReset">Reset</string>
+    <string name="route_suggest_notice">Please Wait&#8230;</string>
 </resources>

@@ -19,6 +19,7 @@ import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.fragment.Tab_HistoryFragment;
 import com.example.tonyso.TrafficApp.listener.OnItemClickListener;
+import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 import com.example.tonyso.TrafficApp.utility.LanguageSelector;
 import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
@@ -37,7 +38,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
 
     private static final String TAG = HistoryAdapter.class.getSimpleName();
     private static final String TRAFFIC_URL = "http://tdcctv.data.one.gov.hk/";
+    private static final String TRAFFIC_SPEED_MAP = "http://resource.data.one.gov.hk/td/";
+    private static final String TC = "TC";
+    private static final String EN = "EN";
+
     private static final String JPG = ".JPG";
+    private static final String PNG = ".png";
+
     private final DisplayImageOptions imageOptions;
     SortedList<TimedBookMark> mSortedList;
     private Tab_HistoryFragment context;
@@ -160,7 +167,18 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             holder.district.setText(mSortedList.get(position).getRegions()[1]);
         }
 
-        String url = TRAFFIC_URL.concat(mSortedList.get(position).getRouteImageKey()).concat(JPG);
+        String url = "";
+        //Compare Two String
+        TimedBookMark route = mSortedList.get(position);
+        if (route.getType().equals(RouteCCTV.TYPE_CCTV)) {
+            url = TRAFFIC_URL + route.getRouteImageKey() + JPG;
+            Log.d(TAG, url);
+        } else {
+            url = TRAFFIC_SPEED_MAP + route.getRouteImageKey() +
+                    (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH) ? EN : TC) + PNG;
+            Log.d(TAG, "Else: " + url);
+        }
+
         imageLoader.displayImage(url, holder.imageView, imageOptions, new ImageLoadingListener() {
             @Override
             public void onLoadingStarted(String imageUri, View view) {

@@ -18,6 +18,7 @@ import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.fragment.Tab_BookMarkFragment;
 import com.example.tonyso.TrafficApp.listener.OnItemClickListener;
 import com.example.tonyso.TrafficApp.listener.OnRemainingTimeListener;
+import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 import com.example.tonyso.TrafficApp.utility.LanguageSelector;
 import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
@@ -37,8 +38,14 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         implements OnRemainingTimeListener {
 
     public static final String TAG = BookMarkAdapter.class.getSimpleName();
-    private static String TRAFFIC_URL = "http://tdcctv.data.one.gov.hk/";
-    private static String JPG = ".JPG";
+    private static final String TRAFFIC_URL = "http://tdcctv.data.one.gov.hk/";
+    private static final String TRAFFIC_SPEED_MAP = "http://resource.data.one.gov.hk/td/";
+    private static final String TC = "TC";
+    private static final String EN = "EN";
+
+    private static final String JPG = ".JPG";
+    private static final String PNG = ".png";
+
     List<TimedBookMark> myDatasets;
     SortedList<TimedBookMark> sortedList;
     Tab_BookMarkFragment frag;
@@ -169,7 +176,18 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
             holder.district.setText(sortedList.get(position).getRegions()[1]);
         }
 
-        String url = TRAFFIC_URL.concat(sortedList.get(position).getRouteImageKey()).concat(JPG);
+        String url = "";
+        //Compare Two String
+        TimedBookMark route = sortedList.get(position);
+        if (route.getType().equals(RouteCCTV.TYPE_CCTV)) {
+            url = TRAFFIC_URL + route.getRouteImageKey() + JPG;
+            Log.d(TAG, url);
+        } else {
+            url = TRAFFIC_SPEED_MAP + route.getRouteImageKey() +
+                    (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH) ? EN : TC) + PNG;
+            Log.d(TAG, "Else: " + url);
+        }
+
         imageLoader.displayImage(url, holder.imageView, imageOptions, new ImageLoadingListener() {
             @Override
             public void onLoadingStarted(String imageUri, View view) {

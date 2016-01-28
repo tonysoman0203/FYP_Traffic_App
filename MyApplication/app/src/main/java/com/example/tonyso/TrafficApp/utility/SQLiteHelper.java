@@ -34,6 +34,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     private static final String KEY_REMAIN_TIME = "remainTime";
     private static final String KEY_LAT = "lat";
     private static final String KEY_LNG = "lng";
+    private static final String KEY_TYPE = "type";
+
     //Create Table
     public static final String CREATE_TABLE =
             "CREATE TABLE " + BOOKMARK_TABLE_NAME + " (" +
@@ -48,7 +50,9 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                     KEY_DISTRICT_ZH + " TEXT," +
                     KEY_LAT + " TEXT," +
                     KEY_LNG + " TEXT," +
-                    KEY_TIMEOVER + " boolean NOT NULL default 0);";
+                    KEY_TIMEOVER + " boolean NOT NULL default 0," +
+                    KEY_TYPE + " TEXT);";
+
     private static SQLiteDatabase database;
 
     public SQLiteHelper(Context context) {
@@ -91,6 +95,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             values.put(KEY_TIMEOVER, bookMark.isTimeOver());
             values.put(KEY_LAT, bookMark.getLatLngs()[0]);
             values.put(KEY_LNG, bookMark.getLatLngs()[1]);
+            values.put(KEY_TYPE, bookMark.type);
             // Inserting Row
             long success = db.insert(BOOKMARK_TABLE_NAME, null, values);
             db.close(); // Closing database connection
@@ -112,7 +117,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                         .setRouteImageKey(cursor.getString(6))
                         .setDistrict(new String[]{cursor.getString(7), cursor.getString(8)})
                         .setLatLngs(new double[]{Double.parseDouble(cursor.getString(9)), Double.parseDouble(cursor.getString(10))})
-                        .setIsTimeOver((cursor.getInt(11) == 1) ? true : false);
+                        .setIsTimeOver((cursor.getInt(11) == 1) ? true : false)
+                        .setType(cursor.getString(12));
                 return builder.build();
             } while (cursor.moveToNext());
         }
@@ -157,7 +163,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                                 .setRouteImageKey(cursor.getString(6))
                                 .setDistrict(new String[]{cursor.getString(7), cursor.getString(8)})
                                 .setLatLngs(new double[]{Double.parseDouble(cursor.getString(9)), Double.parseDouble(cursor.getString(10))})
-                                .setIsTimeOver(false);
+                                .setIsTimeOver(false)
+                                .setType(cursor.getString(12));
                         bookMark_List.add(builder.build());
                     } while (cursor.moveToNext());
                 }
@@ -186,6 +193,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put(KEY_TIMEOVER, bookMark.isTimeOver());
         values.put(KEY_LAT, bookMark.getLatLngs()[0]);
         values.put(KEY_LNG, bookMark.getLatLngs()[1]);
+        values.put(KEY_TYPE, bookMark.type);
+
         // Inserting Row
         long success = db.update(BOOKMARK_TABLE_NAME, values, "" + KEY_ID + "=" + bookMark.get_id(), null);
         db.close(); // Closing database connection
@@ -215,7 +224,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                         .setRouteImageKey(cursor.getString(6))
                         .setDistrict(new String[]{cursor.getString(7), cursor.getString(8)})
                         .setLatLngs(new double[]{Double.parseDouble(cursor.getString(9)), Double.parseDouble(cursor.getString(10))})
-                        .setIsTimeOver(true);
+                        .setIsTimeOver(true)
+                        .setType(cursor.getString(12));
                 bookMarks.add(builder.build());
             } while (cursor.moveToNext());
         }

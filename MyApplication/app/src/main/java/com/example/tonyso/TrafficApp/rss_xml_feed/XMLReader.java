@@ -1,4 +1,4 @@
-package com.example.tonyso.TrafficApp.utility;
+package com.example.tonyso.TrafficApp.rss_xml_feed;
 
 import android.content.Context;
 import android.content.res.XmlResourceParser;
@@ -7,6 +7,7 @@ import android.util.Log;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.RouteSpeedMap;
+import com.example.tonyso.TrafficApp.utility.Convertor;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;

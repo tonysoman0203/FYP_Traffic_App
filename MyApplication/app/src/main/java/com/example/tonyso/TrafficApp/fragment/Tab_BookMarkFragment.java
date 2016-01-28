@@ -20,12 +20,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.BookMarkService;
-import com.example.tonyso.TrafficApp.BookmarkTimeStatusObserver;
 import com.example.tonyso.TrafficApp.InfoDetailActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.adapter.BookMarkAdapter;
 import com.example.tonyso.TrafficApp.baseclass.TabBaseFragment;
+import com.example.tonyso.TrafficApp.listener.BookmarkTimeStatusObserver;
 import com.example.tonyso.TrafficApp.listener.OnItemClickListener;
 import com.example.tonyso.TrafficApp.listener.OnRemainingTimeListener;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;

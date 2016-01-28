@@ -6,10 +6,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.tonyso.TrafficApp.MyApplication;
+import com.example.tonyso.TrafficApp.rss_xml_feed.XMLReader;
 import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
 import com.example.tonyso.TrafficApp.utility.ShareStorage;
 import com.example.tonyso.TrafficApp.utility.StoreObject;
-import com.example.tonyso.TrafficApp.utility.XMLReader;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;

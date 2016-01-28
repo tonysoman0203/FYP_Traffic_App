@@ -54,5 +54,6 @@
     <string name="Minute">分鐘</string>
     <string name="notfound">未能提供</string>
     <string name="route_speed_image">顯示行車速度屏嗎？</string>
+    <string name="txtLocationLabel">Please Choose Origin Point</string>
 
 </resources>

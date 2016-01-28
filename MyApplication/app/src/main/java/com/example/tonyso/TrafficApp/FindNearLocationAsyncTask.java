@@ -51,7 +51,7 @@ public class FindNearLocationAsyncTask extends AsyncTask<Void, Void, List<Nearby
     }
 
     private List<NearbyLocation> findNearLocation() {
-        NearByPlacesJsonParser service = new NearByPlacesJsonParser(context.getString(R.string.place_api_server_key));
+        LocationPlacesJsonParser service = new LocationPlacesJsonParser(context.getString(R.string.place_api_server_key));
         return service.findPlaces(latlng.latitude, latlng.longitude, "", currLocation);
     }
 

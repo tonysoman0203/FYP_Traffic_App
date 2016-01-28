@@ -1,13 +1,16 @@
-package com.example.tonyso.TrafficApp.utility;
+package com.example.tonyso.TrafficApp.location;
 
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.util.Log;
 
+import com.example.tonyso.TrafficApp.GetCurrentLocationAsyncTask;
 import com.example.tonyso.TrafficApp.MainActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
+import com.example.tonyso.TrafficApp.utility.ErrorDialog;
+import com.example.tonyso.TrafficApp.utility.LanguageSelector;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -60,22 +63,22 @@ public class GPSLocationFinder implements LocationListener {
             List<Address> addresses = geocoder.getFromLocation(
                     latLng.latitude,
                     latLng.longitude, 10);
-            for (int i =0;i<addresses.size();i++){
-                Log.d("debug",addresses.get(i).getFeatureName());
-            }
             if (addresses.size() > 0) {
                 String address  = addresses.get(1).getFeatureName();
                 Log.e("Test", "" + addresses.get(0).getLatitude() + "," + addresses.get(0).getLongitude());
-               Log.e("Address",addresses.get(0).getFeatureName());
-                Log.e("Address",addresses.get(0).getCountryName());
+                Log.e("Address", addresses.get(0).getFeatureName());
+                //Log.e("Address",addresses.get(0).getCountryName());
                 weatherRefreshListener.onRefreshLocation(address);
-            } else {
-                Log.e(TAG,"No Address Found");
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            //
-            e.printStackTrace();
+            // Get JSON BY Service
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            GetCurrentLocationAsyncTask asyncTask = new GetCurrentLocationAsyncTask();
+            asyncTask.setWeatherListener(weatherRefreshListener);
+            asyncTask.setLatlng(latLng);
+            asyncTask.setApplication((MyApplication) context.getApplication());
+            asyncTask.execute();
         }
 
     }

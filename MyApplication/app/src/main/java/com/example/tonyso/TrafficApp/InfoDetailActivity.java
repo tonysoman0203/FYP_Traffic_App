@@ -33,6 +33,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.places.Places;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import jp.wasabeef.recyclerview.animators.FadeInAnimator;
@@ -53,6 +54,12 @@ public class InfoDetailActivity extends AppCompatActivity
     private static final String DIALOG_ERROR = "dialog_error";
     private static final int RECYCLER_VIEW_SIZE = 3;
     private static final String STATE_RESOLVING_ERROR = "resolving_error";
+    private static final String TRAFFIC_URL = "http://tdcctv.data.one.gov.hk/";
+    private static final String TRAFFIC_SPEED_MAP = "http://resource.data.one.gov.hk/td/";
+    private static final String TC = "TC";
+    private static final String EN = "EN";
+    private static final String JPG = ".JPG";
+    private static final String PNG = ".png";
     public CoordinatorLayout coordinatorLayout;
     //UI Components.....
     Toolbar toolbar;
@@ -76,6 +83,8 @@ public class InfoDetailActivity extends AppCompatActivity
 
     GoogleApiClient mGoogleApiClient;
     FragmentManager fm;
+    ImageLoader imageLoader;
+    DisplayImageOptions displayImageOptions;
     // Bool to track whether the app is already resolving an error
     private boolean mResolvingError = false;
 
@@ -90,7 +99,7 @@ public class InfoDetailActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fm = getSupportFragmentManager();
-        setContentView(R.layout.activity_traffic_info_detail_scrolling);
+        setContentView(R.layout.fragment_nav_traffic_info_detail_main);
         mResolvingError = savedInstanceState != null
                 && savedInstanceState.getBoolean(STATE_RESOLVING_ERROR, false);
         buildGoogleApiClient();
@@ -134,6 +143,11 @@ public class InfoDetailActivity extends AppCompatActivity
         fadeInAnimator.setMoveDuration(1000);
         recyclerView.setItemAnimator(fadeInAnimator);
         recyclerView.setAdapter(infoDetailAdapter);
+//
+//        Uri gmmIntentUri = Uri.parse("geo:" + sortedList.get(getAdapterPosition()).getLatlngs().latitude + "," + sortedList.get(getAdapterPosition()).getLatlngs().longitude + "?z=19");
+//        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+//        mapIntent.setPackage("com.google.android.apps.maps");
+//        context.startActivity(mapIntent);
     }
 
     private void setToolbar(){
@@ -162,6 +176,13 @@ public class InfoDetailActivity extends AppCompatActivity
         //Getting Instance and Cache
         languageSelector = LanguageSelector.getInstance(this);
         sqLiteHelper = new SQLiteHelper(this);
+        imageLoader = ImageLoader.getInstance();
+        displayImageOptions = new DisplayImageOptions.Builder()
+                .showStubImage(R.drawable.ic_launcher)        //    Display Stub Image
+                .showImageForEmptyUri(R.drawable.ic_launcher)    //    If Empty image found
+                .cacheInMemory()
+                .cacheOnDisc().bitmapConfig(Bitmap.Config.RGB_565)
+                .build();
     }
 
     @Override
@@ -178,7 +199,18 @@ public class InfoDetailActivity extends AppCompatActivity
     }
 
     private void setImageHeader() {
-            ImageLoader.getInstance().displayImage("http://tdcctv.data.one.gov.hk/" + route.getRef_key() + ".JPG", imageRoute);
+        String url = "";
+        //Compare Two String
+        if (route.getType().equals(RouteCCTV.TYPE_CCTV)) {
+            url = TRAFFIC_URL + route.getRef_key() + JPG;
+            Log.d(TAG, url);
+        } else {
+            url = TRAFFIC_SPEED_MAP + route.getRef_key() +
+                    (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH) ? EN : TC) + PNG;
+            Log.d(TAG, "Else: " + url);
+        }
+        imageLoader.displayImage(url, imageRoute, displayImageOptions);
+
     }
 
     @Override
@@ -211,6 +243,7 @@ public class InfoDetailActivity extends AppCompatActivity
                                 .setRegion(bookMark.getRegions())
                                 .setKey(bookMark.getRouteImageKey())
                                 .setLatLngs(bookMark.getLatLngs())
+                                .setType(bookMark.getType())
                                 .build();
                     }
                     break;
@@ -224,6 +257,7 @@ public class InfoDetailActivity extends AppCompatActivity
                                 .setRegion(bookMark.getRegions())
                                 .setKey(bookMark.getRouteImageKey())
                                 .setLatLngs(bookMark.getLatLngs())
+                                .setType(bookMark.getType())
                                 .build();
                     }
                     break;

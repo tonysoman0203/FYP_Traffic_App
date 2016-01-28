@@ -6,10 +6,9 @@ import java.io.Serializable;
  * Created by TonySo on 31/10/15.
  */
 public class RouteCCTV extends Route implements Serializable{
+    static public final String TYPE_CCTV = "cctv";
     protected String[] description = null;
     protected String[] region = null;
-    private double[] latLngs = null;
-    static public final String TYPE_CCTV = "cctv";
 
     private RouteCCTV(Builder builder) {
         route_id = builder.id;
@@ -18,6 +17,21 @@ public class RouteCCTV extends Route implements Serializable{
         this.region = builder.region;
         this.latLngs = builder.latLngs;
         this.type = builder.type;
+    }
+
+    public RouteCCTV() {
+    }
+
+    public double[] getLatLngs() {
+        return latLngs;
+    }
+
+    public String[] getDescription() {
+        return description;
+    }
+
+    public String[] getRegion() {
+        return region;
     }
 
     public static class Builder {
@@ -85,21 +99,6 @@ public class RouteCCTV extends Route implements Serializable{
             this.type = type;
             return this;
         }
-    }
-
-    public RouteCCTV() {
-    }
-
-    public double[] getLatLngs() {
-        return latLngs;
-    }
-
-    public String[] getDescription() {
-        return description;
-    }
-
-    public String[] getRegion() {
-        return region;
     }
 
 }

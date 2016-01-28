@@ -24,12 +24,32 @@ import java.util.logging.Logger;
 /**
  * Created by soman on 2016/1/3.
  */
-public class NearByPlacesJsonParser {
+public class LocationPlacesJsonParser {
     static String TAG = NearbyLocation.class.getName();
     private String API_KEY;
 
-    public NearByPlacesJsonParser(String API_KEY) {
+    public LocationPlacesJsonParser(String API_KEY) {
         this.API_KEY = API_KEY;
+    }
+
+    public static String getUrlContents(String theUrl) {
+        StringBuilder content = new StringBuilder();
+
+        try {
+            URL url = new URL(theUrl);
+            URLConnection urlConnection = url.openConnection();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()), 8);
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+            bufferedReader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+
+        return content.toString();
     }
 
     protected String getJSON(String url) {
@@ -37,7 +57,7 @@ public class NearByPlacesJsonParser {
     }
 
     public List<NearbyLocation> findPlaces(double latitude, double longitude, String placeSpacification, String currLocation) {
-        String urlString = makeUrl(latitude, longitude, placeSpacification);
+        String urlString = makePlacesApiUrl(latitude, longitude, placeSpacification);
         try {
             String json = getJSON(urlString);
 
@@ -68,13 +88,12 @@ public class NearByPlacesJsonParser {
 
             return arrayList;
         } catch (JSONException ex) {
-            Logger.getLogger(NearByPlacesJsonParser.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LocationPlacesJsonParser.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
 
     private String makeDistanceURL(String currentLocation, String destination) {
-        //http://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&sensor=false
         StringBuilder url = new StringBuilder("http://maps.googleapis.com/maps/api/directions/json?");
         try {
             url.append("origin=" + URLEncoder.encode(currentLocation, "UTF-8"));
@@ -88,7 +107,7 @@ public class NearByPlacesJsonParser {
     }
 
     //https://maps.googleapis.com/maps/api/place/search/json?location=28.632808,77.218276&radius=500&types=atm&sensor=false&key=<key>
-    private String makeUrl(double latitude, double longitude, String place) {
+    private String makePlacesApiUrl(double latitude, double longitude, String place) {
         StringBuilder urlString = new StringBuilder("https://maps.googleapis.com/maps/api/place/search/json?");
 
         if (place.equals("")) {
@@ -111,26 +130,6 @@ public class NearByPlacesJsonParser {
 
 
         return urlString.toString();
-    }
-
-    private String getUrlContents(String theUrl) {
-        StringBuilder content = new StringBuilder();
-
-        try {
-            URL url = new URL(theUrl);
-            URLConnection urlConnection = url.openConnection();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()), 8);
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                content.append(line).append("\n");
-            }
-            bufferedReader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-
-        }
-
-        return content.toString();
     }
 
     private NearbyLocation getNearByLocation(JSONObject jsonObject) {

@@ -226,16 +226,32 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
         String name = arr[p];
         List<RouteCCTV> selectedRoute = new ArrayList<>();
         List<RouteSpeedMap> speedMaps = myApplication.speedMaps;
+        List<RouteSpeedMap> selectedMaps = new ArrayList<>();
 
-        for (int i = 0; i < routeList.size(); i++) {
+        /**
+         * Generate Selected Route List
+         */
+        for (RouteCCTV r : routeList) {
             String d;
             if (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH)) {
-                d = routeList.get(i).getRegion()[0];
+                d = r.getRegion()[0];
             } else {
-                d = routeList.get(i).getRegion()[1];
+                d = r.getRegion()[1];
             }
             if (d.matches(name)) {
-                selectedRoute.add(routeList.get(i));
+                selectedRoute.add(r);
+            }
+        }
+
+        for (RouteSpeedMap s : speedMaps) {
+            String r;
+            if (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH)) {
+                r = s.getRegion()[0];
+            } else {
+                r = s.getRegion()[1];
+            }
+            if (r.matches(name)) {
+                selectedMaps.add(s);
             }
         }
 
@@ -263,23 +279,28 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
             markerOptions.title(desc);
             Marker marker = mMap.addMarker(markerOptions);
             markerSet.put(marker.getId(), false);
-
-            for (RouteSpeedMap speedMap : speedMaps) {
-                String locationDesc = speedMap.getName();
-                Log.e(TAG, locationDesc);
-                double[] temp = speedMap.getLatLng();
-                Log.e(TAG, "" + temp[0] + " " + temp[1]);
-                LatLng latLng1 = new LatLng(speedMap.getLatLng()[0], speedMap.getLatLng()[1]);
-                markerOptions = new MarkerOptions();
-                markerOptions.position(latLng1);
-                markerOptions.title(locationDesc);
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-                speedMapSet.put(locationDesc, speedMap);
-                marker = mMap.addMarker(markerOptions);
-                markerSet.put(marker.getId(), false);
-            }
         }
 
+        for (RouteSpeedMap speedMap : selectedMaps) {
+            String locationDesc;
+            if (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH)) {
+                locationDesc = speedMap.getDescription()[0];
+                speedMapSet.put(locationDesc, speedMap);
+            } else {
+                locationDesc = speedMap.getDescription()[1];
+                speedMapSet.put(locationDesc, speedMap);
+            }
+            Log.e(TAG, locationDesc);
+            double[] temp = speedMap.getLatLngs();
+            Log.e(TAG, "" + temp[0] + " " + temp[1]);
+            LatLng latLng1 = new LatLng(speedMap.getLatLngs()[0], speedMap.getLatLngs()[1]);
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng1);
+            markerOptions.title(locationDesc);
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+            Marker marker = mMap.addMarker(markerOptions);
+            markerSet.put(marker.getId(), false);
+        }
 
         mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(markerSet, getContext(), speedMapSet));
         mMap.setOnMarkerClickListener(this);
@@ -326,17 +347,8 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
-
-
         mMap.setMyLocationEnabled(true);
     }
 
@@ -409,7 +421,11 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
                 final String title = m.getTitle();
                 Log.e(TAG, title);
                 intent.putExtra("key", title);
-                intent.putExtra(title, roadCCTVMap.get(title));
+                if (roadCCTVMap.get(title) != null) {
+                    intent.putExtra(title, roadCCTVMap.get(title));
+                } else {
+                    intent.putExtra(title, speedMapSet.get(title));
+                }
                 intent.putExtra("type", InfoDetailActivity.ADD_ROUTE_TYPE);
                 FragmentManager fragmentManager = getChildFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -460,7 +476,7 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
             } else if (speedMap != null) {
                 url = TRAFFIC_SPEED_MAP + speedMap.getRef_key() +
                         (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH) ? EN : TC) + PNG;
-                Log.d(TAG, url);
+                Log.d(TAG, "Else: " + url);
             }
 
             boolean isImageLoaded = markerSet.get(marker.getId());

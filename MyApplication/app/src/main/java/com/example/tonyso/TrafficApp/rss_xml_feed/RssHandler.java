@@ -1,4 +1,4 @@
-package com.example.tonyso.TrafficApp.listener;
+package com.example.tonyso.TrafficApp.rss_xml_feed;
 
 //import java.io.BufferedReader;
 
@@ -33,14 +33,10 @@ import java.util.List;
 public class RssHandler extends DefaultHandler {
 
     private static final String TAG = RssHandler.class.getSimpleName();
-    private final String item = "item";
+    private static final String item = "item";
     int id = 0;
-    private String desc = "";
-    private String tagName ="";
     private Rss_Listener listener;
-    private XmlPullParserFactory xmlPullParserFactory;
     private XmlPullParser xmlPullParser;
-    private ArrayList<Weather>weathers;
     private ErrorDialog errorDialog;
     private HttpURLConnection connection;
     private LanguageSelector languageSelector ;
@@ -63,7 +59,7 @@ public class RssHandler extends DefaultHandler {
             connection.setDoInput(true);
             connection.connect();
             InputStream inputStream = connection.getInputStream();
-            xmlPullParserFactory = XmlPullParserFactory.newInstance();
+            XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
             xmlPullParserFactory.setNamespaceAware(true);
             xmlPullParser = xmlPullParserFactory.newPullParser();
             xmlPullParser.setInput(inputStream, "UTF-8");
@@ -84,13 +80,13 @@ public class RssHandler extends DefaultHandler {
     public void processWeatherFeed(Context context, URL url) {
         setupHTTPConnection(url);
         try {
-            weathers = new ArrayList<>();
+            ArrayList<Weather> weathers = new ArrayList<>();
             Weather weather = new Weather();
             int event = xmlPullParser.getEventType();
             String t = "";
 
             while (event != XmlPullParser.END_DOCUMENT){
-                tagName = xmlPullParser.getName();
+                String tagName = xmlPullParser.getName();
                 switch (event){
                     case XmlPullParser.START_DOCUMENT:break; //1
                     case XmlPullParser.START_TAG: //2
@@ -145,21 +141,19 @@ public class RssHandler extends DefaultHandler {
                 }
             }
 
-        } catch (ConnectException e){
+        } catch (ConnectException | XmlPullParserException e) {
             e.printStackTrace();
         } catch (IOException e) {
             Log.e(TAG, e.toString());
             //errorListener.processErrorMessage(e.toString());
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        }finally {
+        } finally {
             connection.disconnect();
         }
 
     }
 
     private String getWeatherIcon(String description){
-       this.desc = description;
+        String desc = description;
         if (description.contains("<img ")){
             String img  = description.substring(description.indexOf("<img "));
             String cleanUp = img.substring(0, img.indexOf(">") + 1);
@@ -173,10 +167,10 @@ public class RssHandler extends DefaultHandler {
                 img = img.substring(0,indexOf);
             }
             Log.e("Image URL",img);
-            this.desc = this.desc.replace(cleanUp,"");
+            desc = desc.replace(cleanUp, "");
             return img;
         }
-        return this.desc;
+        return desc;
     }
 
 

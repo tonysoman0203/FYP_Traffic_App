@@ -26,7 +26,6 @@ import com.example.tonyso.TrafficApp.listener.OnSetTimeListener;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 import com.example.tonyso.TrafficApp.utility.CommonUtils;
-import com.example.tonyso.TrafficApp.utility.DividerItemDecoration;
 import com.example.tonyso.TrafficApp.utility.LanguageSelector;
 import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -339,6 +338,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                                 .setTargetTime(endTime)
                                 .setRemainTime(getRemainTime(startTime, endTime))
                                 .setLatLngs(route.getLatLngs())
+                                .setType(route.getType())
                                 .setIsTimeOver(false).build());
                         if (success != -1) {
                             Snackbar.make(coordinatorLayout, "Adding Bookmark Success...", Snackbar.LENGTH_SHORT).show();
@@ -357,6 +357,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                                 .setTargetTime(endTime)
                                 .setRemainTime(getRemainTime(startTime, endTime))
                                 .setLatLngs(route.getLatLngs())
+                                .setType(route.getType())
                                 .setIsTimeOver(false).build());
                         if (success != -1) {
                             Snackbar.make(coordinatorLayout, "Editing Bookmark Success...", Snackbar.LENGTH_SHORT).show();
@@ -486,7 +487,6 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             super(v2);
             progressBar = (ProgressBar) v2.findViewById(R.id.progressBar);
             recyclerView = (RecyclerView) v2.findViewById(R.id.nearbyList);
-            recyclerView.addItemDecoration(new DividerItemDecoration(context.getResources().getDrawable(android.R.drawable.divider_horizontal_dim_dark), true, true));
             recyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         }
     }

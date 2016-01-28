@@ -6,6 +6,7 @@ import java.io.Serializable;
  * Created by TonySo on 18/9/2015.
  */
 public class TimedBookMark implements Serializable {
+    public String type;
     private  int _id;
     private  String[] bkRouteName;
     private  String startTime;
@@ -15,6 +16,23 @@ public class TimedBookMark implements Serializable {
     private int remainTime;
     private boolean isTimeOver;
     private double[] latLngs = null;
+
+    private TimedBookMark(Builder builder) {
+        this._id = builder._id;
+        this.bkRouteName = builder.bkRouteName;
+        this.startTime = builder.timestamp;
+        this.targetTime = builder.targetTime;
+        this.routeImageKey = builder.routeImageKey;
+        this.regions = builder.district;
+        this.isTimeOver = builder.isTimeOver;
+        this.remainTime = builder.remainTime;
+        this.latLngs = builder.latLngs;
+        this.type = builder.type;
+    }
+
+    public String getType() {
+        return type;
+    }
 
     public void setIsTimeOver(boolean isTimeOver) {
         this.isTimeOver = isTimeOver;
@@ -64,18 +82,6 @@ public class TimedBookMark implements Serializable {
         return isTimeOver;
     }
 
-    private TimedBookMark(Builder builder){
-        this._id = builder._id;
-        this.bkRouteName = builder.bkRouteName;
-        this.startTime = builder.timestamp;
-        this.targetTime = builder.targetTime;
-        this.routeImageKey = builder.routeImageKey;
-        this.regions = builder.district;
-        this.isTimeOver = builder.isTimeOver;
-        this.remainTime = builder.remainTime;
-        this.latLngs = builder.latLngs;
-    }
-
     public static class Builder{
         private int _id;
         private String[] bkRouteName;
@@ -86,6 +92,10 @@ public class TimedBookMark implements Serializable {
         private int remainTime;
         private String[] district;
         private boolean isTimeOver;
+        private String type;
+
+        public Builder() {
+        }
 
         public int getRemainTime() {
             return remainTime;
@@ -105,11 +115,9 @@ public class TimedBookMark implements Serializable {
             return this;
         }
 
-        public Builder() {}
-
         public TimedBookMark build(){
             return new TimedBookMark(this);
-        };
+        }
 
         public int get_id() {
             return _id;
@@ -171,6 +179,11 @@ public class TimedBookMark implements Serializable {
 
         public Builder setIsTimeOver(boolean isTimeOver) {
             this.isTimeOver = isTimeOver;
+            return this;
+        }
+
+        public Builder setType(String type) {
+            this.type = type;
             return this;
         }
     }

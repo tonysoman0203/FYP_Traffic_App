@@ -2,6 +2,7 @@ package com.example.tonyso.TrafficApp;
 
 import android.app.Application;
 
+import com.example.tonyso.TrafficApp.listener.BookmarkTimeStatusObserver;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.RouteSpeedMap;
 
@@ -18,6 +19,7 @@ public class MyApplication extends Application{
     public static String CURR_LANG;
     public List<RouteCCTV> list ;
     public List<RouteSpeedMap> speedMaps;
+    public String locate;
     BookmarkTimeStatusObserver timeStatusObserver;
 
 

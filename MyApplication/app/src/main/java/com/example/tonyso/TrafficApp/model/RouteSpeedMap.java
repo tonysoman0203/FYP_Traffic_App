@@ -6,14 +6,13 @@ package com.example.tonyso.TrafficApp.model;
 public class RouteSpeedMap extends RouteCCTV {
     static final public String TYPE_Speed_Map = "SpeedMap";
     private String[] regions;
-    private String[] description;
 
     public RouteSpeedMap() {
     }
 
     private RouteSpeedMap(RouteSpeedMap routeSpeedMap, int id) {
         this.route_id = id;
-        this.latLng = routeSpeedMap.latLng;
+        this.latLngs = routeSpeedMap.latLngs;
         this.route_id = routeSpeedMap.route_id;
         this.region = routeSpeedMap.regions;
         this.name = routeSpeedMap.name;

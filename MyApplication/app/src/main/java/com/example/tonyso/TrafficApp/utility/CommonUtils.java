@@ -11,7 +11,6 @@ import com.example.tonyso.TrafficApp.MyApplication;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -54,19 +53,6 @@ public class CommonUtils {
     public static Date getCurrentDate() {
         Calendar c = Calendar.getInstance();
         return c.getTime();
-    }
-
-    public static Timestamp getTimestamp(String time){
-        Timestamp timestamp = null;
-        try{
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
-            Date parsedDate = dateFormat.parse(time);
-            timestamp = new java.sql.Timestamp(parsedDate.getTime());
-            return timestamp;
-        }catch(Exception e){//this generic but you can control another types of exception
-           e.printStackTrace();
-        }
-        return timestamp;
     }
 
     public static String getCurrentDateTime() {
@@ -149,13 +135,9 @@ public class CommonUtils {
             }
             return isConnectingNetwork;
         }else {
-            if (isWIFINetwork == NetworkInfo.State.CONNECTED){
-                isConnectingNetwork = true;
-               // return isConnectingNetwork;
-            }else{
-                isConnectingNetwork = false;
-                //return isConnectingNetwork;
-            }
+            // return isConnectingNetwork;
+//return isConnectingNetwork;
+            isConnectingNetwork = isWIFINetwork == NetworkInfo.State.CONNECTED;
             return isConnectingNetwork;
         }
     }

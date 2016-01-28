@@ -1,13 +1,14 @@
-package com.example.tonyso.TrafficApp.utility;
+package com.example.tonyso.TrafficApp.rss_xml_feed;
 
 import android.app.ProgressDialog;
 import android.util.Log;
 
 import com.example.tonyso.TrafficApp.MainActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
-import com.example.tonyso.TrafficApp.listener.RssHandler;
 import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
 import com.example.tonyso.TrafficApp.model.Weather;
+import com.example.tonyso.TrafficApp.utility.ErrorDialog;
+import com.example.tonyso.TrafficApp.utility.LanguageSelector;
 
 import java.net.MalformedURLException;
 import java.net.URL;

@@ -10,7 +10,7 @@ public class Route implements Serializable{
     protected String name;
     protected String sat_level;
     protected String ref_key; //RD659F
-    protected double[] latLng;
+    protected double[] latLngs;
     protected String type;
 
     public Route(int route_id, String name, String sat_level, String refkey, double[] latLng) {
@@ -18,18 +18,18 @@ public class Route implements Serializable{
         this.name = name;
         this.sat_level = sat_level;
         ref_key = refkey;
-        this.latLng = latLng;
+        this.latLngs = latLng;
     }
 
     public Route() {
     }
 
-    public double[] getLatLng() {
-        return latLng;
+    public double[] getLatLngs() {
+        return latLngs;
     }
 
     public Route setLatLng(double[] latLng) {
-        this.latLng = latLng;
+        this.latLngs = latLng;
         return this;
     }
 
