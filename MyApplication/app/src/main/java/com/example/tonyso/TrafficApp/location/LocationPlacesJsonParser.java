@@ -1,4 +1,4 @@
-package com.example.tonyso.TrafficApp;
+package com.example.tonyso.TrafficApp.location;
 
 import android.util.Log;
 

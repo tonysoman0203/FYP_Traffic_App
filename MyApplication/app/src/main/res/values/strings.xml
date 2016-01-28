@@ -123,6 +123,8 @@
     <string name="title_routeSuggest">RouteSuggestion</string>
     <string name="route_suggest_begin">Origin</string>
     <string name="route_suggest_end">Destination</string>
+    <string name="route_suggest_origin_set">Set As Origin</string>
+    <string name="route_suggest_destination_set">Set As Destination</string>
     <string name="route_suggestion_current">Current Location</string>
     <string name="txtLocationLabel">Please Choose Origin &amp; Destination Point to port a graph </string>
     <string name="route_suggest_btnSubmit">Confirm </string>

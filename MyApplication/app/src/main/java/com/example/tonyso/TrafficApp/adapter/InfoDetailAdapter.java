@@ -16,13 +16,13 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.tonyso.TrafficApp.FindNearLocationAsyncTask;
 import com.example.tonyso.TrafficApp.InfoDetailActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.fragment.Tab_BookMarkFragment;
 import com.example.tonyso.TrafficApp.listener.OnInfoDetailMenuClickListener;
 import com.example.tonyso.TrafficApp.listener.OnSetTimeListener;
+import com.example.tonyso.TrafficApp.location.FindNearLocationAsyncTask;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 import com.example.tonyso.TrafficApp.utility.CommonUtils;

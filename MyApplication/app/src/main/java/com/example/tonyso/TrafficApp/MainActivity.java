@@ -106,33 +106,6 @@ public class MainActivity extends BaseActivity
         }
     };
 
-    public static GoogleApiClient getmGoogleApiClient() {
-        return mGoogleApiClient;
-    }
-
-    public void setmGoogleApiClient(GoogleApiClient mGoogleApiClient) {
-        MainActivity.mGoogleApiClient = mGoogleApiClient;
-    }
-
-    public static void changeFragment(Fragment fragment, boolean doAddToBackStack) {
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.flcontent, fragment);
-        transaction.setCustomAnimations(android.R.anim.fade_out, android.R.anim.fade_in);
-        if (doAddToBackStack) {
-            transaction.addToBackStack(null);
-            toggle.setDrawerIndicatorEnabled(true);
-            toggle.syncState();
-        } else {
-            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            toggle.syncState();
-        }
-        transaction.commit();
-    }
-
-    public static void onDialogDismissed() {
-        mResolvingError = false;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -246,6 +219,7 @@ public class MainActivity extends BaseActivity
         Log.i(MainActivity.class.getName(), "OnResume------@");
         toolbar.setTitle(getString(R.string.app_name));
         CommonUtils.checkPlayServices(this, PLAY_SERVICES_RESOLUTION_REQUEST);
+        setUpCountDownService();
 
         if (languageSelector.getLanguage().equals(MyApplication.Language.ZH_HANT)) {
             txtCurrDate.setText(CommonUtils.initDate(ZH_HANT));
@@ -253,13 +227,10 @@ public class MainActivity extends BaseActivity
             txtCurrDate.setText(CommonUtils.initDate(ENG));
         }
 
-
         if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
             startLocationUpdates();
         }
 
-        setUpCountDownService();
-        //setImageDownloadService();
     }
 
     @Override
@@ -414,6 +385,21 @@ public class MainActivity extends BaseActivity
         return true;
     }
 
+    public static void changeFragment(Fragment fragment, boolean doAddToBackStack) {
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.flcontent, fragment);
+        transaction.setCustomAnimations(android.R.anim.fade_out, android.R.anim.fade_in);
+        if (doAddToBackStack) {
+            transaction.addToBackStack(null);
+            toggle.setDrawerIndicatorEnabled(true);
+            toggle.syncState();
+        } else {
+            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            toggle.syncState();
+        }
+        transaction.commit();
+    }
+
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -552,4 +538,18 @@ public class MainActivity extends BaseActivity
             onDialogDismissed();
         }
     }
+
+    public static GoogleApiClient getmGoogleApiClient() {
+        return mGoogleApiClient;
+    }
+
+    public void setmGoogleApiClient(GoogleApiClient mGoogleApiClient) {
+        MainActivity.mGoogleApiClient = mGoogleApiClient;
+    }
+
+
+    public static void onDialogDismissed() {
+        mResolvingError = false;
+    }
+
 }

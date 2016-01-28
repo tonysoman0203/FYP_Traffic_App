@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/nav_route_suggest_origin"
+        android:icon="@drawable/ic_add_location_black_36dp"
+        android:orderInCategory="200"
+        android:title="@string/route_suggest_origin_set"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/nav_traffic_destination"
+        android:icon="@drawable/ic_add_location_black_36dp"
+        android:orderInCategory="300"
+        android:title="@string/route_suggest_destination_set"
+        app:showAsAction="ifRoom" />
+
+</menu>

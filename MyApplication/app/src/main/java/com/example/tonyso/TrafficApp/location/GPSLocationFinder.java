@@ -5,12 +5,13 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.util.Log;
 
-import com.example.tonyso.TrafficApp.GetCurrentLocationAsyncTask;
 import com.example.tonyso.TrafficApp.MainActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
 import com.example.tonyso.TrafficApp.utility.ErrorDialog;
 import com.example.tonyso.TrafficApp.utility.LanguageSelector;
+import com.example.tonyso.TrafficApp.utility.ShareStorage;
+import com.example.tonyso.TrafficApp.utility.StoreObject;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -60,21 +61,23 @@ public class GPSLocationFinder implements LocationListener {
         try {
             LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
             Geocoder geocoder = new Geocoder(context,locale);
-            List<Address> addresses = geocoder.getFromLocation(
-                    latLng.latitude,
-                    latLng.longitude, 10);
+            List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 10);
             if (addresses.size() > 0) {
-                String address  = addresses.get(1).getFeatureName();
                 Log.e("Test", "" + addresses.get(0).getLatitude() + "," + addresses.get(0).getLongitude());
-                Log.e("Address", addresses.get(0).getFeatureName());
-                //Log.e("Address",addresses.get(0).getCountryName());
-                weatherRefreshListener.onRefreshLocation(address);
+                Log.e("Address: ", addresses.get(0).getFeatureName());
+                Log.e("Address", addresses.get(0).getAddressLine(1));
+                String name = addresses.get(1).getFeatureName();
+                String address = addresses.get(0).getAddressLine(0).concat(addresses.get(0).getAddressLine(1));
+                ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE, new StoreObject<Object>(false, "name", name), ShareStorage.SP.ProtectedData, context);
+                ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE, new StoreObject<Object>(false, "address", address), ShareStorage.SP.ProtectedData, context);
+                ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE, new StoreObject<Object>(false, "latlng", latLng), ShareStorage.SP.ProtectedData, context);
+                weatherRefreshListener.onRefreshLocation(name);
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             // Get JSON BY Service
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-            GetCurrentLocationAsyncTask asyncTask = new GetCurrentLocationAsyncTask();
+            GetLocationAsyncTask asyncTask = new GetLocationAsyncTask();
             asyncTask.setWeatherListener(weatherRefreshListener);
             asyncTask.setLatlng(latLng);
             asyncTask.setApplication((MyApplication) context.getApplication());

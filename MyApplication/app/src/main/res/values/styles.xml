@@ -48,7 +48,7 @@
         <item name="android:textAppearance">?attr/textAppearanceListItem</item>
     </style>
 
-    
+
     <style name="MyTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabTextColor">@android:color/darker_gray</item>
         <item name="tabIndicatorColor">@android:color/white</item>

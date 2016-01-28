@@ -1,4 +1,4 @@
-package com.example.tonyso.TrafficApp;
+package com.example.tonyso.TrafficApp.location;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.adapter.InfoDetailAdapter;
 import com.example.tonyso.TrafficApp.adapter.NearPlaceItemAdpater;
 import com.example.tonyso.TrafficApp.model.NearbyLocation;
