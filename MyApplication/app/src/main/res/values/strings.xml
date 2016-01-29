@@ -126,8 +126,9 @@
     <string name="route_suggest_origin_set">Set As Origin</string>
     <string name="route_suggest_destination_set">Set As Destination</string>
     <string name="route_suggestion_current">Current Location</string>
-    <string name="txtLocationLabel">Please Choose Origin &amp; Destination Point to port a graph </string>
+    <string name="snackbar_route_suggest_orgin">Please Choose Origin Point</string>
     <string name="route_suggest_btnSubmit">Confirm </string>
     <string name="route_suggest_btnReset">Reset</string>
     <string name="route_suggest_notice">Please Wait&#8230;</string>
+    <string name="snackbar_route_suggest_destination">Please choose destionation point</string>
 </resources>

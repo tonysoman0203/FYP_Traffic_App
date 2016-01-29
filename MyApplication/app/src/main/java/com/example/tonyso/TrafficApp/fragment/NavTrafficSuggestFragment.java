@@ -1,9 +1,11 @@
 package com.example.tonyso.TrafficApp.fragment;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -33,16 +35,14 @@ public class NavTrafficSuggestFragment extends Fragment implements
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String TAG = NavTrafficSuggestFragment.class.getCanonicalName();
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private GoogleMap mGoogleMap;
     GetLocationAsyncTask task;
     MyApplication myapp;
     Toolbar toolbar;
     SupportMapFragment mapFragment;
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+    private GoogleMap mGoogleMap;
     /**
      * 28/1/2016 Route Suggestion Layout Implementation
      */
@@ -51,6 +51,7 @@ public class NavTrafficSuggestFragment extends Fragment implements
     private EditText origin, destination;
     private Button btnSubmit, btnReset;
     private AppBarLayout appBarLayout;
+    private Snackbar snackbar;
 
     public NavTrafficSuggestFragment() {
         // Required empty public constructor
@@ -113,6 +114,34 @@ public class NavTrafficSuggestFragment extends Fragment implements
             public void onClick(View v) {
                 origin.setText("");
                 destination.setText("");
+                snackbar = Snackbar.make(getActivity().findViewById(R.id.coordinateLayoutMain),
+                        getString(R.string.snackbar_route_suggest_orgin), Snackbar.LENGTH_INDEFINITE);
+                snackbar.show();
+                mapFragment.getView().animate()
+                        .translationY(0)
+                        .setDuration(3000)
+                        .setListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                frameLayout.setVisibility(View.GONE);
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+                                //inputDialogView.setVisibility(View.VISIBLE);
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+
+                            }
+                        });
+
             }
         });
     }
@@ -122,6 +151,8 @@ public class NavTrafficSuggestFragment extends Fragment implements
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         //Sync Map
         mapFragment.getMapAsync(this);
+        snackbar = Snackbar.make(getActivity().findViewById(R.id.coordinateLayoutMain), getString(R.string.snackbar_route_suggest_orgin), Snackbar.LENGTH_INDEFINITE);
+        snackbar.show();
     }
 
     @Override
@@ -171,6 +202,10 @@ public class NavTrafficSuggestFragment extends Fragment implements
                             case R.id.nav_route_suggest_origin:
                                 origin.setText(m.getTitle());
                                 animateDialogView();
+                                snackbar.dismiss();
+                                snackbar = Snackbar.make(getActivity().findViewById(R.id.coordinateLayoutMain)
+                                        , getString(R.string.snackbar_route_suggest_destination), Snackbar.LENGTH_INDEFINITE);
+                                snackbar.show();
                                 break;
                             case R.id.nav_traffic_destination:
                                 destination.setText(m.getTitle());
@@ -185,7 +220,30 @@ public class NavTrafficSuggestFragment extends Fragment implements
 
     private void animateDialogView() {
         //move map Fragment under input dialog view
-        mapFragment.getView().animate().translationY(100);
+        mapFragment.getView().animate()
+                .translationY(500)
+                .setDuration(3000)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        frameLayout.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                        //inputDialogView.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
 
     }
 }
