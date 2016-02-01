@@ -130,5 +130,5 @@
     <string name="route_suggest_btnSubmit">Confirm </string>
     <string name="route_suggest_btnReset">Reset</string>
     <string name="route_suggest_notice">Please Wait&#8230;</string>
-    <string name="snackbar_route_suggest_destination">Please choose destionation point</string>
+    <string name="snackbar_route_suggest_destination">Please choose destination point</string>
 </resources>

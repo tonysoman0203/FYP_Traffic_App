@@ -68,9 +68,12 @@ public class GPSLocationFinder implements LocationListener {
                 Log.e("Address", addresses.get(0).getAddressLine(1));
                 String name = addresses.get(1).getFeatureName();
                 String address = addresses.get(0).getAddressLine(0).concat(addresses.get(0).getAddressLine(1));
-                ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE, new StoreObject<Object>(false, "name", name), ShareStorage.SP.ProtectedData, context);
-                ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE, new StoreObject<Object>(false, "address", address), ShareStorage.SP.ProtectedData, context);
-                ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE, new StoreObject<Object>(false, "latlng", latLng), ShareStorage.SP.ProtectedData, context);
+                ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                        new StoreObject<Object>(false, "name", name), ShareStorage.SP.ProtectedData, context);
+                ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                        new StoreObject<Object>(false, "address", address), ShareStorage.SP.ProtectedData, context);
+                ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                        new StoreObject<Object>(false, "latlng", latLng), ShareStorage.SP.ProtectedData, context);
                 weatherRefreshListener.onRefreshLocation(name);
             }
         } catch (IOException e) {

@@ -119,7 +119,7 @@ public class NavTrafficSuggestFragment extends Fragment implements
                 snackbar.show();
                 mapFragment.getView().animate()
                         .translationY(0)
-                        .setDuration(3000)
+                        .setDuration(1000)
                         .setListener(new Animator.AnimatorListener() {
                             @Override
                             public void onAnimationStart(Animator animation) {
@@ -163,7 +163,7 @@ public class NavTrafficSuggestFragment extends Fragment implements
     @Override
     public void onDetach() {
         super.onDetach();
-
+        snackbar.dismiss();
     }
 
     @Override
@@ -209,6 +209,8 @@ public class NavTrafficSuggestFragment extends Fragment implements
                                 break;
                             case R.id.nav_traffic_destination:
                                 destination.setText(m.getTitle());
+                                animateDialogView();
+                                snackbar.dismiss();
                                 break;
                             default:
                                 break;
@@ -222,7 +224,7 @@ public class NavTrafficSuggestFragment extends Fragment implements
         //move map Fragment under input dialog view
         mapFragment.getView().animate()
                 .translationY(500)
-                .setDuration(3000)
+                .setDuration(1000)
                 .setListener(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animation) {

@@ -262,15 +262,5 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             }).show();
             return true;
         }
-
-
-//        @Override
-//        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-//            menu.add(Menu.NONE, R.id.bookmark_delete, Menu.NONE, context.getResources().getString(R.string.history_record_delete));
-//            menu.add(Menu.NONE, R.id.bookmark_share, Menu.NONE, context.getResources().getString(R.string.popup_share));
-//        }
-
     }
-
-
 }
