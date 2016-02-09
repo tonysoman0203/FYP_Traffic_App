@@ -14,5 +14,10 @@
         android:orderInCategory="300"
         android:title="@string/route_suggest_destination_set"
         app:showAsAction="ifRoom" />
-
+    <item
+        android:id="@+id/nav_traffic_cancel"
+        android:icon="@drawable/bs_ic_clear"
+        android:orderInCategory="300"
+        android:title="@string/route_detail_cancel"
+        app:showAsAction="ifRoom" />
 </menu>

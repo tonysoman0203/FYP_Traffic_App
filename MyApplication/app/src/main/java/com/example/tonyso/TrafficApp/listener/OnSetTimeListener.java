@@ -11,7 +11,7 @@ import android.widget.EditText;
 import android.widget.TimePicker;
 
 import com.example.tonyso.TrafficApp.InfoDetailActivity;
-import com.example.tonyso.TrafficApp.utility.CommonUtils;
+import com.example.tonyso.TrafficApp.utility.DateTime;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -56,7 +56,7 @@ public class OnSetTimeListener implements View.OnFocusChangeListener,
         try {
             //check Select Date >= CurrTime
             Date selectTime = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.TRADITIONAL_CHINESE).parse(date + " " + hour + ":" + minute);
-            Date currTime = CommonUtils.getCurrentDate();
+            Date currTime = DateTime.getCurrentDate();
             if (selectTime.before(currTime)) {
                 Snackbar.make(context.coordinatorLayout, "開始時間不可大於結束時間", Snackbar.LENGTH_LONG).show();
                 new TimePickerDialog(context, this, hour, this.minute, true).show();

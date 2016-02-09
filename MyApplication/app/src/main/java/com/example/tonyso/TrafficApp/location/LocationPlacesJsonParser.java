@@ -13,8 +13,8 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class LocationPlacesJsonParser {
 
         try {
             URL url = new URL(theUrl);
-            URLConnection urlConnection = url.openConnection();
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()), 8);
             String line;
             while ((line = bufferedReader.readLine()) != null) {
@@ -52,7 +52,7 @@ public class LocationPlacesJsonParser {
         return content.toString();
     }
 
-    protected String getJSON(String url) {
+    public String getJSON(String url) {
         return getUrlContents(url);
     }
 
@@ -76,7 +76,7 @@ public class LocationPlacesJsonParser {
             }
 
             for (int i = 0; i < arrayList.size(); i++) {
-                String distanceUrl = makeDistanceURL(currLocation, String.valueOf(arrayList.get(i).getName()));
+                String distanceUrl = makeDistanceURL(currLocation, String.valueOf(arrayList.get(i).getName()), null, null);
                 try {
                     json = getJSON(distanceUrl);
                     Log.d("JSON Distance= ", json);
@@ -93,17 +93,31 @@ public class LocationPlacesJsonParser {
         return null;
     }
 
-    private String makeDistanceURL(String currentLocation, String destination) {
-        StringBuilder url = new StringBuilder("http://maps.googleapis.com/maps/api/directions/json?");
+    public String makeDistanceURL(String currentLocation, String destination, LatLng srcLat, LatLng srcLng) {
+        StringBuilder urlString = new StringBuilder("http://maps.googleapis.com/maps/api/directions/json?");
         try {
-            url.append("origin=" + URLEncoder.encode(currentLocation, "UTF-8"));
-            url.append("&");
-            url.append("destination=" + URLEncoder.encode(destination, "UTF-8"));
-            url.append("&sensor=false");
+            if (srcLat == null || srcLng == null) {
+                urlString.append("origin=" + URLEncoder.encode(currentLocation, "UTF-8"));
+                urlString.append("&");
+                urlString.append("destination=" + URLEncoder.encode(destination, "UTF-8"));
+                urlString.append("&sensor=false");
+            } else {
+                urlString.append("?origin=");// from
+                urlString.append(Double.toString(srcLat.latitude));
+                urlString.append(",");
+                urlString.append(Double.toString(srcLat.longitude));
+                urlString.append("&destination=");// to
+                urlString.append(Double.toString(srcLng.latitude));
+                urlString.append(",");
+                urlString.append(Double.toString(srcLng.longitude));
+                urlString.append("&sensor=false&mode=driving&alternatives=true");
+                urlString.append("&key=" + API_KEY);
+            }
+
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return url.toString();
+        return urlString.toString();
     }
 
     //https://maps.googleapis.com/maps/api/place/search/json?location=28.632808,77.218276&radius=500&types=atm&sensor=false&key=<key>

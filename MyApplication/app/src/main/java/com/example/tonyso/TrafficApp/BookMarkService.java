@@ -8,7 +8,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.example.tonyso.TrafficApp.adapter.InfoDetailAdapter;
 import com.example.tonyso.TrafficApp.fragment.Tab_BookMarkFragment;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
-import com.example.tonyso.TrafficApp.utility.CommonUtils;
+import com.example.tonyso.TrafficApp.utility.DateTime;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -98,7 +98,7 @@ public class BookMarkService extends Service {
             ArrayList<TimedBookMark> timedBookMarks = new ArrayList<>();
             for (int i = 0; i < list.size(); i++) {
                 TimedBookMark timedBookMark = list.get(i);
-                String currTime = CommonUtils.getCurrentDateTime();
+                String currTime = DateTime.getCurrentDateTime();
                 String targetTime = timedBookMark.getTargetTime();
                 timedBookMark.setRemainTime(InfoDetailAdapter.getRemainTime(currTime, targetTime));
                 timedBookMarks.add(timedBookMark);

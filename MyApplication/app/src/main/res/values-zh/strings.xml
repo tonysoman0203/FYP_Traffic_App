@@ -54,7 +54,8 @@
     <string name="Minute">分鐘</string>
     <string name="notfound">未能提供</string>
     <string name="route_speed_image">顯示行車速度屏嗎？</string>
-    <string name="snackbar_route_suggest_orgin">Please Choose Origin Point</string>
-    <string name="snackbar_route_suggest_destination">Please choose destionation point</string>
+    <string name="snackbar_route_suggest_orgin">請選擇起點</string>
+    <string name="snackbar_route_suggest_destination">請選擇終點</string>
+    <string name="route_detail_cancel">取消</string>
 
 </resources>

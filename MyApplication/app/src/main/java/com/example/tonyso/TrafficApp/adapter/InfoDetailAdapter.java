@@ -25,7 +25,7 @@ import com.example.tonyso.TrafficApp.listener.OnSetTimeListener;
 import com.example.tonyso.TrafficApp.location.FindNearLocationAsyncTask;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
-import com.example.tonyso.TrafficApp.utility.CommonUtils;
+import com.example.tonyso.TrafficApp.utility.DateTime;
 import com.example.tonyso.TrafficApp.utility.LanguageSelector;
 import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -402,7 +402,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         try {
             start = new SimpleDateFormat("yyyy-mm-dd HH:mm").parse(startTime);
             end = new SimpleDateFormat("yyyy-mm-dd HH:mm").parse(endTime);
-            currDate = new SimpleDateFormat("yyyy-mm-dd HH:mm").parse(CommonUtils.getCurrentDateTime());
+            currDate = new SimpleDateFormat("yyyy-mm-dd HH:mm").parse(DateTime.getCurrentDateTime());
             startInSec = start.getTime();
             endInSec = end.getTime();
         } catch (ParseException e) {
@@ -490,7 +490,4 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             recyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         }
     }
-
 }
-
-

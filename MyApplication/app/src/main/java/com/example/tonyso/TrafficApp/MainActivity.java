@@ -46,6 +46,7 @@ import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
 import com.example.tonyso.TrafficApp.location.GPSLocationFinder;
 import com.example.tonyso.TrafficApp.rss_xml_feed.RssReader;
 import com.example.tonyso.TrafficApp.utility.CommonUtils;
+import com.example.tonyso.TrafficApp.utility.DateTime;
 import com.example.tonyso.TrafficApp.utility.LanguageSelector;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -106,6 +107,33 @@ public class MainActivity extends BaseActivity
         }
     };
 
+    public static void changeFragment(Fragment fragment, boolean doAddToBackStack) {
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.flcontent, fragment);
+        transaction.setCustomAnimations(android.R.anim.fade_out, android.R.anim.fade_in);
+        if (doAddToBackStack) {
+            transaction.addToBackStack(null);
+            toggle.setDrawerIndicatorEnabled(true);
+            toggle.syncState();
+        } else {
+            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            toggle.syncState();
+        }
+        transaction.commit();
+    }
+
+    public static GoogleApiClient getmGoogleApiClient() {
+        return mGoogleApiClient;
+    }
+
+    public void setmGoogleApiClient(GoogleApiClient mGoogleApiClient) {
+        MainActivity.mGoogleApiClient = mGoogleApiClient;
+    }
+
+    public static void onDialogDismissed() {
+        mResolvingError = false;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,7 +142,8 @@ public class MainActivity extends BaseActivity
         myApplication = (MyApplication) getApplication();
         init();
 
-        if (CommonUtils.checkPlayServices(this, PLAY_SERVICES_RESOLUTION_REQUEST)) {
+        boolean gplayStatus = CommonUtils.checkPlayServices(this, PLAY_SERVICES_RESOLUTION_REQUEST);
+        if (gplayStatus) {
             buildGoogleApiClient();
             createLocationRequest();
         } else {
@@ -222,9 +251,9 @@ public class MainActivity extends BaseActivity
         setUpCountDownService();
 
         if (languageSelector.getLanguage().equals(MyApplication.Language.ZH_HANT)) {
-            txtCurrDate.setText(CommonUtils.initDate(ZH_HANT));
+            txtCurrDate.setText(DateTime.initDate(ZH_HANT));
         } else {
-            txtCurrDate.setText(CommonUtils.initDate(ENG));
+            txtCurrDate.setText(DateTime.initDate(ENG));
         }
 
         if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
@@ -385,21 +414,6 @@ public class MainActivity extends BaseActivity
         return true;
     }
 
-    public static void changeFragment(Fragment fragment, boolean doAddToBackStack) {
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.flcontent, fragment);
-        transaction.setCustomAnimations(android.R.anim.fade_out, android.R.anim.fade_in);
-        if (doAddToBackStack) {
-            transaction.addToBackStack(null);
-            toggle.setDrawerIndicatorEnabled(true);
-            toggle.syncState();
-        } else {
-            activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            toggle.syncState();
-        }
-        transaction.commit();
-    }
-
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -537,19 +551,6 @@ public class MainActivity extends BaseActivity
         public void onDismiss(DialogInterface dialog) {
             onDialogDismissed();
         }
-    }
-
-    public static GoogleApiClient getmGoogleApiClient() {
-        return mGoogleApiClient;
-    }
-
-    public void setmGoogleApiClient(GoogleApiClient mGoogleApiClient) {
-        MainActivity.mGoogleApiClient = mGoogleApiClient;
-    }
-
-
-    public static void onDialogDismissed() {
-        mResolvingError = false;
     }
 
 }

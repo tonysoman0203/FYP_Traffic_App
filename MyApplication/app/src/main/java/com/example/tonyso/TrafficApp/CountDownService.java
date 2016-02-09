@@ -5,20 +5,17 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.example.tonyso.TrafficApp.utility.CommonUtils;
+import com.example.tonyso.TrafficApp.utility.DateTime;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class CountDownService extends Service {
 
-    MyTimerTask myTimerTask;
-
-    LocalBroadcastManager localBroadcastManager;
-
     static final public String CURR_TIME_RESULT = "com.example.tonyso.myapplication.CountDownService.TIMERESULT";
-
     static final public String MESSAGE = "com.example.tonyso.myapplication.CountDownService.MSG";
+    MyTimerTask myTimerTask;
+    LocalBroadcastManager localBroadcastManager;
 
 
 
@@ -55,7 +52,7 @@ public class CountDownService extends Service {
 
         @Override
         public void run(){
-            String currTime = CommonUtils.getTime();
+            String currTime = DateTime.getTime();
             sendResult(currTime);
         }
 

@@ -47,7 +47,7 @@ public class GetLocationAsyncTask extends AsyncTask<Void, Place, Place> {
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject json = results.getJSONObject(i);
                     JSONArray address_components = json.getJSONArray("address_components");
-                    for (int ac = 0; i < address_components.length(); ac++) {
+                    for (int ac = 0; i < address_components.length() - 1; ac++) {
                         String types = address_components.getJSONObject(ac).getString("types");
                         Log.i(getClass().getCanonicalName(), "Type:" + types);
                         if (types.equalsIgnoreCase("[\"neighborhood\",\"political\"]")) {
@@ -93,9 +93,12 @@ public class GetLocationAsyncTask extends AsyncTask<Void, Place, Place> {
     protected void onPostExecute(Place address) {
         super.onPostExecute(address);
         //Log.d(getClass().getCanonicalName(), address.getName().toString());
-        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE, new StoreObject<Object>(false, "name", address.getName()), ShareStorage.SP.ProtectedData, context);
-        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE, new StoreObject<Object>(false, "address", address.getAddress().toString()), ShareStorage.SP.ProtectedData, context);
-        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE, new StoreObject<Object>(false, "latlng", address.getLatlngs()), ShareStorage.SP.ProtectedData, context);
+        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                new StoreObject<Object>(false, "name", address.getName()), ShareStorage.SP.ProtectedData, context);
+        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                new StoreObject<Object>(false, "address", address.getAddress().toString()), ShareStorage.SP.ProtectedData, context);
+        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                new StoreObject<Object>(false, "latlng", address.getLatlngs()), ShareStorage.SP.ProtectedData, context);
         if (weatherListener != null) {
             weatherListener.onRefreshLocation(address.getName().toString());
         } else {
@@ -118,11 +121,11 @@ public class GetLocationAsyncTask extends AsyncTask<Void, Place, Place> {
         this.latlng = latlng;
     }
 
-    public void setGoogleMap(GoogleMap googleMap) {
-        this.googleMap = googleMap;
-    }
-
     public GoogleMap getGoogleMap() {
         return googleMap;
+    }
+
+    public void setGoogleMap(GoogleMap googleMap) {
+        this.googleMap = googleMap;
     }
 }
