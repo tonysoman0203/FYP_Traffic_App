@@ -1,5 +1,6 @@
 package com.example.tonyso.TrafficApp.location;
 
+import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -25,7 +26,7 @@ import java.util.Locale;
  */
 public class GPSLocationFinder implements LocationListener {
     private static final String TAG = GPSLocationFinder.class.getSimpleName();
-    MainActivity context;
+    Context context;
     Location mLocation;
     ErrorDialog errorDialog;
     LanguageSelector languageSelector ;
@@ -41,6 +42,8 @@ public class GPSLocationFinder implements LocationListener {
         this.languageSelector = LanguageSelector.getInstance(this.context);
         this.weatherRefreshListener = gpsLocationFinder.weatherRefreshListener;
     }
+
+    //public static GPSLocationFinder getInstance()
 
     public GPSLocationFinder build() {
         return new GPSLocationFinder(this);
@@ -73,7 +76,9 @@ public class GPSLocationFinder implements LocationListener {
                 ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
                         new StoreObject<Object>(false, "address", address), ShareStorage.SP.ProtectedData, context);
                 ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
-                        new StoreObject<Object>(false, "latlng", latLng), ShareStorage.SP.ProtectedData, context);
+                        new StoreObject<Object>(false, "lat", latLng.latitude), ShareStorage.SP.ProtectedData, context);
+                ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                        new StoreObject<Object>(false, "lng", latLng.latitude), ShareStorage.SP.ProtectedData, context);
                 weatherRefreshListener.onRefreshLocation(name);
             }
         } catch (IOException e) {
@@ -83,7 +88,6 @@ public class GPSLocationFinder implements LocationListener {
             GetLocationAsyncTask asyncTask = new GetLocationAsyncTask();
             asyncTask.setWeatherListener(weatherRefreshListener);
             asyncTask.setLatlng(latLng);
-            asyncTask.setApplication((MyApplication) context.getApplication());
             asyncTask.execute();
         }
 

@@ -20,14 +20,15 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             app:errorEnabled="true"
-            app:hintAnimationEnabled="true">
+            app:hintAnimationEnabled="true"
+            android:layout_toStartOf="@+id/imageButton"
+            android:layout_alignParentEnd="true">
 
             <EditText
                 android:id="@+id/originEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawablePadding="2dip"
-                android:drawableRight="@drawable/ic_my_location_black_36dp"
                 android:hint="@string/route_suggest_begin"
                 android:inputType="text"
                 android:textSize="@dimen/editText_size" />
@@ -83,6 +84,14 @@
                 android:layout_weight="1"
                 android:text="@string/route_suggest_btnReset" />
         </LinearLayout>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageButton"
+            android:background="@drawable/ic_my_location_black_36dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true" />
 
     </RelativeLayout>
 </android.support.v4.widget.NestedScrollView>

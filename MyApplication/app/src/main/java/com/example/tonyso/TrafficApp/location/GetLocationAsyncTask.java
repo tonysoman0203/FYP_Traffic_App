@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
 import com.example.tonyso.TrafficApp.model.Place;
 import com.example.tonyso.TrafficApp.utility.ShareStorage;
@@ -21,10 +20,9 @@ import org.json.JSONObject;
  * Created by TonySo on 20/1/16.
  */
 public class GetLocationAsyncTask extends AsyncTask<Void, Place, Place> {
-    public Context location;
+    public Context context;
     private WeatherRefreshListener weatherListener;
     private LatLng latlng;
-    private MyApplication context;
     private GoogleMap googleMap;
 
     public GetLocationAsyncTask() {
@@ -98,7 +96,9 @@ public class GetLocationAsyncTask extends AsyncTask<Void, Place, Place> {
         ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
                 new StoreObject<Object>(false, "address", address.getAddress().toString()), ShareStorage.SP.ProtectedData, context);
         ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
-                new StoreObject<Object>(false, "latlng", address.getLatlngs()), ShareStorage.SP.ProtectedData, context);
+                new StoreObject<Object>(false, "lat", address.getLatlngs().latitude), ShareStorage.SP.ProtectedData, context);
+        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                new StoreObject<Object>(false, "lng", address.getLatlngs().longitude), ShareStorage.SP.ProtectedData, context);
         if (weatherListener != null) {
             weatherListener.onRefreshLocation(address.getName().toString());
         } else {
@@ -111,10 +111,6 @@ public class GetLocationAsyncTask extends AsyncTask<Void, Place, Place> {
 
     public void setWeatherListener(WeatherRefreshListener weatherListener) {
         this.weatherListener = weatherListener;
-    }
-
-    public void setApplication(MyApplication context) {
-        this.context = context;
     }
 
     public void setLatlng(LatLng latlng) {

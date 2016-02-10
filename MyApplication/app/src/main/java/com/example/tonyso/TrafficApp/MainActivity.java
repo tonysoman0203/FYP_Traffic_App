@@ -1,6 +1,7 @@
 package com.example.tonyso.TrafficApp;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -36,6 +37,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
 import com.example.tonyso.TrafficApp.fragment.FeedBackFragment;
@@ -45,11 +47,11 @@ import com.example.tonyso.TrafficApp.fragment.Tab_MainFragment;
 import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
 import com.example.tonyso.TrafficApp.location.GPSLocationFinder;
 import com.example.tonyso.TrafficApp.rss_xml_feed.RssReader;
-import com.example.tonyso.TrafficApp.utility.CommonUtils;
 import com.example.tonyso.TrafficApp.utility.DateTime;
 import com.example.tonyso.TrafficApp.utility.LanguageSelector;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -142,7 +144,7 @@ public class MainActivity extends BaseActivity
         myApplication = (MyApplication) getApplication();
         init();
 
-        boolean gplayStatus = CommonUtils.checkPlayServices(this, PLAY_SERVICES_RESOLUTION_REQUEST);
+        boolean gplayStatus = checkPlayServices(this, PLAY_SERVICES_RESOLUTION_REQUEST);
         if (gplayStatus) {
             buildGoogleApiClient();
             createLocationRequest();
@@ -162,7 +164,7 @@ public class MainActivity extends BaseActivity
         Tab_MainFragment fragment = Tab_MainFragment.newInstance(getString(R.string.app_name), indicatorColor, dividerColor, tabLayout);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.flcontent, fragment);
-        fragmentTransaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        //fragmentTransaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
         //fragmentTransaction.addToBackStack(TAG);
         fragmentTransaction.commit();
     }
@@ -247,7 +249,6 @@ public class MainActivity extends BaseActivity
         super.onResume();
         Log.i(MainActivity.class.getName(), "OnResume------@");
         toolbar.setTitle(getString(R.string.app_name));
-        CommonUtils.checkPlayServices(this, PLAY_SERVICES_RESOLUTION_REQUEST);
         setUpCountDownService();
 
         if (languageSelector.getLanguage().equals(MyApplication.Language.ZH_HANT)) {
@@ -260,6 +261,27 @@ public class MainActivity extends BaseActivity
             startLocationUpdates();
         }
 
+    }
+
+    /**
+     * Method to verify google play services on the device
+     */
+    public static boolean checkPlayServices(Activity context, int PLAY_SERVICES_RESOLUTION_REQUEST) {
+        int resultCode = GooglePlayServicesUtil
+                .isGooglePlayServicesAvailable(context);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, context,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Toast.makeText(context,
+                        "This device is not supported.", Toast.LENGTH_LONG)
+                        .show();
+                context.finish();
+            }
+            return false;
+        }
+        return true;
     }
 
     @Override

@@ -47,6 +47,9 @@ public class ShareStorage {
                 } else if (storeObject.getValue() instanceof Boolean) {
                     String encrypt_value = encryption(String.valueOf(storeObject.getValue()));
                     sharedPreferences.edit().putString(key, encrypt_value).apply();
+                } else if (storeObject.getValue() instanceof Double) {
+                    String encrypt_value = encryption(String.valueOf(storeObject.getValue()));
+                    sharedPreferences.edit().putString(key, encrypt_value).apply();
                 } else {
                     return;
                 }

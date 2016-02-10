@@ -9,13 +9,13 @@ import android.view.ViewGroup;
 
 import com.example.tonyso.TrafficApp.MainActivity;
 import com.example.tonyso.TrafficApp.R;
-import com.example.tonyso.TrafficApp.baseclass.TabBaseFragment;
+import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 /**
  * Created by TonySo on 11/1/16.
  */
-public class Tab_Home_Fragment extends TabBaseFragment {
+public class Tab_Home_Fragment extends BaseFragment {
 
     private static final String TAG = Tab_Home_Fragment.class.getSimpleName();
     private GoogleApiClient mGoogleApiClient;
@@ -36,6 +36,7 @@ public class Tab_Home_Fragment extends TabBaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        super.getInstance();
         this.mGoogleApiClient = MainActivity.getmGoogleApiClient();
     }
 

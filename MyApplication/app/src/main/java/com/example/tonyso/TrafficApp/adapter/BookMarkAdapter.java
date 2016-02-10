@@ -25,7 +25,6 @@ import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.display.SimpleBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import java.util.ArrayList;
@@ -62,14 +61,9 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         addDatatoSortedList(myDatasets);
         this.frag = tab_bookMarkFragment;
         setOnItemClickListener(frag);
-        imageLoader = ImageLoader.getInstance();
-        imageOptions = new DisplayImageOptions.Builder()
-                .showImageForEmptyUri(R.drawable.ic_error_black_24dp)
-                .cacheInMemory(true)
-                .considerExifParams(true)
-                .displayer(new SimpleBitmapDisplayer())
-                .build();
-        languageSelector = LanguageSelector.getInstance(frag.getContext());
+        imageLoader = tab_bookMarkFragment.getImageLoader();
+        imageOptions = tab_bookMarkFragment.getImageOptions();
+        languageSelector = tab_bookMarkFragment.getLanguageSelector();
     }
 
     public int getPosition() {

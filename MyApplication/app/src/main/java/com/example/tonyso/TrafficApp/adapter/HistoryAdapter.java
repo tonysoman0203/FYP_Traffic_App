@@ -26,7 +26,6 @@ import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.display.SimpleBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import java.util.List;
@@ -50,22 +49,16 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
     private Tab_HistoryFragment context;
     private LanguageSelector languageSelector;
     private ImageLoader imageLoader;
-
-
     private int position;
     private OnItemClickListener onItemClickListener;
 
     public HistoryAdapter(Tab_HistoryFragment context, List<TimedBookMark> historyList) {
         this.context = context;
         this.onItemClickListener = context;
-        this.languageSelector = LanguageSelector.getInstance(context.getContext());
+        this.languageSelector = context.getLanguageSelector();
         mSortedList = getmSortedList(historyList);
-        imageLoader = ImageLoader.getInstance();
-        imageOptions = new DisplayImageOptions.Builder()
-                .cacheInMemory(true)
-                .considerExifParams(true)
-                .displayer(new SimpleBitmapDisplayer())
-                .build();
+        imageLoader = context.getImageLoader();
+        imageOptions = context.getImageOptions();
     }
 
     public SortedList<TimedBookMark> getmSortedList() {

@@ -15,14 +15,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.InfoDetailActivity;
-import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.adapter.HistoryAdapter;
-import com.example.tonyso.TrafficApp.baseclass.TabBaseFragment;
+import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
 import com.example.tonyso.TrafficApp.listener.BookmarkTimeStatusObserver;
 import com.example.tonyso.TrafficApp.listener.OnItemClickListener;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
-import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,19 +29,16 @@ import java.util.Observer;
 
 import jp.wasabeef.recyclerview.animators.FadeInRightAnimator;
 
-public class Tab_HistoryFragment extends TabBaseFragment implements Observer, OnItemClickListener {
+public class Tab_HistoryFragment extends BaseFragment implements Observer, OnItemClickListener {
 
     public static final String INTENT_TAG_HISTORY_ITEM = "History Object";
     private static final String TAG = Tab_HistoryFragment.class.getSimpleName();
     private static final int HISTORY_VIEW_RECORD_REQUEST_CODE = 00001000;
-    MyApplication myApplication;
     BookmarkTimeStatusObserver bookmarkTimeStatusObserver;
-    SQLiteHelper sqLiteHelper;
     private RecyclerView mRecyclerHistoryView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private List<TimedBookMark> historyList = new ArrayList<>();
     private HistoryAdapter historyAdapter;
-    private View view;
     private TextView emptyView;
     private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
@@ -79,8 +74,8 @@ public class Tab_HistoryFragment extends TabBaseFragment implements Observer, On
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        super.getInstance();
         // TODO: Change Adapter to display your content
-        myApplication = (MyApplication) getActivity().getApplication();
         myApplication.getTimeStatusObserver().addObserver(this);
         bookmarkTimeStatusObserver = myApplication.getTimeStatusObserver();
     }
@@ -89,7 +84,6 @@ public class Tab_HistoryFragment extends TabBaseFragment implements Observer, On
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tab_history_list, container, false);
-        sqLiteHelper = new SQLiteHelper(this.getContext());
         initializeUIView(view);
         setHistoryAdapter();
         return view;

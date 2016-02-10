@@ -57,5 +57,6 @@
     <string name="snackbar_route_suggest_orgin">請選擇起點</string>
     <string name="snackbar_route_suggest_destination">請選擇終點</string>
     <string name="route_detail_cancel">取消</string>
+    <string name="route_suggestion_current">現時地點：</string>
 
 </resources>

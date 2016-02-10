@@ -1,16 +1,11 @@
 package com.example.tonyso.TrafficApp.fragment;
 
 import android.animation.Animator;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,42 +15,35 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 
 import com.cocosw.bottomsheet.BottomSheet;
-import com.example.tonyso.TrafficApp.MainActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
+import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
+import com.example.tonyso.TrafficApp.location.DrawPathAsyncTask;
 import com.example.tonyso.TrafficApp.location.GetLocationAsyncTask;
-import com.example.tonyso.TrafficApp.location.LocationPlacesJsonParser;
+import com.example.tonyso.TrafficApp.utility.ErrorDialog;
+import com.example.tonyso.TrafficApp.utility.ShareStorage;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 
-public class NavTrafficSuggestFragment extends Fragment implements
+public class NavTrafficSuggestFragment extends BaseFragment implements
         GoogleMap.OnMapLongClickListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String TAG = NavTrafficSuggestFragment.class.getCanonicalName();
     GetLocationAsyncTask task;
-    MyApplication myapp;
     Toolbar toolbar;
     SupportMapFragment mapFragment;
     // TODO: Rename and change types of parameters
     private String mParam1;
-    private String mParam2;
     private GoogleMap mGoogleMap;
     /**
      * 28/1/2016 Route Suggestion Layout Implementation
@@ -84,8 +72,10 @@ public class NavTrafficSuggestFragment extends Fragment implements
         setHasOptionsMenu(true);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
-            //mParam2 = getArguments().getString(ARG_PARAM2);
+        } else {
+            mParam1 = getContext().getString(R.string.title_routeSuggest);
         }
+        super.getInstance();
     }
 
     @Override
@@ -98,7 +88,6 @@ public class NavTrafficSuggestFragment extends Fragment implements
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        myapp = (MyApplication) MainActivity.activity.getApplication();
         setFragmentToolbar();
         initGoogleMap();
         initPopupDialog(view);
@@ -122,11 +111,16 @@ public class NavTrafficSuggestFragment extends Fragment implements
             public void onClick(View v) {
                 if (origin.getText() == null || destination.getText() == null) {
                     //show errorDialog
+                    ErrorDialog errorDialog = ErrorDialog.getInstance(getContext());
+                    errorDialog.displayAlertDialog("Input Error! Please select again...");
+                    origin.setText("");
+                    destination.setText("");
                 } else {
                     //fetch path
                     String[] l = new String[]{origin.getText().toString(), destination.getText().toString()};
                     if (mGoogleMap != null) {
-                        DrawPathAsyncTask drawPathAsyncTask = new DrawPathAsyncTask(getActivity(), mGoogleMap, l);
+                        DrawPathAsyncTask drawPathAsyncTask = new DrawPathAsyncTask(
+                                NavTrafficSuggestFragment.this, getActivity(), mGoogleMap, l, routeList, routeSpeedMap);
                         drawPathAsyncTask.execute();
                     }
 
@@ -150,22 +144,35 @@ public class NavTrafficSuggestFragment extends Fragment implements
                             @Override
                             public void onAnimationStart(Animator animation) {
                             }
-
                             @Override
                             public void onAnimationEnd(Animator animation) {
                                 frameLayout.setVisibility(View.GONE);
                             }
-
                             @Override
                             public void onAnimationCancel(Animator animation) {
                             }
-
                             @Override
                             public void onAnimationRepeat(Animator animation) {
                             }
                         });
-                mapFragment.getMap().clear();
+                mGoogleMap.clear();
+            }
+        });
 
+        //ImageButton
+        /*
+      Navigate and get current location
+     */
+        ImageButton imgCurrentLocation = (ImageButton) inputDialogView.findViewById(R.id.imageButton);
+        imgCurrentLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                origin.setText(getCurrentLocation());
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .title(getCurrentLocation().toString())
+                        .position(getCurrentLocationByLatLng());
+                mGoogleMap.addMarker(markerOptions);
+                animateDialogView();
             }
         });
     }
@@ -175,7 +182,22 @@ public class NavTrafficSuggestFragment extends Fragment implements
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         //Sync Map
         mapFragment.getMapAsync(this);
-        snackbar = Snackbar.make(getActivity().findViewById(R.id.coordinateLayoutMain), getString(R.string.snackbar_route_suggest_orgin), Snackbar.LENGTH_INDEFINITE);
+        snackbar = Snackbar.make(getActivity().findViewById(R.id.coordinateLayoutMain),
+                getString(R.string.snackbar_route_suggest_orgin), Snackbar.LENGTH_INDEFINITE);
+        snackbar.setAction(getString(R.string.route_suggestion_current), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                origin.setText(getCurrentLocation());
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .title(getCurrentLocation().toString())
+                        .position(getCurrentLocationByLatLng());
+                mGoogleMap.addMarker(markerOptions);
+                animateDialogView();
+                snackbar = Snackbar.make(getActivity().findViewById(R.id.coordinateLayoutMain)
+                        , getString(R.string.snackbar_route_suggest_destination), Snackbar.LENGTH_INDEFINITE);
+                snackbar.show();
+            }
+        });
         snackbar.show();
     }
 
@@ -263,7 +285,6 @@ public class NavTrafficSuggestFragment extends Fragment implements
                 .setListener(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animation) {
-
                     }
 
                     @Override
@@ -273,119 +294,25 @@ public class NavTrafficSuggestFragment extends Fragment implements
 
                     @Override
                     public void onAnimationCancel(Animator animation) {
-                        //inputDialogView.setVisibility(View.VISIBLE);
                     }
 
                     @Override
                     public void onAnimationRepeat(Animator animation) {
-
                     }
                 });
     }
 
-    public class DrawPathAsyncTask extends AsyncTask<Void, Void, String> {
-        private final String TAG = DrawPathAsyncTask.class.getCanonicalName();
-        Context context;
-        GoogleMap mMap;
-        String[] location;
-        private ProgressDialog progressDialog;
+    public StringBuffer getCurrentLocation() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(ShareStorage.retrieveData("address", ShareStorage.SP.ProtectedData, getContext()));
+        return sb;
+    }
 
-        public DrawPathAsyncTask(Context context, GoogleMap map, String[] location) {
-            this.context = context;
-            this.mMap = map;
-            this.location = location;
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            LocationPlacesJsonParser jsonParser = new LocationPlacesJsonParser(context.getString(R.string.place_api_server_key));
-            String url = jsonParser.makeDistanceURL(location[0], location[1], null, null);
-            return jsonParser.getJSON(url);
-        }
-
-        private List<LatLng> decodePoly(String encoded) {
-
-            List<LatLng> poly = new ArrayList<LatLng>();
-            int index = 0, len = encoded.length();
-            int lat = 0, lng = 0;
-
-            while (index < len) {
-                int b, shift = 0, result = 0;
-                do {
-                    b = encoded.charAt(index++) - 63;
-                    result |= (b & 0x1f) << shift;
-                    shift += 5;
-                } while (b >= 0x20);
-                int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-                lat += dlat;
-
-                shift = 0;
-                result = 0;
-                do {
-                    b = encoded.charAt(index++) - 63;
-                    result |= (b & 0x1f) << shift;
-                    shift += 5;
-                } while (b >= 0x20);
-                int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-                lng += dlng;
-
-                LatLng p = new LatLng((((double) lat / 1E5)),
-                        (((double) lng / 1E5)));
-                poly.add(p);
-            }
-
-            return poly;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = new ProgressDialog(context);
-            progressDialog.setIndeterminate(true);
-            progressDialog.setMessage("Fetching Routes.......");
-            progressDialog.show();
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            Log.e(TAG, s);
-            progressDialog.hide();
-            if (s != null) {
-                drawPath(s);
-            }
-        }
-
-        public void drawPath(String result) {
-
-            try {
-                //Tranform the string into a json object
-                final JSONObject json = new JSONObject(result);
-                JSONArray routeArray = json.getJSONArray("routes");
-                JSONObject routes = routeArray.getJSONObject(0);
-                JSONObject overviewPolylines = routes.getJSONObject("overview_polyline");
-                String encodedString = overviewPolylines.getString("points");
-                List<LatLng> list = decodePoly(encodedString);
-                Polyline line = mMap.addPolyline(new PolylineOptions()
-                                .addAll(list)
-                                .width(12)
-                                .color(Color.parseColor("#05b1fb"))//Google maps blue color
-                                .geodesic(true)
-                );
-
-           /*
-           for(int z = 0; z<list.size()-1;z++){
-                LatLng src= list.get(z);
-                LatLng dest= list.get(z+1);
-                Polyline line = mMap.addPolyline(new PolylineOptions()
-                .add(new LatLng(src.latitude, src.longitude), new LatLng(dest.latitude,   dest.longitude))
-                .width(2)
-                .color(Color.BLUE).geodesic(true));
-            }
-           */
-            } catch (JSONException e) {
-
-            }
-        }
+    public LatLng getCurrentLocationByLatLng() {
+        double[] lls = new double[]{
+                Double.parseDouble(ShareStorage.retrieveData("lat", ShareStorage.SP.ProtectedData, getContext())),
+                Double.parseDouble(ShareStorage.retrieveData("lng", ShareStorage.SP.ProtectedData, getContext()))
+        };
+        return new LatLng(lls[0], lls[1]);
     }
 }

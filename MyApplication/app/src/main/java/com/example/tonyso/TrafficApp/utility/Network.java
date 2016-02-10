@@ -1,48 +1,22 @@
 package com.example.tonyso.TrafficApp.utility;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.tonyso.TrafficApp.MyApplication;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 
 /**
  * Created by TonySoMan on 2/9/2015.
  */
-public class CommonUtils {
+public class Network {
 
     static Boolean isConnectingNetwork = false;
     static Boolean isConnectingMobileNetwork = false;
     static Boolean isConnectingWifiNetwork = false;
 
     static NetworkInfo.State isWIFINetwork , isMobileNetwork;
-
-
-    /**
-     * Method to verify google play services on the device
-     * */
-    public static boolean checkPlayServices(Activity context,int PLAY_SERVICES_RESOLUTION_REQUEST) {
-        int resultCode = GooglePlayServicesUtil
-                .isGooglePlayServicesAvailable(context);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, context,
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Toast.makeText(context,
-                        "This device is not supported.", Toast.LENGTH_LONG)
-                        .show();
-                context.finish();
-            }
-            return false;
-        }
-        return true;
-    }
 
     public static boolean checkInternetStatus(Context context) {
         ConnectivityManager conmgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

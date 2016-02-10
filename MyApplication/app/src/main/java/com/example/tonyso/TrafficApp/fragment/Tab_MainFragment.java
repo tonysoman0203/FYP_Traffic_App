@@ -11,11 +11,11 @@ import android.view.ViewGroup;
 
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.adapter.TabFragmentPagerAdapter;
-import com.example.tonyso.TrafficApp.baseclass.TabBaseFragment;
+import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
 
 import java.util.LinkedList;
 
-public class Tab_MainFragment extends TabBaseFragment {
+public class Tab_MainFragment extends BaseFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -23,7 +23,7 @@ public class Tab_MainFragment extends TabBaseFragment {
     static TabLayout tabLayout;
     ViewPager viewPager;
     TabFragmentPagerAdapter adapter;
-    LinkedList<TabBaseFragment> fragments;
+    LinkedList<BaseFragment> fragments;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -67,6 +67,7 @@ public class Tab_MainFragment extends TabBaseFragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        super.getInstance();
     }
 
     @Override
@@ -86,7 +87,7 @@ public class Tab_MainFragment extends TabBaseFragment {
         return view;
     }
 
-    private LinkedList<TabBaseFragment> getFragments() {
+    private LinkedList<BaseFragment> getFragments() {
         int indicatorColor = this.getResources().getColor(R.color.colorAccent);
         int dividerColor = Color.WHITE;
 
@@ -96,7 +97,7 @@ public class Tab_MainFragment extends TabBaseFragment {
         int ic_bookmark = R.drawable.ic_bookmark_white_48dp;
         int ic_history = R.drawable.ic_history_white_48dp;
 
-        LinkedList<TabBaseFragment> fragments = new LinkedList<>();
+        LinkedList<BaseFragment> fragments = new LinkedList<>();
         String bookmark = getString(R.string.tab_BookMarks);
         String history = getString(R.string.tab_History);
         fragments.add(Tab_Home_Fragment.newInstance(near, indicatorColor, dividerColor, ic_home));

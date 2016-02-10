@@ -21,10 +21,9 @@ import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.BookMarkService;
 import com.example.tonyso.TrafficApp.InfoDetailActivity;
-import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.adapter.BookMarkAdapter;
-import com.example.tonyso.TrafficApp.baseclass.TabBaseFragment;
+import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
 import com.example.tonyso.TrafficApp.listener.BookmarkTimeStatusObserver;
 import com.example.tonyso.TrafficApp.listener.OnItemClickListener;
 import com.example.tonyso.TrafficApp.listener.OnRemainingTimeListener;
@@ -39,7 +38,7 @@ import jp.wasabeef.recyclerview.animators.FadeInRightAnimator;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class Tab_BookMarkFragment extends TabBaseFragment
+public class Tab_BookMarkFragment extends BaseFragment
         implements OnItemClickListener {
 
     // Intent for Counting Remaining Time: Tag
@@ -51,7 +50,6 @@ public class Tab_BookMarkFragment extends TabBaseFragment
     private static final String TAG = Tab_BookMarkFragment.class.getName();
     RecyclerView recyclerView;
     BookMarkAdapter bookMarkAdapter;
-    SQLiteHelper sqLiteHelper;
     TextView msg;
     ArrayList<TimedBookMark> bookmarklist;
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -59,7 +57,6 @@ public class Tab_BookMarkFragment extends TabBaseFragment
     OnRemainingTimeListener onRemainingTimeListener;
     Intent bookmarkService;
     BookmarkTimeStatusObserver bookmarkTimeStatusObserver;
-    MyApplication myApplication;
 
     boolean isObserved = false;
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -92,6 +89,7 @@ public class Tab_BookMarkFragment extends TabBaseFragment
             }
         }
     };
+
     private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
@@ -115,7 +113,7 @@ public class Tab_BookMarkFragment extends TabBaseFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        myApplication = (MyApplication) getActivity().getApplication();
+        super.getInstance();
         bookmarkTimeStatusObserver = myApplication.getTimeStatusObserver();
     }
 

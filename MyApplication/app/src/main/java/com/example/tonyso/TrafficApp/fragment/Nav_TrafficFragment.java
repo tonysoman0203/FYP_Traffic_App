@@ -32,10 +32,9 @@ import android.widget.Spinner;
 import com.example.tonyso.TrafficApp.InfoDetailActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
+import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.RouteSpeedMap;
-import com.example.tonyso.TrafficApp.utility.LanguageSelector;
-import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -45,8 +44,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
@@ -60,7 +57,7 @@ import java.util.Map;
  * A simple {@link Fragment} subclass.
  */
 
-public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
+public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallback,
         GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
 
     private static final String TAG = Nav_TrafficFragment.class.getName();
@@ -77,21 +74,15 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
     Map<String, LatLng> regionMap = new HashMap<>();
     Hashtable<String, Boolean> markerSet = new Hashtable<>();
     Hashtable<String, RouteSpeedMap> speedMapSet = new Hashtable<>();
-    SQLiteHelper sqLiteHelper;
     Snackbar snackbar;
     CoordinatorLayout coordinatorLayout;
     String[] arr, latlng;
     boolean isTrafficOn;
     Toolbar toolbar;
-    ImageLoader imageLoader;
     View view;
-    DisplayImageOptions displayImageOptions;
-    MyApplication myApplication;
     private String Title = "";
     private SupportMapFragment mapFragment;
     private GoogleMap mMap;
-    private List<RouteCCTV> routeList;
-    private LanguageSelector languageSelector;
     //Spinner Test
     private Spinner spinner;
 
@@ -115,7 +106,7 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
         }
 
         //Getting Instance
-        getInstance();
+        super.getInstance();
     }
 
     @Nullable
@@ -161,20 +152,7 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
         toolbar.setTitle(Title);
     }
 
-    private void getInstance() {
 
-        imageLoader = ImageLoader.getInstance();
-        displayImageOptions = new DisplayImageOptions.Builder()
-                .showStubImage(R.drawable.ic_launcher)        //    Display Stub Image
-                .showImageForEmptyUri(R.drawable.ic_launcher)    //    If Empty image found
-                .cacheInMemory()
-                .cacheOnDisc().bitmapConfig(Bitmap.Config.RGB_565)
-                .build();
-        sqLiteHelper = new SQLiteHelper(this.getContext());
-        languageSelector = LanguageSelector.getInstance(this.getContext());
-        myApplication = (MyApplication) getActivity().getApplication();
-        routeList = myApplication.list;
-    }
 
     private void onSpinnerItemSelected() {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -205,8 +183,8 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
     }
 
     private void setSpinnerProperty() {
-        arr = getResources().getStringArray(R.array.regions);
-        latlng = getResources().getStringArray(R.array.region_LatLng);
+        arr = super.region_arr;
+        latlng = super.region_latlng;
         setRegionHashMap(arr, latlng);
         ArrayAdapter<String> dataAdpater = new ArrayAdapter(this.getContext(), android.R.layout.simple_spinner_item, arr);
         dataAdpater.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -225,7 +203,7 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
         if (p == 0) return;
         String name = arr[p];
         List<RouteCCTV> selectedRoute = new ArrayList<>();
-        List<RouteSpeedMap> speedMaps = myApplication.speedMaps;
+        List<RouteSpeedMap> speedMaps = super.routeSpeedMap;
         List<RouteSpeedMap> selectedMaps = new ArrayList<>();
 
         /**
@@ -358,18 +336,6 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        Log.e(TAG, "On Start Frag");
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.e(TAG, "On Resume Frag");
-    }
-
-    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
@@ -381,30 +347,6 @@ public class Nav_TrafficFragment extends Fragment implements OnMapReadyCallback,
         super.onPause();
         Log.e(TAG, "On Pause Frag");
 
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.e(TAG, "On Stop Frag");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.e(TAG, "onDestroy Frag");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.e(TAG, "On Destroy View");
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.e(TAG, "On Detach");
     }
 
     @Override
