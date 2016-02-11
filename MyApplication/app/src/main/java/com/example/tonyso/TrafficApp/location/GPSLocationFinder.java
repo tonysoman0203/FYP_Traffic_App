@@ -76,14 +76,14 @@ public class GPSLocationFinder implements LocationListener {
                 ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
                         new StoreObject<Object>(false, "address", address), ShareStorage.SP.ProtectedData, context);
                 ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
-                        new StoreObject<Object>(false, "lat", latLng.latitude), ShareStorage.SP.ProtectedData, context);
+                        new StoreObject<Object>(false, "lat", location.getLatitude()), ShareStorage.SP.ProtectedData, context);
                 ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
-                        new StoreObject<Object>(false, "lng", latLng.latitude), ShareStorage.SP.ProtectedData, context);
+                        new StoreObject<Object>(false, "lng", location.getLongitude()), ShareStorage.SP.ProtectedData, context);
                 weatherRefreshListener.onRefreshLocation(name);
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            // Get JSON BY Service
+            // Get JSON BY WebService
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
             GetLocationAsyncTask asyncTask = new GetLocationAsyncTask();
             asyncTask.setWeatherListener(weatherRefreshListener);
@@ -91,6 +91,15 @@ public class GPSLocationFinder implements LocationListener {
             asyncTask.execute();
         }
 
+    }
+
+    public Location getmLocation() {
+        return mLocation;
+    }
+
+    public GPSLocationFinder setmLocation(Location mLocation) {
+        this.mLocation = mLocation;
+        return this;
     }
 
     @Override

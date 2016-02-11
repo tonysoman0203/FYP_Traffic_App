@@ -129,7 +129,12 @@
     <string name="snackbar_route_suggest_orgin">Please Choose Origin Point</string>
     <string name="route_suggest_btnSubmit">Confirm </string>
     <string name="route_suggest_btnReset">Reset</string>
-    <string name="route_suggest_notice">Please Wait&#8230;</string>
+    <string name="route_suggest_notice">Please Wait…</string>
     <string name="snackbar_route_suggest_destination">Please choose destination point</string>
     <string name="route_detail_cancel">Cancel</string>
+    <string name="route_suggest_car">Car</string>
+    <string name="route_suggest_cctv">CCTV</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

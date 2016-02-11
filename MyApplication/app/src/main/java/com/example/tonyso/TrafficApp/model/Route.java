@@ -1,6 +1,7 @@
 package com.example.tonyso.TrafficApp.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by TonySo on 16/9/2015.
@@ -12,20 +13,36 @@ public class Route implements Serializable{
     protected String ref_key; //RD659F
     protected double[] latLngs;
     protected String type;
+    protected List<Double> latlngslist_unformated;
 
-    public Route(int route_id, String name, String sat_level, String refkey, double[] latLng) {
+    public Route(int route_id, String name, String sat_level, String refkey, double[] latLng, List<Double> latlngslist_unformated) {
         this.route_id = route_id;
         this.name = name;
         this.sat_level = sat_level;
         ref_key = refkey;
         this.latLngs = latLng;
+        this.latlngslist_unformated = latlngslist_unformated;
     }
 
     public Route() {
     }
 
+    public List<Double> getLatlngslist_unformated() {
+        return latlngslist_unformated;
+    }
+
+    public Route setLatlngslist_unformated(List<Double> latlngslist_unformated) {
+        this.latlngslist_unformated = latlngslist_unformated;
+        return this;
+    }
+
     public double[] getLatLngs() {
         return latLngs;
+    }
+
+    public Route setLatLngs(double[] latLngs) {
+        this.latLngs = latLngs;
+        return this;
     }
 
     public Route setLatLng(double[] latLng) {

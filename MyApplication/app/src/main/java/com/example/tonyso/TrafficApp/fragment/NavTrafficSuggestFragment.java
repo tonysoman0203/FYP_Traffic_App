@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,10 +20,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
 import com.cocosw.bottomsheet.BottomSheet;
-import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
-import com.example.tonyso.TrafficApp.location.DrawPathAsyncTask;
 import com.example.tonyso.TrafficApp.location.GetLocationAsyncTask;
 import com.example.tonyso.TrafficApp.utility.ErrorDialog;
 import com.example.tonyso.TrafficApp.utility.ShareStorage;
@@ -51,6 +51,7 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
     private FrameLayout frameLayout;
     private EditText origin, destination;
     private Snackbar snackbar;
+    private View view;
 
     public NavTrafficSuggestFragment() {
         // Required empty public constructor
@@ -81,8 +82,18 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        if (view != null) {
+            ViewGroup parent = (ViewGroup) view.getParent();
+            if (parent != null)
+                parent.removeView(view);
+        }
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_nav_traffic_suggest, container, false);
+        try {
+            view = inflater.inflate(R.layout.fragment_nav_traffic_suggest, container, false);
+        } catch (InflateException i) {
+            i.printStackTrace();
+        }
+        return view;
     }
 
     @Override
@@ -117,12 +128,15 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
                     destination.setText("");
                 } else {
                     //fetch path
-                    String[] l = new String[]{origin.getText().toString(), destination.getText().toString()};
-                    if (mGoogleMap != null) {
-                        DrawPathAsyncTask drawPathAsyncTask = new DrawPathAsyncTask(
-                                NavTrafficSuggestFragment.this, getActivity(), mGoogleMap, l, routeList, routeSpeedMap);
-                        drawPathAsyncTask.execute();
-                    }
+//                    String[] l = new String[]{origin.getText().toString(), destination.getText().toString()};
+//                    if (mGoogleMap != null) {
+//                        DrawPathAsyncTask drawPathAsyncTask = new DrawPathAsyncTask(
+//                                NavTrafficSuggestFragment.this, getActivity(), mGoogleMap, l, routeList, routeSpeedMap);
+//                        drawPathAsyncTask.execute();
+//                    }
+                    NavTrafficSuggestDetailFragment fragment = new NavTrafficSuggestDetailFragment();
+                    FragmentManager fm = getChildFragmentManager();
+                    fragment.show(fm, "dialogid");
 
                 }
             }
@@ -210,13 +224,13 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
     public void onDetach() {
         super.onDetach();
         snackbar.dismiss();
+        mapFragment.onDetach();
     }
 
     @Override
     public void onMapLongClick(LatLng latLng) {
         task = new GetLocationAsyncTask();
         task.setLatlng(latLng);
-        task.setApplication((MyApplication) getActivity().getApplication());
         task.setGoogleMap(mGoogleMap);
         task.execute();
     }

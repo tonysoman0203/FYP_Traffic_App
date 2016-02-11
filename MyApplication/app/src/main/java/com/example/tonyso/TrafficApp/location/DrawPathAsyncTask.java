@@ -3,7 +3,6 @@ package com.example.tonyso.TrafficApp.location;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -29,16 +28,14 @@ import java.util.Map;
  * Created by soman on 2016/2/10.
  */
 public class DrawPathAsyncTask extends AsyncTask<Void, Void, String> {
-    private NavTrafficSuggestFragment navTrafficSuggestFragment;
     private final String TAG = DrawPathAsyncTask.class.getCanonicalName();
     Context context;
     GoogleMap mMap;
     String[] location;
     List<RouteCCTV> routeCCTVs;
     List<RouteSpeedMap> routeSpeedMaps;
-
     List<Map<String, Float>> distanceList = new ArrayList<>();
-
+    private NavTrafficSuggestFragment navTrafficSuggestFragment;
     private ProgressDialog progressDialog;
 
     public DrawPathAsyncTask(NavTrafficSuggestFragment navTrafficSuggestFragment,
@@ -57,7 +54,7 @@ public class DrawPathAsyncTask extends AsyncTask<Void, Void, String> {
         super.onPreExecute();
         progressDialog = new ProgressDialog(context);
         progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Fetching Routes.......");
+        progressDialog.setMessage("Fetching Routes.......From Location =" + location[0] + "to" + location[1]);
         progressDialog.show();
     }
 
@@ -113,21 +110,19 @@ public class DrawPathAsyncTask extends AsyncTask<Void, Void, String> {
     }
 
     public void drawPath(String result) {
-        float[] distances = new float[3];
         try {
             //Transform the string into a json object
             final JSONObject json = new JSONObject(result);
             JSONArray routeArray = json.getJSONArray("routes");
             JSONObject routes = routeArray.getJSONObject(0);
+
+            JSONArray legs = routes.getJSONArray("legs");
+            Log.e(TAG, legs.toString());
+            String distance = legs.getJSONObject(0).getJSONObject("distance").getString("text");
+            Log.e(TAG, distance);
             JSONObject overviewPolylines = routes.getJSONObject("overview_polyline");
             String encodedString = overviewPolylines.getString("points");
             List<LatLng> list = decodePoly(encodedString);
-
-            LatLng startLatLng = list.get(0);
-            LatLng endLng = list.get(list.size() - 1);
-
-            Location.distanceBetween(startLatLng.latitude, startLatLng.longitude, endLng.latitude, endLng.longitude, distances);
-            Log.e("Debug", distances[0] + " " + distances[1] + " " + distances[2]);
 
 
             Polyline line = mMap.addPolyline(new PolylineOptions()

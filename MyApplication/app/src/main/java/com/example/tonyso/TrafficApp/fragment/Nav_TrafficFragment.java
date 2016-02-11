@@ -126,6 +126,13 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        snackbar.dismiss();
+        mapFragment.onDetach();
+    }
+
+    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setFragmentToolbar();

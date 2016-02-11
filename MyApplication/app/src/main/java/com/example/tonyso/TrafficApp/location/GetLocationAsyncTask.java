@@ -91,15 +91,15 @@ public class GetLocationAsyncTask extends AsyncTask<Void, Place, Place> {
     protected void onPostExecute(Place address) {
         super.onPostExecute(address);
         //Log.d(getClass().getCanonicalName(), address.getName().toString());
-        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
-                new StoreObject<Object>(false, "name", address.getName()), ShareStorage.SP.ProtectedData, context);
-        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
-                new StoreObject<Object>(false, "address", address.getAddress().toString()), ShareStorage.SP.ProtectedData, context);
-        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
-                new StoreObject<Object>(false, "lat", address.getLatlngs().latitude), ShareStorage.SP.ProtectedData, context);
-        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
-                new StoreObject<Object>(false, "lng", address.getLatlngs().longitude), ShareStorage.SP.ProtectedData, context);
         if (weatherListener != null) {
+            ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                    new StoreObject<Object>(false, "name", address.getName()), ShareStorage.SP.ProtectedData, context);
+            ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                    new StoreObject<Object>(false, "address", address.getAddress().toString()), ShareStorage.SP.ProtectedData, context);
+            ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                    new StoreObject<Object>(false, "lat", address.getLatlngs().latitude), ShareStorage.SP.ProtectedData, context);
+            ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                    new StoreObject<Object>(false, "lng", address.getLatlngs().longitude), ShareStorage.SP.ProtectedData, context);
             weatherListener.onRefreshLocation(address.getName().toString());
         } else {
             MarkerOptions markerOptions = new MarkerOptions()
