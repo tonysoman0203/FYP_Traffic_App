@@ -6,10 +6,13 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.adapter.TabFragmentPagerAdapter;
@@ -35,6 +38,8 @@ public class NavTrafficSuggestDetailFragment extends DialogFragment {
     View rootView;
     private TabFragmentPagerAdapter mSectionsPagerAdapter;
     private LinkedList<BaseFragment> fragments;
+    private ViewPager viewPager;
+
 
     public NavTrafficSuggestDetailFragment() {
 
@@ -74,14 +79,32 @@ public class NavTrafficSuggestDetailFragment extends DialogFragment {
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new TabFragmentPagerAdapter(getChildFragmentManager(), fragments);
+        viewPager = (ViewPager) rootView.findViewById(R.id.viewpager);
+        viewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) rootView.findViewById(R.id.tablayout);
-        tabLayout.setTabsFromPagerAdapter(mSectionsPagerAdapter);
-        tabLayout.getTabAt(0).setIcon(fragments.get(0).getIcon());
-        tabLayout.getTabAt(1).setIcon(fragments.get(1).getIcon());
-        //tabLayout.getTabAt(0).setIcon(R.drawable.ic_directions_car_white_36dp);
-        //tabLayout.getTabAt(1).setIcon(R.drawable.ic_local_see_white_36dp);
+        tabLayout.setupWithViewPager(viewPager);
+        setupTabLayoutIcon(tabLayout);
+
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+
+        //TabLayout.Tab tab = tabLayout.getTabAt(0);
+        //tab.select();
+
         return rootView;
+    }
+
+    private void setupTabLayoutIcon(TabLayout tabLayout) {
+        for (int i = 0; i < fragments.size(); i++) {
+            View item = getActivity().getLayoutInflater().inflate(R.layout.item_tab_icon, null);
+            ImageView imageView = (ImageView) item.findViewById(R.id.imgIcon);
+            TextView txt = (TextView) item.findViewById(R.id.txtTitle);
+            imageView.setImageResource(fragments.get(i).getIcon());
+            txt.setText(fragments.get(i).getTitle());
+            tabLayout.getTabAt(i).setCustomView(item);
+        }
+        tabLayout.getTabAt(0).getCustomView().setSelected(true);
     }
 
     private LinkedList<BaseFragment> getFragments() {
