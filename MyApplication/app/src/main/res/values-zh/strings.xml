@@ -57,9 +57,10 @@
     <string name="snackbar_route_suggest_orgin">請選擇起點</string>
     <string name="snackbar_route_suggest_destination">請選擇終點</string>
     <string name="route_detail_cancel">取消</string>
-    <string name="route_suggestion_current">現時地點：</string>
+    <string name="route_suggestion_current">現時地點</string>
     <string name="route_suggest_begin">起點</string>
     <string name="route_suggest_end">目的地</string>
     <string name="route_suggest_notice">請稍候…</string>
+    <string name="distance">距離:</string>
 
 </resources>

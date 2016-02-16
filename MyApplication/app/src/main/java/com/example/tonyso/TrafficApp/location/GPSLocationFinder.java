@@ -66,20 +66,24 @@ public class GPSLocationFinder implements LocationListener {
             Geocoder geocoder = new Geocoder(context,locale);
             List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 10);
             if (addresses.size() > 0) {
+                Log.d(TAG, addresses.toString());
                 Log.e("Test", "" + addresses.get(0).getLatitude() + "," + addresses.get(0).getLongitude());
                 Log.e("Address: ", addresses.get(0).getFeatureName());
                 Log.e("Address", addresses.get(0).getAddressLine(1));
-                String name = addresses.get(1).getFeatureName();
+                String district = addresses.get(1).getFeatureName();
                 String address = addresses.get(0).getAddressLine(0).concat(addresses.get(0).getAddressLine(1));
+
                 ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
-                        new StoreObject<Object>(false, "name", name), ShareStorage.SP.ProtectedData, context);
+                        new StoreObject<Object>(false, "name", district), ShareStorage.SP.ProtectedData, context);
                 ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
                         new StoreObject<Object>(false, "address", address), ShareStorage.SP.ProtectedData, context);
+                ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                        new StoreObject<Object>(false, "district", district), ShareStorage.SP.ProtectedData, context);
                 ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
                         new StoreObject<Object>(false, "lat", location.getLatitude()), ShareStorage.SP.ProtectedData, context);
                 ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
                         new StoreObject<Object>(false, "lng", location.getLongitude()), ShareStorage.SP.ProtectedData, context);
-                weatherRefreshListener.onRefreshLocation(name);
+                weatherRefreshListener.onRefreshLocation(district);
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -88,7 +92,7 @@ public class GPSLocationFinder implements LocationListener {
             GetLocationAsyncTask asyncTask = new GetLocationAsyncTask();
             asyncTask.setWeatherListener(weatherRefreshListener);
             asyncTask.setLatlng(latLng);
-            asyncTask.execute();
+            asyncTask.execute(MyApplication.CURR_LANG);
         }
 
     }

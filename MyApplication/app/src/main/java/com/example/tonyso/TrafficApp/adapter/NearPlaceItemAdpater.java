@@ -156,7 +156,7 @@ public class NearPlaceItemAdpater extends RecyclerView.Adapter<NearPlaceItemAdpa
 
         @Override
         public void onClick(View v) {
-            Uri gmmIntentUri = Uri.parse("geo:" + sortedList.get(getAdapterPosition()).getLatlngs().latitude + "," + sortedList.get(getAdapterPosition()).getLatlngs().longitude + "?z=19");
+            Uri gmmIntentUri = Uri.parse("geo:" + sortedList.get(getAdapterPosition()).getLatlngs()[0] + "," + sortedList.get(getAdapterPosition()).getLatlngs()[1] + "?z=19");
             Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
             mapIntent.setPackage("com.google.android.apps.maps");
             context.startActivity(mapIntent);

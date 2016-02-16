@@ -2,23 +2,49 @@ package com.example.tonyso.TrafficApp.model;
 
 import android.graphics.Bitmap;
 
-import com.google.android.gms.maps.model.LatLng;
+import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Created by TonySo on 6/1/16.
  */
-public class Place {
+public class Place implements Serializable {
 
     String placeId;
     CharSequence name;
-    LatLng latlngs;
+    double[] latlngs;
     String type;
     CharSequence address;
     CharSequence phoneno;
     String lastUpdateTime;
     Bitmap bitmap;
+    CharSequence district;
 
     public Place() {
+    }
+
+    @Override
+    public String toString() {
+        return "Place{" +
+                "placeId='" + placeId + '\'' +
+                ", name=" + name +
+                ", latlngs=" + Arrays.toString(latlngs) +
+                ", type='" + type + '\'' +
+                ", address=" + address +
+                ", phoneno=" + phoneno +
+                ", lastUpdateTime='" + lastUpdateTime + '\'' +
+                ", bitmap=" + bitmap +
+                ", district=" + district +
+                '}';
+    }
+
+    public CharSequence getDistrict() {
+        return district;
+    }
+
+    public Place setDistrict(CharSequence district) {
+        this.district = district;
+        return this;
     }
 
     public Place(Place place) {
@@ -29,6 +55,7 @@ public class Place {
         this.phoneno = place.phoneno;
         this.lastUpdateTime = place.lastUpdateTime;
         this.type = place.type;
+        this.district = place.district;
     }
 
 
@@ -80,11 +107,11 @@ public class Place {
         return this;
     }
 
-    public LatLng getLatlngs() {
+    public double[] getLatlngs() {
         return latlngs;
     }
 
-    public Place setLatlngs(LatLng latlngs) {
+    public Place setLatlngs(double[] latlngs) {
         this.latlngs = latlngs;
         return this;
     }

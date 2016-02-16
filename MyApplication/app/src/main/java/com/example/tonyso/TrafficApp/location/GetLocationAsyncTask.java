@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.tonyso.TrafficApp.MyApplication;
+import com.example.tonyso.TrafficApp.fragment.NavTrafficSuggestFragment;
 import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
 import com.example.tonyso.TrafficApp.model.Place;
 import com.example.tonyso.TrafficApp.utility.ShareStorage;
@@ -19,7 +21,7 @@ import org.json.JSONObject;
 /**
  * Created by TonySo on 20/1/16.
  */
-public class GetLocationAsyncTask extends AsyncTask<Void, Place, Place> {
+public class GetLocationAsyncTask extends AsyncTask<String, Place, Place> {
     public Context context;
     private WeatherRefreshListener weatherListener;
     private LatLng latlng;
@@ -29,11 +31,11 @@ public class GetLocationAsyncTask extends AsyncTask<Void, Place, Place> {
     }
 
     @Override
-    protected Place doInBackground(Void... params) {
-        String url = constructURL();
+    protected Place doInBackground(String... params) {
+        String url = constructURL(params[0]);
         Log.e(getClass().getCanonicalName(), url);
         String result = LocationPlacesJsonParser.getUrlContents(url);
-        String currentLocation = "";
+        String district = "";
         Place location = null;
         try {
             JSONObject jsonObject = new JSONObject(result);
@@ -49,9 +51,12 @@ public class GetLocationAsyncTask extends AsyncTask<Void, Place, Place> {
                         String types = address_components.getJSONObject(ac).getString("types");
                         Log.i(getClass().getCanonicalName(), "Type:" + types);
                         if (types.equalsIgnoreCase("[\"neighborhood\",\"political\"]")) {
-                            currentLocation = address_components.getJSONObject(ac).getString("long_name");
-                            Log.i(getClass().getCanonicalName(), "LongName=" + currentLocation);
-                            location.setName(currentLocation);
+                            district = address_components.getJSONObject(ac).getString("long_name");
+                            Log.i(getClass().getCanonicalName(), "district=" + district);
+                            location.setDistrict(district);
+                        } else if (types.equalsIgnoreCase("[\"premise\")")) {
+                            Log.e(getClass().getCanonicalName(), address_components.getJSONObject(ac).getString("long_name"));
+                            location.setName(address_components.getJSONObject(ac).getString("long_name"));
                         } else {
                             location.setAddress(json.getString("formatted_address"));
                             Log.i(getClass().getCanonicalName(), location.getAddress().toString());
@@ -71,19 +76,27 @@ public class GetLocationAsyncTask extends AsyncTask<Void, Place, Place> {
         return location;
     }
 
-    private LatLng getLatlngs(JSONObject l) throws JSONException {
+    private double[] getLatlngs(JSONObject l) throws JSONException {
         double lat = l.getDouble("lat");
         double lng = l.getDouble("lng");
-        LatLng latLng = new LatLng(lat, lng);
-        return latLng;
+        //LatLng latLng = new LatLng(lat, lng);
+        return new double[]{lat, lng};
     }
 
-    private String constructURL() {
+    private String constructURL(String locale) {
         StringBuffer urlbuffer = new StringBuffer("http://maps.googleapis.com/maps/api/geocode/json?latlng=");
-        urlbuffer.append(latlng.latitude);
-        urlbuffer.append(",");
-        urlbuffer.append(latlng.longitude);
-        urlbuffer.append("&sensor=true");
+        if (locale.equals(MyApplication.Language.ZH_HANT)) {
+            urlbuffer.append(latlng.latitude);
+            urlbuffer.append(",");
+            urlbuffer.append(latlng.longitude);
+            urlbuffer.append("&sensor=true");
+            urlbuffer.append("&language=zh-tw");
+        } else {
+            urlbuffer.append(latlng.latitude);
+            urlbuffer.append(",");
+            urlbuffer.append(latlng.longitude);
+            urlbuffer.append("&sensor=true");
+        }
         return urlbuffer.toString();
     }
 
@@ -91,15 +104,23 @@ public class GetLocationAsyncTask extends AsyncTask<Void, Place, Place> {
     protected void onPostExecute(Place address) {
         super.onPostExecute(address);
         //Log.d(getClass().getCanonicalName(), address.getName().toString());
+        if (NavTrafficSuggestFragment.placeMap != null) {
+            address.setPlaceId(String.valueOf(NavTrafficSuggestFragment.place_ids++));
+            NavTrafficSuggestFragment.placeMap.put(address.getAddress().toString(), address);
+            Log.d(getClass().getCanonicalName(), "Put a address into Map success..." + address.toString());
+        }
+
         if (weatherListener != null) {
             ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
                     new StoreObject<Object>(false, "name", address.getName()), ShareStorage.SP.ProtectedData, context);
             ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
                     new StoreObject<Object>(false, "address", address.getAddress().toString()), ShareStorage.SP.ProtectedData, context);
             ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
-                    new StoreObject<Object>(false, "lat", address.getLatlngs().latitude), ShareStorage.SP.ProtectedData, context);
+                    new StoreObject<Object>(false, "district", address.getDistrict()), ShareStorage.SP.ProtectedData, context);
             ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
-                    new StoreObject<Object>(false, "lng", address.getLatlngs().longitude), ShareStorage.SP.ProtectedData, context);
+                    new StoreObject<Object>(false, "lat", address.getLatlngs()[0]), ShareStorage.SP.ProtectedData, context);
+            ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                    new StoreObject<Object>(false, "lng", address.getLatlngs()[1]), ShareStorage.SP.ProtectedData, context);
             weatherListener.onRefreshLocation(address.getName().toString());
         } else {
             MarkerOptions markerOptions = new MarkerOptions()
@@ -124,4 +145,5 @@ public class GetLocationAsyncTask extends AsyncTask<Void, Place, Place> {
     public void setGoogleMap(GoogleMap googleMap) {
         this.googleMap = googleMap;
     }
+
 }

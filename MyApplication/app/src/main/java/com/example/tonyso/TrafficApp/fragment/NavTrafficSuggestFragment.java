@@ -5,8 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentManager;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,17 +21,22 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
 import com.cocosw.bottomsheet.BottomSheet;
+import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
+import com.example.tonyso.TrafficApp.location.DrawPathAsyncTask;
 import com.example.tonyso.TrafficApp.location.GetLocationAsyncTask;
-import com.example.tonyso.TrafficApp.utility.ErrorDialog;
-import com.example.tonyso.TrafficApp.utility.ShareStorage;
+import com.example.tonyso.TrafficApp.model.Place;
+import com.example.tonyso.TrafficApp.utility.Current;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class NavTrafficSuggestFragment extends BaseFragment implements
@@ -39,6 +45,9 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String TAG = NavTrafficSuggestFragment.class.getCanonicalName();
+    private static final Integer TYPE_GPS = 1;
+    private static final Integer TYPE_ASYNCTASK = 2;
+
     GetLocationAsyncTask task;
     Toolbar toolbar;
     SupportMapFragment mapFragment;
@@ -52,6 +61,11 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
     private EditText origin, destination;
     private Snackbar snackbar;
     private View view;
+
+    public static Map<String, Place> placeMap;
+    public static int place_ids = -1;
+
+    private Place[] places;
 
     public NavTrafficSuggestFragment() {
         // Required empty public constructor
@@ -77,6 +91,7 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
             mParam1 = getContext().getString(R.string.title_routeSuggest);
         }
         super.getInstance();
+        placeMap = new HashMap<>();
     }
 
     @Override
@@ -115,29 +130,30 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
         //Initialize EditText
         origin = (EditText) inputDialogView.findViewById(R.id.originEditText);
         destination = (EditText) inputDialogView.findViewById(R.id.destinationEditText);
+        final TextInputLayout orginInput = (TextInputLayout) inputDialogView.findViewById(R.id.originWrapper);
+        final TextInputLayout destInput = (TextInputLayout) inputDialogView.findViewById(R.id.destinationWrapper);
+
         //Initialize Button
         Button btnSubmit = (Button) inputDialogView.findViewById(R.id.btnSuggestSubmit);
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (origin.getText() == null || destination.getText() == null) {
-                    //show errorDialog
-                    ErrorDialog errorDialog = ErrorDialog.getInstance(getContext());
-                    errorDialog.displayAlertDialog("Input Error! Please select again...");
+                if (TextUtils.isEmpty(origin.getText())) {
+                    orginInput.setError("Input Error...Please select again...");
+                    origin.setText("");
+                    destination.setText("");
+                } else if (TextUtils.isEmpty(destination.getText())) {
+                    destInput.setError("Input Error...Please select again...");
                     origin.setText("");
                     destination.setText("");
                 } else {
                     //fetch path
-//                    String[] l = new String[]{origin.getText().toString(), destination.getText().toString()};
-//                    if (mGoogleMap != null) {
-//                        DrawPathAsyncTask drawPathAsyncTask = new DrawPathAsyncTask(
-//                                NavTrafficSuggestFragment.this, getActivity(), mGoogleMap, l, routeList, routeSpeedMap);
-//                        drawPathAsyncTask.execute();
-//                    }
-                    NavTrafficSuggestDetailFragment fragment = new NavTrafficSuggestDetailFragment();
-                    FragmentManager fm = getChildFragmentManager();
-                    fragment.show(fm, "dialogid");
-
+                    String[] l = new String[]{origin.getText().toString(), destination.getText().toString()};
+                    Place origin = buildPlace(l[0]);
+                    Place destination = buildPlace(l[1]);
+                    DrawPathAsyncTask drawPathAsyncTask = new DrawPathAsyncTask(
+                            NavTrafficSuggestFragment.this, getActivity(), origin, destination);
+                    drawPathAsyncTask.execute();
                 }
             }
         });
@@ -146,51 +162,48 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
         btnReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                origin.setText("");
-                destination.setText("");
-                snackbar = Snackbar.make(getActivity().findViewById(R.id.coordinateLayoutMain),
-                        getString(R.string.snackbar_route_suggest_orgin), Snackbar.LENGTH_INDEFINITE);
-                snackbar.show();
-                mapFragment.getView().animate()
-                        .translationY(0)
-                        .setDuration(1000)
-                        .setListener(new Animator.AnimatorListener() {
-                            @Override
-                            public void onAnimationStart(Animator animation) {
-                            }
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                frameLayout.setVisibility(View.GONE);
-                            }
-                            @Override
-                            public void onAnimationCancel(Animator animation) {
-                            }
-                            @Override
-                            public void onAnimationRepeat(Animator animation) {
-                            }
-                        });
-                mGoogleMap.clear();
+                resetView();
             }
         });
 
-        //ImageButton
-        /*
-      Navigate and get current location
-     */
         ImageButton imgCurrentLocation = (ImageButton) inputDialogView.findViewById(R.id.imageButton);
         imgCurrentLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                origin.setText(getCurrentLocation());
+                origin.setText(Current.getCurrentAddress(getContext()));
                 MarkerOptions markerOptions = new MarkerOptions()
-                        .title(getCurrentLocation().toString())
-                        .position(getCurrentLocationByLatLng());
+                        .title(Current.getCurrentAddress(getContext()).toString())
+                        .position(Current.getCurrentLocationByLatLng(getContext()));
                 mGoogleMap.addMarker(markerOptions);
-                animateDialogView();
             }
         });
     }
 
+    private void resetView() {
+        origin.setText("");
+        destination.setText("");
+        snackbar = Snackbar.make(getActivity().findViewById(R.id.coordinateLayoutMain),
+                getString(R.string.snackbar_route_suggest_orgin), Snackbar.LENGTH_INDEFINITE);
+        snackbar.show();
+        animateDialogView(false);
+        mGoogleMap.clear();
+    }
+
+    private Place buildPlace(String key) {
+        Place place;
+        if (placeMap.get(key) != null) {
+            place = placeMap.get(key);
+            System.out.print(place.toString());
+        } else {
+            place = new Place();
+            place.setPlaceId("" + (place_ids++));
+            place.setName(Current.getCurrentLocationName(getContext()));
+            place.setAddress(Current.getCurrentAddress(getContext()));
+            place.setLatlngs(Current.getLatLngInDouble(getContext()));
+            place.setDistrict(Current.getCurrentDistrict(getContext()));
+        }
+        return place;
+    }
 
     private void initGoogleMap() {
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -201,15 +214,12 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
         snackbar.setAction(getString(R.string.route_suggestion_current), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                origin.setText(getCurrentLocation());
+                origin.setText(Current.getCurrentAddress(getContext()));
                 MarkerOptions markerOptions = new MarkerOptions()
-                        .title(getCurrentLocation().toString())
-                        .position(getCurrentLocationByLatLng());
+                        .title(Current.getCurrentAddress(getContext()).toString())
+                        .position(Current.getCurrentLocationByLatLng(getContext()));
                 mGoogleMap.addMarker(markerOptions);
-                animateDialogView();
-                snackbar = Snackbar.make(getActivity().findViewById(R.id.coordinateLayoutMain)
-                        , getString(R.string.snackbar_route_suggest_destination), Snackbar.LENGTH_INDEFINITE);
-                snackbar.show();
+                animateDialogView(true);
             }
         });
         snackbar.show();
@@ -232,7 +242,7 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
         task = new GetLocationAsyncTask();
         task.setLatlng(latLng);
         task.setGoogleMap(mGoogleMap);
-        task.execute();
+        task.execute(MyApplication.CURR_LANG);
     }
 
     @Override
@@ -261,15 +271,12 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
                         switch (which) {
                             case R.id.nav_route_suggest_origin:
                                 origin.setText(m.getTitle());
-                                animateDialogView();
+                                animateDialogView(true);
                                 snackbar.dismiss();
-                                snackbar = Snackbar.make(getActivity().findViewById(R.id.coordinateLayoutMain)
-                                        , getString(R.string.snackbar_route_suggest_destination), Snackbar.LENGTH_INDEFINITE);
-                                snackbar.show();
                                 break;
                             case R.id.nav_traffic_destination:
                                 destination.setText(m.getTitle());
-                                animateDialogView();
+                                animateDialogView(true);
                                 snackbar.dismiss();
                                 break;
                             default:
@@ -290,11 +297,10 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
         return true;
     }
 
-
-    private void animateDialogView() {
+    private void animateDialogView(final boolean status) {
         //move map Fragment under input dialog view
         mapFragment.getView().animate()
-                .translationY(500)
+                .translationY((status) ? 500 : 0)
                 .setDuration(1000)
                 .setListener(new Animator.AnimatorListener() {
                     @Override
@@ -303,7 +309,13 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        frameLayout.setVisibility(View.VISIBLE);
+                        if (status) {
+                            frameLayout.setVisibility(View.VISIBLE);
+                            snackbar = Snackbar.make(getActivity().findViewById(R.id.coordinateLayoutMain)
+                                    , getString(R.string.snackbar_route_suggest_destination), Snackbar.LENGTH_INDEFINITE);
+                            snackbar.show();
+                        } else
+                            frameLayout.setVisibility(View.GONE);
                     }
 
                     @Override
@@ -314,19 +326,5 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
                     public void onAnimationRepeat(Animator animation) {
                     }
                 });
-    }
-
-    public StringBuffer getCurrentLocation() {
-        StringBuffer sb = new StringBuffer();
-        sb.append(ShareStorage.retrieveData("address", ShareStorage.SP.ProtectedData, getContext()));
-        return sb;
-    }
-
-    public LatLng getCurrentLocationByLatLng() {
-        double[] lls = new double[]{
-                Double.parseDouble(ShareStorage.retrieveData("lat", ShareStorage.SP.ProtectedData, getContext())),
-                Double.parseDouble(ShareStorage.retrieveData("lng", ShareStorage.SP.ProtectedData, getContext()))
-        };
-        return new LatLng(lls[0], lls[1]);
     }
 }

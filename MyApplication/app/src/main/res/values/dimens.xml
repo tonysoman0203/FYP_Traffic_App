@@ -10,6 +10,7 @@
     <dimen name="suggest_route_detail_app_bar_height">220dp</dimen>
     <dimen name="title_height">100dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="marker_title">16sp</dimen>
     <dimen name="image_final_width">32dp</dimen>
     <dimen name="editText_size">14sp</dimen>
 </resources>

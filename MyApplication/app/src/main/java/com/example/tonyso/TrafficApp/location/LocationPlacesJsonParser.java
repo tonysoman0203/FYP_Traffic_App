@@ -2,9 +2,9 @@ package com.example.tonyso.TrafficApp.location;
 
 import android.util.Log;
 
+import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.model.NearbyLocation;
 import com.example.tonyso.TrafficApp.model.Place;
-import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -76,7 +76,7 @@ public class LocationPlacesJsonParser {
             }
 
             for (int i = 0; i < arrayList.size(); i++) {
-                String distanceUrl = makeDistanceURL(currLocation, String.valueOf(arrayList.get(i).getName()), null, null);
+                String distanceUrl = makeDistanceURL(currLocation, String.valueOf(arrayList.get(i).getName()));
                 try {
                     json = getJSON(distanceUrl);
                     Log.d("JSON Distance= ", json);
@@ -93,25 +93,22 @@ public class LocationPlacesJsonParser {
         return null;
     }
 
-    public String makeDistanceURL(String currentLocation, String destination, LatLng srcLat, LatLng srcLng) {
-        StringBuilder urlString = new StringBuilder("http://maps.googleapis.com/maps/api/directions/json?");
+    public String makeDistanceURL(String currentLocation, String destination) {
+        StringBuilder urlString = new StringBuilder("https://maps.googleapis.com/maps/api/directions/json?");
         try {
-            if (srcLat == null || srcLng == null) {
+            if (MyApplication.CURR_LANG.equals(MyApplication.Language.ZH_HANT)) {
                 urlString.append("origin=" + URLEncoder.encode(currentLocation, "UTF-8"));
                 urlString.append("&");
                 urlString.append("destination=" + URLEncoder.encode(destination, "UTF-8"));
                 urlString.append("&sensor=false");
+                //urlString.append("&key=" + API_KEY);
+                urlString.append("&language=zh-tw");
             } else {
-                urlString.append("?origin=");// from
-                urlString.append(Double.toString(srcLat.latitude));
-                urlString.append(",");
-                urlString.append(Double.toString(srcLat.longitude));
-                urlString.append("&destination=");// to
-                urlString.append(Double.toString(srcLng.latitude));
-                urlString.append(",");
-                urlString.append(Double.toString(srcLng.longitude));
+                urlString.append("origin=" + URLEncoder.encode(currentLocation, "UTF-8"));
+                urlString.append("&");
+                urlString.append("destination=" + URLEncoder.encode(destination, "UTF-8"));
                 urlString.append("&sensor=false&mode=driving&alternatives=true");
-                urlString.append("&key=" + API_KEY);
+                //urlString.append("&key=" + API_KEY);
             }
 
         } catch (UnsupportedEncodingException e) {
@@ -151,7 +148,7 @@ public class LocationPlacesJsonParser {
             NearbyLocation result = new NearbyLocation();
             JSONObject geometry = (JSONObject) jsonObject.get("geometry");
             JSONObject location = (JSONObject) geometry.get("location");
-            result.setLatlngs(new LatLng((Double) location.get("lat"), (Double) location.get("lng")));
+            result.setLatlngs(new double[]{(Double) location.get("lat"), (Double) location.get("lng")});
             result.setIcon(jsonObject.getString("icon"));
             result.setName(jsonObject.getString("name"));
             result.setPlaceId(jsonObject.getString("place_id"));
