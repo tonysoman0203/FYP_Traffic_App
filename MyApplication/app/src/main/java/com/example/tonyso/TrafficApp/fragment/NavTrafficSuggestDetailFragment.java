@@ -154,7 +154,7 @@ public class NavTrafficSuggestDetailFragment extends BaseDialogFragment {
         } else {
             fragments.add(NavSuggestMapFragment.newInstance(TABS_TITLES[0], indicatorColor, dividerColor, drawableIcons[0], origin, destination));
         }
-        fragments.add(NavTrafficSuggestCCTVFragment.newInstance(TABS_TITLES[1], indicatorColor, dividerColor, drawableIcons[1]));
+        fragments.add(NavTrafficSuggestCCTVFragment.newInstance(TABS_TITLES[1], indicatorColor, dividerColor, drawableIcons[1], origin, destination));
         return fragments;
     }
 
