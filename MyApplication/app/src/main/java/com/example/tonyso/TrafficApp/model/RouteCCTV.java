@@ -9,6 +9,7 @@ public class RouteCCTV extends Route implements Serializable{
     static public final String TYPE_CCTV = "cctv";
     protected String[] description = null;
     protected String[] region = null;
+    public String distance;
 
     private RouteCCTV(Builder builder) {
         route_id = builder.id;
@@ -17,6 +18,15 @@ public class RouteCCTV extends Route implements Serializable{
         this.region = builder.region;
         this.latLngs = builder.latLngs;
         this.type = builder.type;
+        this.distance = builder.distance;
+    }
+
+    public String getDistance() {
+        return distance;
+    }
+
+    public void setDistance(String distance) {
+        this.distance = distance;
     }
 
     public RouteCCTV() {
@@ -41,9 +51,18 @@ public class RouteCCTV extends Route implements Serializable{
         private String[] region;
         private double[] latLngs;
         private String type;
+        public String distance;
 
         public RouteCCTV build(){
             return new RouteCCTV(this);
+        }
+
+        public String getDistance() {
+            return distance;
+        }
+
+        public void setDistance(String distance) {
+            this.distance = distance;
         }
 
         public int getId() {

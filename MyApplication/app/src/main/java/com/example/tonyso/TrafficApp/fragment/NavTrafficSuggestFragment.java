@@ -40,7 +40,7 @@ import java.util.Map;
 
 
 public class NavTrafficSuggestFragment extends BaseFragment implements
-        GoogleMap.OnMapLongClickListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+        GoogleMap.OnMapClickListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -184,6 +184,17 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
         destination.setText("");
         snackbar = Snackbar.make(getActivity().findViewById(R.id.coordinateLayoutMain),
                 getString(R.string.snackbar_route_suggest_orgin), Snackbar.LENGTH_INDEFINITE);
+        snackbar.setAction(getString(R.string.route_suggestion_current), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                origin.setText(Current.getCurrentAddress(getContext()));
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .title(Current.getCurrentAddress(getContext()).toString())
+                        .position(Current.getCurrentLocationByLatLng(getContext()));
+                mGoogleMap.addMarker(markerOptions);
+                animateDialogView(true);
+            }
+        });
         snackbar.show();
         animateDialogView(false);
         mGoogleMap.clear();
@@ -238,7 +249,7 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
     }
 
     @Override
-    public void onMapLongClick(LatLng latLng) {
+    public void onMapClick(LatLng latLng) {
         task = new GetLocationAsyncTask();
         task.setLatlng(latLng);
         task.setGoogleMap(mGoogleMap);
@@ -249,7 +260,7 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
     public void onMapReady(GoogleMap googleMap) {
         this.mGoogleMap = googleMap;
         mGoogleMap.setMyLocationEnabled(true);
-        mGoogleMap.setOnMapLongClickListener(this);
+        mGoogleMap.setOnMapClickListener(this);
         mGoogleMap.setOnMarkerClickListener(this);
     }
 

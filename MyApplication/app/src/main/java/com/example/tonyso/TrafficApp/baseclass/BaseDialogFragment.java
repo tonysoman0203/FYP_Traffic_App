@@ -60,7 +60,7 @@ public class BaseDialogFragment extends DialogFragment {
 
         imageLoader = ImageLoader.getInstance();
         displayImageOptions = new DisplayImageOptions.Builder()
-                .showStubImage(R.drawable.ic_launcher)        //    Display Stub Image
+                .showStubImage(R.drawable.placeholder)        //    Display Stub Image
                 .showImageForEmptyUri(R.drawable.ic_error_black_24dp)    //    If Empty image found
                 .cacheOnDisc().bitmapConfig(Bitmap.Config.RGB_565)
                 .cacheInMemory(true)

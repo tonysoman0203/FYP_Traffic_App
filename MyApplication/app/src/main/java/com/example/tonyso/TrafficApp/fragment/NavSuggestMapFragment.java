@@ -40,7 +40,7 @@ public class NavSuggestMapFragment extends BaseFragment
     // TODO: Rename and change types of parameters
     SupportMapFragment mapFragment;
     private View view;
-    private GoogleMap mMap;
+    public static GoogleMap mMap;
     SwipeRefreshLayout mSwipeRefreshLayout;
     private Place origin, destination;
 
@@ -120,6 +120,10 @@ public class NavSuggestMapFragment extends BaseFragment
     @Override
     public void onMapClick(LatLng latLng) {
 
+    }
+
+    public static GoogleMap getGoogleMap() {
+        return mMap;
     }
 
     @Override
