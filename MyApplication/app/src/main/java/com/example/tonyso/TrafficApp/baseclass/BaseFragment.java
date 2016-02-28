@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
+import com.example.tonyso.TrafficApp.listener.StatusObserver;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.RouteSpeedMap;
 import com.example.tonyso.TrafficApp.utility.LanguageSelector;
@@ -40,6 +41,7 @@ public class BaseFragment extends Fragment {
     protected List<RouteCCTV> routeList;
     protected List<RouteSpeedMap> routeSpeedMap;
 
+    protected StatusObserver observer;
 
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -106,6 +108,7 @@ public class BaseFragment extends Fragment {
         myApplication = (MyApplication) getActivity().getApplication();
         routeList = myApplication.list;
         routeSpeedMap = myApplication.speedMaps;
+        observer = myApplication.getTimeStatusObserver();
     }
 
     @Override

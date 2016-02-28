@@ -150,9 +150,9 @@ public class NavTrafficSuggestDetailFragment extends BaseDialogFragment {
         final int dividerColor = Color.WHITE;
         LinkedList<BaseFragment> fragments = new LinkedList<>();
         if (arrDisDuration != null) {
-            fragments.add(NavSuggestMapFragment.newInstance(arrDisDuration[1], indicatorColor, dividerColor, drawableIcons[0], origin, destination));
+            fragments.add(NavSuggestMapFragment.newInstance(arrDisDuration[1], indicatorColor, dividerColor, drawableIcons[0], origin, destination, arrDisDuration));
         } else {
-            fragments.add(NavSuggestMapFragment.newInstance(TABS_TITLES[0], indicatorColor, dividerColor, drawableIcons[0], origin, destination));
+            fragments.add(NavSuggestMapFragment.newInstance(TABS_TITLES[0], indicatorColor, dividerColor, drawableIcons[0], origin, destination, arrDisDuration));
         }
         fragments.add(NavTrafficSuggestCCTVFragment.newInstance(TABS_TITLES[1], indicatorColor, dividerColor, drawableIcons[1], origin, destination, arrDisDuration));
         return fragments;

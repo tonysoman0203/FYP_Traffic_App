@@ -15,6 +15,7 @@ import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
 import com.example.tonyso.TrafficApp.listener.OnPathReadyListener;
 import com.example.tonyso.TrafficApp.location.DrawPathAsyncTask;
+import com.example.tonyso.TrafficApp.location.FetchDistanceCCTVTask;
 import com.example.tonyso.TrafficApp.model.Place;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,6 +39,7 @@ public class NavSuggestMapFragment extends BaseFragment
     private static final String ARG_PARAM2 = "param2";
 
     public static List<LatLng> cctvLatLng ;
+    private static String ARG_DIS = "distance";
 
     // TODO: Rename and change types of parameters
     SupportMapFragment mapFragment;
@@ -46,13 +48,16 @@ public class NavSuggestMapFragment extends BaseFragment
     SwipeRefreshLayout mSwipeRefreshLayout;
     private Place origin, destination;
     public static boolean isPathReady;
+    FetchDistanceCCTVTask cctvTask;
+
+    private String[] distance;
 
     public NavSuggestMapFragment() {
         // Required empty public constructor
     }
 
     // TODO: Rename and change types and number of parameters
-    public static NavSuggestMapFragment newInstance(String near, int indicatorColor, int dividerColor, int ic_home, Place origin, Place destination) {
+    public static NavSuggestMapFragment newInstance(String near, int indicatorColor, int dividerColor, int ic_home, Place origin, Place destination, String[] arrDisDuration) {
         NavSuggestMapFragment f = new NavSuggestMapFragment();
         f.setTitle(near);
         f.setIndicatorColor(indicatorColor);
@@ -61,6 +66,7 @@ public class NavSuggestMapFragment extends BaseFragment
         Bundle bundle = new Bundle();
         bundle.putSerializable(ARG_PARAM1, origin);
         bundle.putSerializable(ARG_PARAM2, destination);
+        bundle.putStringArray(ARG_DIS, arrDisDuration);
         f.setArguments(bundle);
         return f;
     }
@@ -68,9 +74,11 @@ public class NavSuggestMapFragment extends BaseFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getInstance();
         if (getArguments() != null) {
             origin = (Place) getArguments().getSerializable(ARG_PARAM1);
             destination = (Place) getArguments().getSerializable(ARG_PARAM2);
+            distance = getArguments().getStringArray(ARG_DIS);
         }
     }
 
@@ -133,8 +141,6 @@ public class NavSuggestMapFragment extends BaseFragment
     public void onPathReady(List<LatLng> paths, final String duration) {
 
         isPathReady = true;
-
-
         cctvLatLng = paths;
 
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(paths.get(0), 15));
@@ -174,6 +180,15 @@ public class NavSuggestMapFragment extends BaseFragment
                 return false;
             }
         });
-    }
 
+        //observer.setIsPathReady(true);
+        cctvTask = new FetchDistanceCCTVTask();
+        //cctvTask.setFragment(this);
+        cctvTask.setCctvList(routeList);
+        cctvTask.setOrigin(origin);
+        cctvTask.setDestination(destination);
+        cctvTask.setTotat_distance(Double.parseDouble(distance[0].substring(0, 3)));
+        cctvTask.setPaths(paths);
+        cctvTask.execute();
+    }
 }

@@ -2,7 +2,7 @@ package com.example.tonyso.TrafficApp;
 
 import android.app.Application;
 
-import com.example.tonyso.TrafficApp.listener.BookmarkTimeStatusObserver;
+import com.example.tonyso.TrafficApp.listener.StatusObserver;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.RouteSpeedMap;
 
@@ -20,7 +20,7 @@ public class MyApplication extends Application{
     public List<RouteCCTV> list ;
     public List<RouteSpeedMap> speedMaps;
     public String locate;
-    BookmarkTimeStatusObserver timeStatusObserver;
+    StatusObserver timeStatusObserver;
 
 
     public MyApplication() {
@@ -29,20 +29,19 @@ public class MyApplication extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
-        timeStatusObserver = new BookmarkTimeStatusObserver();
+        timeStatusObserver = new StatusObserver();
     }
 
-    public BookmarkTimeStatusObserver getTimeStatusObserver() {
+    public StatusObserver getTimeStatusObserver() {
         return timeStatusObserver;
     }
 
-    public void setTimeStatusObserver(BookmarkTimeStatusObserver timeStatusObserver) {
+    public void setTimeStatusObserver(StatusObserver timeStatusObserver) {
         this.timeStatusObserver = timeStatusObserver;
     }
 
     public class Language {
         public static final String ZH_HANT = "zh";
         public static final String ENGLISH = "en";
-
     }
 }

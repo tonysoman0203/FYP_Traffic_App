@@ -7,6 +7,7 @@ import android.support.v4.app.DialogFragment;
 
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
+import com.example.tonyso.TrafficApp.listener.StatusObserver;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.RouteSpeedMap;
 import com.example.tonyso.TrafficApp.utility.LanguageSelector;
@@ -31,6 +32,7 @@ public class BaseDialogFragment extends DialogFragment {
     protected LanguageSelector languageSelector;
     protected List<RouteCCTV> routeList;
     protected List<RouteSpeedMap> routeSpeedMap;
+    protected StatusObserver observer;
 
     protected static final int[] drawableIcons = new int[]{
             R.drawable.ic_directions_car_white_36dp,
@@ -72,5 +74,6 @@ public class BaseDialogFragment extends DialogFragment {
         myApplication = (MyApplication) getActivity().getApplication();
         routeList = myApplication.list;
         routeSpeedMap = myApplication.speedMaps;
+        observer = myApplication.getTimeStatusObserver();
     }
 }

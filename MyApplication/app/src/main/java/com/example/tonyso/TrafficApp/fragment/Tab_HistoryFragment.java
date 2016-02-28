@@ -18,8 +18,8 @@ import com.example.tonyso.TrafficApp.InfoDetailActivity;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.adapter.HistoryAdapter;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
-import com.example.tonyso.TrafficApp.listener.BookmarkTimeStatusObserver;
 import com.example.tonyso.TrafficApp.listener.OnItemClickListener;
+import com.example.tonyso.TrafficApp.listener.StatusObserver;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class Tab_HistoryFragment extends BaseFragment implements Observer, OnIte
     public static final String INTENT_TAG_HISTORY_ITEM = "History Object";
     private static final String TAG = Tab_HistoryFragment.class.getSimpleName();
     private static final int HISTORY_VIEW_RECORD_REQUEST_CODE = 00001000;
-    BookmarkTimeStatusObserver bookmarkTimeStatusObserver;
+    StatusObserver statusObserver;
     private RecyclerView mRecyclerHistoryView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private List<TimedBookMark> historyList = new ArrayList<>();
@@ -77,7 +77,7 @@ public class Tab_HistoryFragment extends BaseFragment implements Observer, OnIte
         super.getInstance();
         // TODO: Change Adapter to display your content
         myApplication.getTimeStatusObserver().addObserver(this);
-        bookmarkTimeStatusObserver = myApplication.getTimeStatusObserver();
+        statusObserver = myApplication.getTimeStatusObserver();
     }
 
     @Override
@@ -145,7 +145,7 @@ public class Tab_HistoryFragment extends BaseFragment implements Observer, OnIte
 
     @Override
     public void update(Observable observable, Object data) {
-        if (bookmarkTimeStatusObserver.isTimeOverChanged()) {
+        if (statusObserver.isTimeOverChanged()) {
             Log.e(TAG, "Update AR........ ");
             setHistoryAdapter();
             //historyAdapter.notifyItemInserted(historyAdapter.getItemCount()-1);

@@ -24,9 +24,9 @@ import com.example.tonyso.TrafficApp.InfoDetailActivity;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.adapter.BookMarkAdapter;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
-import com.example.tonyso.TrafficApp.listener.BookmarkTimeStatusObserver;
 import com.example.tonyso.TrafficApp.listener.OnItemClickListener;
 import com.example.tonyso.TrafficApp.listener.OnRemainingTimeListener;
+import com.example.tonyso.TrafficApp.listener.StatusObserver;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
 
@@ -56,7 +56,7 @@ public class Tab_BookMarkFragment extends BaseFragment
     BroadcastReceiver broadcastReceiver;
     OnRemainingTimeListener onRemainingTimeListener;
     Intent bookmarkService;
-    BookmarkTimeStatusObserver bookmarkTimeStatusObserver;
+    StatusObserver statusObserver;
 
     boolean isObserved = false;
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -74,7 +74,7 @@ public class Tab_BookMarkFragment extends BaseFragment
                         onRemainingTimeListener.onRemainingTimeChanged(arrayList);
                         bookMarkAdapter.removeItemWithoutSQLite(i);
                         arrayList.remove(t);
-                        bookmarkTimeStatusObserver.setIsTimeOverChanged(true);
+                        statusObserver.setIsTimeOverChanged(true);
                         break;
                     } else {
                         sqLiteHelper.onUpdateBookMarkRemainingTime(arrayList);
@@ -114,7 +114,7 @@ public class Tab_BookMarkFragment extends BaseFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.getInstance();
-        bookmarkTimeStatusObserver = myApplication.getTimeStatusObserver();
+        statusObserver = myApplication.getTimeStatusObserver();
     }
 
     @Override

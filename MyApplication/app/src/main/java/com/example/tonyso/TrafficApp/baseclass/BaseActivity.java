@@ -29,11 +29,12 @@ public class BaseActivity extends AppCompatActivity {
     //String currLang;
     public static SQLiteDatabase sqLiteDatabase;
     public static SQLiteHelper sqLiteHelper;
+    MyApplication myApplication;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MyApplication myApplication = (MyApplication) getApplication();
+        myApplication = (MyApplication) getApplication();
         storeUserLanuguage();
         myApplication.list = loadCache("ImageList");
         myApplication.speedMaps = loadCache("SpeedMap");
