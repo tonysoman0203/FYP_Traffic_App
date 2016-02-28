@@ -37,12 +37,15 @@ public class NavSuggestMapFragment extends BaseFragment
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    public static List<LatLng> cctvLatLng ;
+
     // TODO: Rename and change types of parameters
     SupportMapFragment mapFragment;
     private View view;
     public static GoogleMap mMap;
     SwipeRefreshLayout mSwipeRefreshLayout;
     private Place origin, destination;
+    public static boolean isPathReady;
 
     public NavSuggestMapFragment() {
         // Required empty public constructor
@@ -128,6 +131,12 @@ public class NavSuggestMapFragment extends BaseFragment
 
     @Override
     public void onPathReady(List<LatLng> paths, final String duration) {
+
+        isPathReady = true;
+
+
+        cctvLatLng = paths;
+
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(paths.get(0), 15));
         Polyline line = mMap.addPolyline(new PolylineOptions()
                         .addAll(paths)

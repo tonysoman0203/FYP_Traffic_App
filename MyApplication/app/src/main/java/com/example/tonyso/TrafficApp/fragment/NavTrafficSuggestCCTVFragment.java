@@ -31,6 +31,7 @@ public class NavTrafficSuggestCCTVFragment extends BaseFragment {
     private Place origin;
     private Place destination;
     private String[] distanceAndDuration;
+
     public NavTrafficSuggestCCTVFragment() {
         // Required empty public constructor
     }
@@ -91,6 +92,7 @@ public class NavTrafficSuggestCCTVFragment extends BaseFragment {
         cctvTask.setTotat_distance(Double.parseDouble(distanceAndDuration[0].substring(0, 3)));
         cctvTask.setRecyclerView(recyclerView);
         cctvTask.execute();
+
     }
 
     private void onViewInitialize(View view) {
@@ -111,5 +113,9 @@ public class NavTrafficSuggestCCTVFragment extends BaseFragment {
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
 
+    }
 }

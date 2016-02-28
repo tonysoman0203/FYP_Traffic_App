@@ -109,46 +109,27 @@ public class FetchDistanceCCTVTask extends AsyncTask<String, Void, List<RouteCCT
     protected List<RouteCCTV> doInBackground(String... params) {
         LatLng ori = new LatLng(origin.getLatlngs()[0], origin.getLatlngs()[1]);
         LatLng dest = new LatLng(destination.getLatlngs()[0], destination.getLatlngs()[1]);
-        List<RouteCCTV> list = new ArrayList<>();
-        String oriDist = origin.getDistrict().toString();
-        Log.e(TAG, oriDist);
-        Log.e(TAG, String.valueOf(totat_distance));
-        DecimalFormat df = new DecimalFormat("#.##");
-        for (RouteCCTV c : cctvList) {
-            LatLng cctvDis = new LatLng(c.getLatLngs()[0], c.getLatLngs()[1]);
+        List<LatLng>paths = NavSuggestMapFragment.cctvLatLng;
 
-            double oriToCCTV = getDistanceFromLatLngInKm(ori, cctvDis);
-            double destToCCTV = getDistanceFromLatLngInKm(cctvDis, dest);
-            double v = (oriToCCTV - totat_distance);
-            double b = destToCCTV - totat_distance;
-            Log.d(TAG, "OriToCCTV - Total distance = " + v);
-            Log.d(TAG, "destToCCTV - Total distance = " + b);
-
-            if (v <= 2) {
-                Log.e(TAG, String.format("The place is %s and km is %.2f", c.getDescription()[1], oriToCCTV));
-                c.setDistance(String.valueOf(df.format(oriToCCTV)));
-                list.add(c);
-            } else if (b <= 2) {
-                Log.e(TAG, String.format("The destination is %s and km is %.2f", c.getDescription()[1], destToCCTV));
-                c.setDistance(String.valueOf(df.format(oriToCCTV)));
-                list.add(c);
-            }
+        for(LatLng latLng : paths){
+            Log.e(TAG,String.format("%.2f",getDistanceFromLatLngInKm(latLng,ori)));
         }
-        return list;
+        return null;
+
     }
 
     @Override
     protected void onPostExecute(List<RouteCCTV> s) {
         super.onPostExecute(s);
-        CCTVListAdapter cctvListAdapter = new CCTVListAdapter(s, fragment.getContext());
-        cctvListAdapter.setImageLoader(fragment.getImageLoader());
-        cctvListAdapter.setDisplayImageOptions(fragment.getImageOptions());
-        recyclerView.setAdapter(cctvListAdapter);
-        for (RouteCCTV r : s) {
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(new LatLng(r.getLatLngs()[0], r.getLatLngs()[1]));
-            NavSuggestMapFragment.getGoogleMap().addMarker(markerOptions);
-        }
+//        CCTVListAdapter cctvListAdapter = new CCTVListAdapter(s, fragment.getContext());
+//        cctvListAdapter.setImageLoader(fragment.getImageLoader());
+//        cctvListAdapter.setDisplayImageOptions(fragment.getImageOptions());
+//        recyclerView.setAdapter(cctvListAdapter);
+//        for (RouteCCTV r : s) {
+//            MarkerOptions markerOptions = new MarkerOptions();
+//            markerOptions.position(new LatLng(r.getLatLngs()[0], r.getLatLngs()[1]));
+//            NavSuggestMapFragment.getGoogleMap().addMarker(markerOptions);
+//        }
     }
 
 
