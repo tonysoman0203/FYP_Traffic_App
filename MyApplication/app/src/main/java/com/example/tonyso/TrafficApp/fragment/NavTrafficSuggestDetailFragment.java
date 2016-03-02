@@ -1,16 +1,19 @@
 package com.example.tonyso.TrafficApp.fragment;
 
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,14 +22,20 @@ import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.adapter.TabFragmentPagerAdapter;
 import com.example.tonyso.TrafficApp.baseclass.BaseDialogFragment;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
+import com.example.tonyso.TrafficApp.listener.OnCCTVFilterReadyListener;
+import com.example.tonyso.TrafficApp.listener.OnPathReadyListener;
+import com.example.tonyso.TrafficApp.location.DrawPathAsyncTask;
 import com.example.tonyso.TrafficApp.model.Place;
+import com.example.tonyso.TrafficApp.model.RouteCCTV;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by TonySo on 11/2/16.
  */
-public class NavTrafficSuggestDetailFragment extends BaseDialogFragment {
+public class NavTrafficSuggestDetailFragment extends BaseDialogFragment implements OnPathReadyListener, OnCCTVFilterReadyListener{
 
     /**
      * The fragment argument representing the section number for this
@@ -53,6 +62,7 @@ public class NavTrafficSuggestDetailFragment extends BaseDialogFragment {
     private EditText originEdt, destinationEdt;
     private Toolbar toolbar;
     private TabLayout tabLayout;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     public NavTrafficSuggestDetailFragment() {
     }
@@ -96,8 +106,18 @@ public class NavTrafficSuggestDetailFragment extends BaseDialogFragment {
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         rootView = inflater.inflate(R.layout.dialog_fragment_route_suggest_detail, container, false);
-        fragments = getFragments();
         onInitializeView();
+        InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(rootView.getWindowToken(), 0);
+        //DrawPath
+        DrawPathAsyncTask drawPathAsyncTask = new DrawPathAsyncTask();
+        drawPathAsyncTask.setContext(getContext());
+        drawPathAsyncTask.setOnPathReadyListener(this);
+        drawPathAsyncTask.setDestination(destination);
+        drawPathAsyncTask.setOrigin(origin);
+        drawPathAsyncTask.setSwipe(mSwipeRefreshLayout);
+        drawPathAsyncTask.setCctvList(routeList);
+        drawPathAsyncTask.execute();
         return rootView;
     }
 
@@ -110,13 +130,6 @@ public class NavTrafficSuggestDetailFragment extends BaseDialogFragment {
                 getDialog().dismiss();
             }
         });
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        viewPager.setAdapter(mSectionsPagerAdapter);
-        tabLayout.setupWithViewPager(viewPager);
-        setupTabLayoutIcon(tabLayout);
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
 
     }
 
@@ -128,9 +141,10 @@ public class NavTrafficSuggestDetailFragment extends BaseDialogFragment {
         originEdt.setText(origin.getAddress());
         destinationEdt.setText(destination.getAddress());
         toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
-        mSectionsPagerAdapter = new TabFragmentPagerAdapter(getChildFragmentManager(), fragments);
         viewPager = (ViewPager) rootView.findViewById(R.id.viewpager);
         tabLayout = (TabLayout) rootView.findViewById(R.id.tablayout);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipemap);
+        mSwipeRefreshLayout.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE, Color.CYAN);
     }
 
     private void setupTabLayoutIcon(TabLayout tabLayout) {
@@ -145,17 +159,38 @@ public class NavTrafficSuggestDetailFragment extends BaseDialogFragment {
         tabLayout.getTabAt(0).getCustomView().setSelected(true);
     }
 
-    private LinkedList<BaseFragment> getFragments() {
+    private LinkedList<BaseFragment> getFragments(ArrayList<Double[]> paths, ArrayList<RouteCCTV> cctvsInPaths) {
         final int indicatorColor = this.getResources().getColor(R.color.colorAccent);
         final int dividerColor = Color.WHITE;
         LinkedList<BaseFragment> fragments = new LinkedList<>();
         if (arrDisDuration != null) {
-            fragments.add(NavSuggestMapFragment.newInstance(arrDisDuration[1], indicatorColor, dividerColor, drawableIcons[0], origin, destination, arrDisDuration));
+            fragments.add(NavSuggestMapFragment.newInstance(arrDisDuration[1],
+                    indicatorColor, dividerColor, drawableIcons[0], origin, destination, arrDisDuration,paths,cctvsInPaths));
         } else {
-            fragments.add(NavSuggestMapFragment.newInstance(TABS_TITLES[0], indicatorColor, dividerColor, drawableIcons[0], origin, destination, arrDisDuration));
+            fragments.add(NavSuggestMapFragment.newInstance(TABS_TITLES[0],
+                    indicatorColor, dividerColor, drawableIcons[0], origin, destination, arrDisDuration,paths,cctvsInPaths));
         }
-        fragments.add(NavTrafficSuggestCCTVFragment.newInstance(TABS_TITLES[1], indicatorColor, dividerColor, drawableIcons[1], origin, destination, arrDisDuration));
+        fragments.add(NavTrafficSuggestCCTVFragment.newInstance(TABS_TITLES[1],
+                indicatorColor, dividerColor, drawableIcons[1], origin, destination, arrDisDuration,cctvsInPaths));
         return fragments;
     }
 
+    @Override
+    public void onCCTVReady(ArrayList<RouteCCTV> list) {
+
+    }
+
+    @Override
+    public void onPathReady(ArrayList<Double[]> paths, ArrayList<RouteCCTV> cctvsInPaths) {
+        fragments = getFragments(paths,cctvsInPaths);
+        // Create the adapter that will return a fragment for each of the three
+        // primary sections of the activity.
+        mSectionsPagerAdapter = new TabFragmentPagerAdapter(getChildFragmentManager(), fragments);
+        viewPager.setAdapter(mSectionsPagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
+        setupTabLayoutIcon(tabLayout);
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+
+    }
 }

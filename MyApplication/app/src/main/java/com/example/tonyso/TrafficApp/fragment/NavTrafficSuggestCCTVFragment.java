@@ -10,9 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.tonyso.TrafficApp.R;
+import com.example.tonyso.TrafficApp.adapter.CCTVListAdapter;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
-import com.example.tonyso.TrafficApp.location.FetchDistanceCCTVTask;
 import com.example.tonyso.TrafficApp.model.Place;
+import com.example.tonyso.TrafficApp.model.RouteCCTV;
+
+import java.util.ArrayList;
 
 import jp.wasabeef.recyclerview.animators.SlideInDownAnimator;
 
@@ -25,20 +28,26 @@ public class NavTrafficSuggestCCTVFragment extends BaseFragment {
     private static final String ARG_PARAM2 = "Destination";
     private static final String ARG_PARAM3 = "distance";
 
+    private static String ARG_DIS = "distance";
+    private static final String ARG_PATHS = "Paths";
+    private static final String ARG_CCTV = "cctvInPaths";
+
+
     private RecyclerView recyclerView;
     private View view;
+    private ArrayList<RouteCCTV> list;
 
     private Place origin;
     private Place destination;
     private String[] distanceAndDuration;
-    FetchDistanceCCTVTask cctvTask;
 
     public NavTrafficSuggestCCTVFragment() {
         // Required empty public constructor
     }
 
     // TODO: Rename and change types and number of parameters
-    public static NavTrafficSuggestCCTVFragment newInstance(String near, int indicatorColor, int dividerColor, int ic_home, Place origin, Place destination, String[] arrDisDuration) {
+    public static NavTrafficSuggestCCTVFragment newInstance(String near, int indicatorColor, int dividerColor, int ic_home,
+                                                            Place origin, Place destination, String[] arrDisDuration, ArrayList<RouteCCTV> cctvsInPaths) {
         NavTrafficSuggestCCTVFragment f = new NavTrafficSuggestCCTVFragment();
         f.setTitle(near);
         f.setIndicatorColor(indicatorColor);
@@ -48,6 +57,7 @@ public class NavTrafficSuggestCCTVFragment extends BaseFragment {
         bundle.putSerializable(ARG_PARAM1, origin);
         bundle.putSerializable(ARG_PARAM2, destination);
         bundle.putStringArray(ARG_PARAM3, arrDisDuration);
+        bundle.putSerializable(ARG_CCTV, cctvsInPaths);
         f.setArguments(bundle);
         return f;
     }
@@ -60,6 +70,7 @@ public class NavTrafficSuggestCCTVFragment extends BaseFragment {
             origin = (Place) getArguments().getSerializable(ARG_PARAM1);
             destination = (Place) getArguments().getSerializable(ARG_PARAM2);
             distanceAndDuration = getArguments().getStringArray(ARG_PARAM3);
+            list = (ArrayList<RouteCCTV>)getArguments().getSerializable(ARG_CCTV);
         }
     }
 
@@ -91,6 +102,10 @@ public class NavTrafficSuggestCCTVFragment extends BaseFragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.cctvlist);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setItemAnimator(new SlideInDownAnimator());
+        CCTVListAdapter cctvListAdapter = new CCTVListAdapter(list, getContext());
+        cctvListAdapter.setImageLoader(getImageLoader());
+        cctvListAdapter.setDisplayImageOptions(getImageOptions());
+        recyclerView.setAdapter(cctvListAdapter);
     }
 
     @Override

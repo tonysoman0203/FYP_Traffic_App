@@ -1,6 +1,7 @@
 package com.example.tonyso.TrafficApp.fragment;
 
 import android.animation.Animator;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -151,8 +152,12 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
                     String[] l = new String[]{origin.getText().toString(), destination.getText().toString()};
                     Place origin = buildPlace(l[0]);
                     Place destination = buildPlace(l[1]);
-                    DrawPathAsyncTask drawPathAsyncTask = new DrawPathAsyncTask(
-                            NavTrafficSuggestFragment.this, getActivity(), origin, destination);
+                    DrawPathAsyncTask drawPathAsyncTask = new DrawPathAsyncTask();
+                    drawPathAsyncTask.setDestination(destination);
+                    drawPathAsyncTask.setOrigin(origin);
+                    drawPathAsyncTask.setNavTrafficSuggestFragment(NavTrafficSuggestFragment.this);
+                    drawPathAsyncTask.setContext(getContext());
+                    drawPathAsyncTask.setProgressDialog(new ProgressDialog(getContext()));
                     drawPathAsyncTask.execute();
                 }
             }
