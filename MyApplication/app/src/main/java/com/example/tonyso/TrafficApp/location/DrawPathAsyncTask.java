@@ -112,7 +112,7 @@ public class DrawPathAsyncTask extends AsyncTask<Void, Void, List<Map<String, Ob
             LatLng ori = new LatLng(origin.getLatlngs()[0], origin.getLatlngs()[1]);
             LatLng cctv = new LatLng(routeCCTV.getLatLngs()[0], routeCCTV.getLatLngs()[1]);
             DecimalFormat decimalFormat = new DecimalFormat("#.##");
-            String distance = decimalFormat.format(getDistanceFromLatLngInKm(ori, cctv));
+            String distance = decimalFormat.format(LatLngConverter.getDistanceFromLatLngInKm(ori, cctv));
             routeCCTV.setDistance(distance);
             routeCCTVMap.put(String.valueOf(id), routeCCTV);
         }
@@ -136,7 +136,7 @@ public class DrawPathAsyncTask extends AsyncTask<Void, Void, List<Map<String, Ob
         for (LatLng latLng : paths) {
             for(int i = 0 ;i<cctvList.size();i++){
                 LatLng lat = new LatLng(cctvList.get(i).getLatLngs()[0],cctvList.get(i).getLatLngs()[1]);
-                double diff = getDistanceFromLatLngInKm(latLng, lat);
+                double diff = LatLngConverter.getDistanceFromLatLngInKm(latLng, lat);
                 Log.e(TAG, String.format("%.2f", diff));
                 if (diff <= 1) {
                     routeCCTV = cctvList.get(i);
@@ -272,32 +272,5 @@ public class DrawPathAsyncTask extends AsyncTask<Void, Void, List<Map<String, Ob
         }
         return pathsList;
     }
-
-    public static double getDistanceFromLatLngInKm(LatLng c1, LatLng c2) {
-        int R = 6371; // Radius of the earth in km
-
-        double lat1 = c1.latitude;
-        double lat2 = c2.latitude;
-
-        double lon1 = c1.longitude;
-        double lon2 = c2.longitude;
-
-        double dLat = deg2rad(lat2 - lat1);
-        double dLon = deg2rad(lon2 - lon1);
-
-        double a =
-                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-                                Math.sin(dLon / 2) * Math.sin(dLon / 2);
-
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double d = R * c; // Distance in km
-        return d;
-    }
-
-    public static double deg2rad(double deg) {
-        return deg * (Math.PI / 180);
-    }
-
 
 }
