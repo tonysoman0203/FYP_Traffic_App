@@ -6,4 +6,11 @@
         android:key="LanguageList"
         android:title=""
         android:summary=""/>
+    <ListPreference
+        android:dialogTitle="@string/km"
+        android:key="distance"
+        android:title="@string/nearKm"
+        android:entryValues="@array/distance_options"
+        android:summary="" />
+
 </PreferenceScreen>

@@ -90,6 +90,7 @@ public class SettingsActivity extends BaseActivity {
     public static class MyPreferenceFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
         Resources rs;
         ListPreference listPreference;
+        ListPreference distancePref;
         String user_lang_pref;
 
         @Override
@@ -100,6 +101,7 @@ public class SettingsActivity extends BaseActivity {
 
             user_lang_pref = languageSelector.getLanguage();
             listPreference = (ListPreference) findPreference("LanguageList");
+            distancePref = (ListPreference) findPreference("distance");
             //  optOutPref.setTitle((String)ShareStorage.retrieveData("Optout", ShareStorage.DataType.STRING).getValue());
             listPreference.setTitle(getString(R.string.pref_title_Language));
 
@@ -124,6 +126,11 @@ public class SettingsActivity extends BaseActivity {
                 }
             });
             setDefaultUserPreference();
+            setDefaultNearLocationPreference();
+        }
+
+        private void setDefaultNearLocationPreference() {
+
         }
 
         private void setDefaultUserPreference() {

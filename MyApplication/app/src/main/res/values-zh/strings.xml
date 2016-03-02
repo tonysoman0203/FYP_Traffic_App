@@ -62,5 +62,7 @@
     <string name="route_suggest_end">目的地</string>
     <string name="route_suggest_notice">請稍候…</string>
     <string name="distance">距離:</string>
+    <string name="nearKm">附近位置(公里)</string>
+    <string name="km">公里</string>
 
 </resources>

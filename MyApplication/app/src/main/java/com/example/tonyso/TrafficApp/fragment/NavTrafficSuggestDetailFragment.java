@@ -1,6 +1,5 @@
 package com.example.tonyso.TrafficApp.fragment;
 
-
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -8,8 +7,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,47 +21,42 @@ import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.adapter.TabFragmentPagerAdapter;
 import com.example.tonyso.TrafficApp.baseclass.BaseDialogFragment;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
-import com.example.tonyso.TrafficApp.listener.OnCCTVFilterReadyListener;
-import com.example.tonyso.TrafficApp.listener.OnPathReadyListener;
-import com.example.tonyso.TrafficApp.location.DrawPathAsyncTask;
 import com.example.tonyso.TrafficApp.model.Place;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-/**
- * Created by TonySo on 11/2/16.
- */
-public class NavTrafficSuggestDetailFragment extends BaseDialogFragment implements OnPathReadyListener, OnCCTVFilterReadyListener{
+public class NavTrafficSuggestDetailFragment extends BaseDialogFragment {
 
     /**
      * The fragment argument representing the section number for this
      * fragment.
      * Constant
      */
-    public static final String ARG_SECTION_NUMBER = "section_number";
-    public static final Integer ARG_SECTION_NUMBER_SIZE = 2;
     public static final String ARG_ORIGIN_OBJECT = "origin";
     public static final String ARG_DESTINATION_OBJECT = "destination";
-    public static final String ARG_DISTANCE_AND_DURATION = "distance_duration";
+    private static final String KET_DISTANCE = "DISTANCE_STRING";
     public static final String TAG = NavTrafficSuggestDetailFragment.class.getCanonicalName();
+    private static final String ARG_LIST = "LIST";
 
     View rootView;
-    private TabFragmentPagerAdapter mSectionsPagerAdapter;
     private LinkedList<BaseFragment> fragments;
     private ViewPager viewPager;
-    private int TABS_SIZE = -1;
 
     private Place origin, destination;
     private String[] arrDisDuration;
 
-    private TextInputLayout originWrapper, destinationWrapper;
-    private EditText originEdt, destinationEdt;
     private Toolbar toolbar;
     private TabLayout tabLayout;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+    //private SwipeRefreshLayout mSwipeRefreshLayout;
+
+    List<Map<String, Object>> list;
+    ArrayList<Double[]> paths;
+    ArrayList<RouteCCTV> cctvs;
 
     public NavTrafficSuggestDetailFragment() {
     }
@@ -71,13 +65,12 @@ public class NavTrafficSuggestDetailFragment extends BaseDialogFragment implemen
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static NavTrafficSuggestDetailFragment newInstance(int sectionNumber, Place origin, Place destination, String[] disDur) {
+    public static NavTrafficSuggestDetailFragment newInstance(Place origin, Place destination, List<Map<String, Object>> result) {
         NavTrafficSuggestDetailFragment fragment = new NavTrafficSuggestDetailFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         args.putSerializable(ARG_ORIGIN_OBJECT, origin);
         args.putSerializable(ARG_DESTINATION_OBJECT, destination);
-        args.putStringArray(ARG_DISTANCE_AND_DURATION, disDur);
+        args.putSerializable(ARG_LIST, (Serializable) result);
         fragment.setArguments(args);
         return fragment;
     }
@@ -87,15 +80,15 @@ public class NavTrafficSuggestDetailFragment extends BaseDialogFragment implemen
         super.onCreate(savedInstanceState);
         getInstance();
         getBundleData();
+        getDataFromResultList();
     }
 
     private void getBundleData() {
         Bundle bundle = this.getArguments();
         if (bundle != null) {
-            TABS_SIZE = bundle.getInt(ARG_SECTION_NUMBER);
             origin = (Place) bundle.getSerializable(ARG_ORIGIN_OBJECT);
             destination = (Place) bundle.getSerializable(ARG_DESTINATION_OBJECT);
-            arrDisDuration = bundle.getStringArray(ARG_DISTANCE_AND_DURATION);
+            list = (List<Map<String, Object>>) bundle.getSerializable(ARG_LIST);
         } else {
             throw new NullPointerException("bundle is null");
         }
@@ -109,15 +102,6 @@ public class NavTrafficSuggestDetailFragment extends BaseDialogFragment implemen
         onInitializeView();
         InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(rootView.getWindowToken(), 0);
-        //DrawPath
-        DrawPathAsyncTask drawPathAsyncTask = new DrawPathAsyncTask();
-        drawPathAsyncTask.setContext(getContext());
-        drawPathAsyncTask.setOnPathReadyListener(this);
-        drawPathAsyncTask.setDestination(destination);
-        drawPathAsyncTask.setOrigin(origin);
-        drawPathAsyncTask.setSwipe(mSwipeRefreshLayout);
-        drawPathAsyncTask.setCctvList(routeList);
-        drawPathAsyncTask.execute();
         return rootView;
     }
 
@@ -130,21 +114,71 @@ public class NavTrafficSuggestDetailFragment extends BaseDialogFragment implemen
                 getDialog().dismiss();
             }
         });
+        setTabFragmentPagerAdapter();
+    }
+
+    private void getDataFromResultList() {
+        //Get Distance and Duration
+        paths = new ArrayList<>();
+        cctvs = new ArrayList<>();
+        Log.d(TAG, "Received List and Size = " + list.size());
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).get(KET_DISTANCE) != null) {
+                arrDisDuration = (String[]) list.get(i).get(KET_DISTANCE);
+            } else if (list.get(i).get(String.valueOf(i)) instanceof Double[]) {
+                int index = 0;
+                Double[] d;
+                while (list.get(i).get(String.valueOf(index)) != null) {
+                    d = (Double[]) list.get(i).get(String.valueOf(index));
+                    paths.add(d);
+                    index++;
+                    if (list.get(i).get(String.valueOf(index)) == null &&
+                            !(list.get(i).get(String.valueOf(index)) instanceof Double[])) {
+                        break;
+                    }
+                }
+            } else {
+                int index = 0;
+                RouteCCTV r;
+                while (list.get(i).get(String.valueOf(index)) != null) {
+                    r = (RouteCCTV) list.get(i).get(String.valueOf(index));
+                    cctvs.add(r);
+                    index++;
+                    if (list.get(i).get(String.valueOf(index)) == null &&
+                            !(list.get(i).get(String.valueOf(index)) instanceof RouteCCTV)) {
+                        break;
+                    }
+                }
+            }
+        }
+        Log.d(TAG, "" + arrDisDuration[0] + " " + arrDisDuration[1]);
+        Log.d(TAG, "" + paths.size());
+        Log.d(TAG, "" + cctvs.size());
 
     }
 
     private void onInitializeView() {
-        originWrapper = (TextInputLayout) rootView.findViewById(R.id.originWrapper);
-        destinationWrapper = (TextInputLayout) rootView.findViewById(R.id.destinationWrapper);
-        originEdt = (EditText) rootView.findViewById(R.id.originEditText);
-        destinationEdt = (EditText) rootView.findViewById(R.id.destinationEditText);
+        TextInputLayout originWrapper = (TextInputLayout) rootView.findViewById(R.id.originWrapper);
+        TextInputLayout destinationWrapper = (TextInputLayout) rootView.findViewById(R.id.destinationWrapper);
+        EditText originEdt = (EditText) rootView.findViewById(R.id.originEditText);
+        EditText destinationEdt = (EditText) rootView.findViewById(R.id.destinationEditText);
         originEdt.setText(origin.getAddress());
         destinationEdt.setText(destination.getAddress());
         toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         viewPager = (ViewPager) rootView.findViewById(R.id.viewpager);
         tabLayout = (TabLayout) rootView.findViewById(R.id.tablayout);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipemap);
-        mSwipeRefreshLayout.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE, Color.CYAN);
+        //mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipemap);
+        //mSwipeRefreshLayout.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE, Color.CYAN);
+    }
+
+    private void setTabFragmentPagerAdapter() {
+        fragments = getFragments();
+        TabFragmentPagerAdapter mSectionsPagerAdapter = new TabFragmentPagerAdapter(getChildFragmentManager(), fragments);
+        viewPager.setAdapter(mSectionsPagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
+        setupTabLayoutIcon(tabLayout);
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
     }
 
     private void setupTabLayoutIcon(TabLayout tabLayout) {
@@ -159,38 +193,20 @@ public class NavTrafficSuggestDetailFragment extends BaseDialogFragment implemen
         tabLayout.getTabAt(0).getCustomView().setSelected(true);
     }
 
-    private LinkedList<BaseFragment> getFragments(ArrayList<Double[]> paths, ArrayList<RouteCCTV> cctvsInPaths) {
+
+    private LinkedList<BaseFragment> getFragments() {
         final int indicatorColor = this.getResources().getColor(R.color.colorAccent);
         final int dividerColor = Color.WHITE;
         LinkedList<BaseFragment> fragments = new LinkedList<>();
         if (arrDisDuration != null) {
             fragments.add(NavSuggestMapFragment.newInstance(arrDisDuration[1],
-                    indicatorColor, dividerColor, drawableIcons[0], origin, destination, arrDisDuration,paths,cctvsInPaths));
+                    indicatorColor, dividerColor, drawableIcons[0], origin, destination, arrDisDuration, paths, cctvs));
         } else {
             fragments.add(NavSuggestMapFragment.newInstance(TABS_TITLES[0],
-                    indicatorColor, dividerColor, drawableIcons[0], origin, destination, arrDisDuration,paths,cctvsInPaths));
+                    indicatorColor, dividerColor, drawableIcons[0], origin, destination, arrDisDuration, paths, cctvs));
         }
         fragments.add(NavTrafficSuggestCCTVFragment.newInstance(TABS_TITLES[1],
-                indicatorColor, dividerColor, drawableIcons[1], origin, destination, arrDisDuration,cctvsInPaths));
+                indicatorColor, dividerColor, drawableIcons[1], origin, destination, arrDisDuration, cctvs));
         return fragments;
-    }
-
-    @Override
-    public void onCCTVReady(ArrayList<RouteCCTV> list) {
-
-    }
-
-    @Override
-    public void onPathReady(ArrayList<Double[]> paths, ArrayList<RouteCCTV> cctvsInPaths) {
-        fragments = getFragments(paths,cctvsInPaths);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new TabFragmentPagerAdapter(getChildFragmentManager(), fragments);
-        viewPager.setAdapter(mSectionsPagerAdapter);
-        tabLayout.setupWithViewPager(viewPager);
-        setupTabLayoutIcon(tabLayout);
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.setOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
-
     }
 }

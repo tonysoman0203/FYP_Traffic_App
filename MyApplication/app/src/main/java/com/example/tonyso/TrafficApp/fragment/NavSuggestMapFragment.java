@@ -2,12 +2,10 @@ package com.example.tonyso.TrafficApp.fragment;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
@@ -46,7 +44,7 @@ public class NavSuggestMapFragment extends BaseFragment
     SupportMapFragment mapFragment;
     private View view;
     GoogleMap mMap;
-    SwipeRefreshLayout mSwipeRefreshLayout;
+
     private Place origin, destination;
     public static boolean isPathReady;
 

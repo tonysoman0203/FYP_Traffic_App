@@ -3,29 +3,24 @@ package com.example.tonyso.TrafficApp.location;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 
 import com.example.tonyso.TrafficApp.R;
-import com.example.tonyso.TrafficApp.fragment.NavSuggestMapFragment;
 import com.example.tonyso.TrafficApp.fragment.NavTrafficSuggestDetailFragment;
 import com.example.tonyso.TrafficApp.fragment.NavTrafficSuggestFragment;
-import com.example.tonyso.TrafficApp.listener.OnPathReadyListener;
 import com.example.tonyso.TrafficApp.model.Place;
-import com.example.tonyso.TrafficApp.model.Route;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
-import com.example.tonyso.TrafficApp.model.RouteSpeedMap;
 import com.example.tonyso.TrafficApp.utility.ErrorDialog;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,10 +28,11 @@ import java.util.Map;
  * Created by soman on 2016/2/10.
  *
  */
-public class DrawPathAsyncTask extends AsyncTask<Void, Void, String> {
+public class DrawPathAsyncTask extends AsyncTask<Void, Void, List<Map<String, Object>>> {
+    private static final String KET_DISTANCE = "DISTANCE_STRING";
     private final String TAG = DrawPathAsyncTask.class.getCanonicalName();
-    private OnPathReadyListener onPathReadyListener;
-    private SwipeRefreshLayout swipe;
+    //private OnPathReadyListener onPathReadyListener;
+    //private SwipeRefreshLayout swipe;
     Context context;
     private NavTrafficSuggestFragment navTrafficSuggestFragment;
     private ProgressDialog progressDialog;
@@ -47,13 +43,13 @@ public class DrawPathAsyncTask extends AsyncTask<Void, Void, String> {
         this.cctvList = cctvList;
     }
 
-    public void setOnPathReadyListener(OnPathReadyListener onPathReadyListener) {
-        this.onPathReadyListener = onPathReadyListener;
-    }
+//    public void setOnPathReadyListener(OnPathReadyListener onPathReadyListener) {
+//        this.onPathReadyListener = onPathReadyListener;
+//    }
 
-    public void setSwipe(SwipeRefreshLayout swipe) {
-        this.swipe = swipe;
-    }
+//    public void setSwipe(SwipeRefreshLayout swipe) {
+//        this.swipe = swipe;
+//    }
 
     public void setContext(Context context) {
         this.context = context;
@@ -81,59 +77,72 @@ public class DrawPathAsyncTask extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        if (swipe == null) {
+//        if (swipe == null) {
             progressDialog.setIndeterminate(true);
             progressDialog.setMessage("Fetching Routes......");
             progressDialog.show();
-        } else {
-            swipe.setRefreshing(true);
-        }
+//        } else {
+//            swipe.setRefreshing(true);
+//        }
     }
 
     @Override
-    protected String doInBackground(Void... params) {
+    protected List<Map<String, Object>> doInBackground(Void... params) {
         LocationPlacesJsonParser jsonParser = new LocationPlacesJsonParser(context.getString(R.string.place_api_server_key));
         String url = jsonParser.makeDistanceURL(origin.getAddress().toString(), destination.getAddress().toString());
         Log.d(TAG, url);
-        return jsonParser.getJSON(url);
+        String json = jsonParser.getJSON(url);
+        return getMapList(json);
     }
 
-
-    @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-        Log.e(TAG, s);
-        if (swipe == null) {
-            progressDialog.hide();
-            String[] disDur = new String[]{getDistance(s), getDuration(s)};
-            NavTrafficSuggestDetailFragment fragment = NavTrafficSuggestDetailFragment.newInstance(
-                    NavTrafficSuggestDetailFragment.ARG_SECTION_NUMBER_SIZE, origin, destination, disDur);
-            FragmentManager fm = navTrafficSuggestFragment.getChildFragmentManager();
-            fragment.show(fm, NavTrafficSuggestDetailFragment.TAG);
-        } else {
-            List<Double[]> list = drawPath(s);
-            List<LatLng>pathsInLatlng = drawPathInLatLng(s);
-            ArrayList<RouteCCTV>cctvsInPaths = (ArrayList<RouteCCTV>) findCCTVInPaths(pathsInLatlng);
-            onPathReadyListener.onPathReady((ArrayList<Double[]>) list,cctvsInPaths);
-            swipe.setRefreshing(false);
-            swipe.setEnabled(false);
+    private List<Map<String, Object>> getMapList(String json) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<String, Object> pathsMap = new HashMap<>();
+        Map<String, Object> routeCCTVMap = new HashMap<>();
+        Map<String, Object> DDMap = new HashMap<>();
+        String[] disDur = new String[]{getDistance(json), getDuration(json)};
+        DDMap.put(KET_DISTANCE, disDur);
+        List<Double[]> path = drawPath(json);
+        List<Object> cctvsInPaths = findCCTVInPaths(drawPathInLatLng(json));
+        for (int index = 0; index < path.size(); index++) {
+            pathsMap.put(String.valueOf(index), path.get(index));
         }
+        for (int id = 0; id < cctvsInPaths.size(); id++) {
+            RouteCCTV routeCCTV = (RouteCCTV) cctvsInPaths.get(id);
+            LatLng ori = new LatLng(origin.getLatlngs()[0], origin.getLatlngs()[1]);
+            LatLng cctv = new LatLng(routeCCTV.getLatLngs()[0], routeCCTV.getLatLngs()[1]);
+            DecimalFormat decimalFormat = new DecimalFormat("#.##");
+            String distance = decimalFormat.format(getDistanceFromLatLngInKm(ori, cctv));
+            routeCCTV.setDistance(distance);
+            routeCCTVMap.put(String.valueOf(id), routeCCTV);
+        }
+        list.add(pathsMap);
+        list.add(routeCCTVMap);
+        list.add(DDMap);
+        return list;
+    }
+    @Override
+    protected void onPostExecute(List<Map<String, Object>> s) {
+        super.onPostExecute(s);
+        progressDialog.hide();
+        NavTrafficSuggestDetailFragment fragment = NavTrafficSuggestDetailFragment.newInstance(origin, destination, s);
+        FragmentManager fm = navTrafficSuggestFragment.getChildFragmentManager();
+        fragment.show(fm, NavTrafficSuggestDetailFragment.TAG);
     }
 
-    private List<RouteCCTV> findCCTVInPaths(List<LatLng>paths) {
-        List<RouteCCTV>route = new ArrayList<>();
+    private List<Object> findCCTVInPaths(List<LatLng> paths) {
+        List<Object> route = new ArrayList<>();
         RouteCCTV routeCCTV;
         for (LatLng latLng : paths) {
             for(int i = 0 ;i<cctvList.size();i++){
                 LatLng lat = new LatLng(cctvList.get(i).getLatLngs()[0],cctvList.get(i).getLatLngs()[1]);
                 double diff = getDistanceFromLatLngInKm(latLng, lat);
                 Log.e(TAG, String.format("%.2f", diff));
-                if (diff <= 0.7) {
+                if (diff <= 1) {
                     routeCCTV = cctvList.get(i);
                     route.add(routeCCTV);
                     cctvList.remove(routeCCTV);
                     i--;
-
                 }
             }
         }
@@ -177,9 +186,9 @@ public class DrawPathAsyncTask extends AsyncTask<Void, Void, String> {
         return duration;
     }
 
-    private List<LatLng> decodePoly(String encoded) {
+    private ArrayList<LatLng> decodePoly(String encoded) {
 
-        List<LatLng> poly = new ArrayList<LatLng>();
+        ArrayList<LatLng> poly = new ArrayList<LatLng>();
         int index = 0, len = encoded.length();
         int lat = 0, lng = 0;
 
@@ -212,8 +221,8 @@ public class DrawPathAsyncTask extends AsyncTask<Void, Void, String> {
     }
 
 
-    public List<Double[]> drawPath(String result) {
-        List<Double[]> pathsList = new ArrayList<>();
+    public ArrayList<Double[]> drawPath(String result) {
+        ArrayList<Double[]> pathsList = new ArrayList<>();
         try {
             //Transform the string into a json object
             final JSONObject json = new JSONObject(result);
@@ -240,8 +249,8 @@ public class DrawPathAsyncTask extends AsyncTask<Void, Void, String> {
         return pathsList;
     }
 
-    public List<LatLng> drawPathInLatLng(String result) {
-        List<LatLng> pathsList = new ArrayList<>();
+    public ArrayList<LatLng> drawPathInLatLng(String result) {
+        ArrayList<LatLng> pathsList = new ArrayList<>();
         try {
             //Transform the string into a json object
             final JSONObject json = new JSONObject(result);

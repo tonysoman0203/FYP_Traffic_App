@@ -158,6 +158,7 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
                     drawPathAsyncTask.setNavTrafficSuggestFragment(NavTrafficSuggestFragment.this);
                     drawPathAsyncTask.setContext(getContext());
                     drawPathAsyncTask.setProgressDialog(new ProgressDialog(getContext()));
+                    drawPathAsyncTask.setCctvList(routeList);
                     drawPathAsyncTask.execute();
                 }
             }

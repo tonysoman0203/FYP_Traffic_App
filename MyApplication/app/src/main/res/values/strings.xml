@@ -29,6 +29,11 @@
         <item>22.279703 113.939074</item>
     </string-array>
 
+    <string-array name="distance_options">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
     <string name="rss_Weather">Weather</string>
     <string name="rss_Location">Location：</string>
     <string name="rss_Temperature">Temperature</string>
@@ -138,4 +143,5 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="km">km</string>
+    <string name="nearKm">Near Distance in Km</string>
 </resources>
