@@ -39,6 +39,7 @@ public class BaseActivity extends AppCompatActivity {
         myApplication.list = loadCache("ImageList");
         myApplication.speedMaps = loadCache("SpeedMap");
         initImageLoader();
+        initNearLocationInKm();
         //initialize SQLLite
         //sqLiteDatabase = SQLiteHelper.getDatabase(this);
         sqLiteHelper = new SQLiteHelper(this);
@@ -69,8 +70,9 @@ public class BaseActivity extends AppCompatActivity {
         MyApplication.CURR_LANG = lang;
     }
 
-    private void initStaticData(){
-
+    private void initNearLocationInKm(){
+        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                new StoreObject<>(false, MyApplication.KEY_NEAR_IN_KM, 2), ShareStorage.SP.PrivateData, getBaseContext());
     }
 
 

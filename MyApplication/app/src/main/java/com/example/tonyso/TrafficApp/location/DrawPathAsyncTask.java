@@ -97,9 +97,11 @@ public class DrawPathAsyncTask extends AsyncTask<Void, Void, List<Map<String, Ob
 
     private List<Map<String, Object>> getMapList(String json) {
         List<Map<String, Object>> list = new ArrayList<>();
+
         Map<String, Object> pathsMap = new HashMap<>();
         Map<String, Object> routeCCTVMap = new HashMap<>();
         Map<String, Object> DDMap = new HashMap<>();
+
         String[] disDur = new String[]{getDistance(json), getDuration(json)};
         DDMap.put(KET_DISTANCE, disDur);
         List<Double[]> path = drawPath(json);

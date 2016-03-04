@@ -17,6 +17,7 @@ public class MyApplication extends Application{
     public static final String Language_UserPref = "UserPref";
     public static final String WIFI = "WIFI";
     public static String CURR_LANG;
+    public static String KEY_NEAR_IN_KM = "KEY_NEAR_IN_KM";
     public List<RouteCCTV> list ;
     public List<RouteSpeedMap> speedMaps;
     public String locate;

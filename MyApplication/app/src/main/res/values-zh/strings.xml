@@ -62,7 +62,23 @@
     <string name="route_suggest_end">目的地</string>
     <string name="route_suggest_notice">請稍候…</string>
     <string name="distance">距離:</string>
-    <string name="nearKm">附近位置(公里)</string>
+    <string name="nearKm">設置附近位置(公里)</string>
     <string name="km">公里</string>
+
+    <string-array name="distance_options">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="distance_options_entries">
+        <item>1 公里</item>
+        <item>2 公里</item>
+        <item>3 公里</item>
+    </string-array>
+    <string name="title_routeSuggest">路線建議</string>
+    <string name="title_activity_traffic_info_detail_scrolling">詳細實時資料</string>
+    <string name="nav_map_default">正常</string>
+    <string name="lastUpdatedTime">最後更新於：</string>
 
 </resources>

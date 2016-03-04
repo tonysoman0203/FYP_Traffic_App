@@ -10,6 +10,7 @@
         android:dialogTitle="@string/km"
         android:key="distance"
         android:title="@string/nearKm"
+        android:entries="@array/distance_options_entries"
         android:entryValues="@array/distance_options"
         android:summary="" />
 

@@ -3,10 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView"
+
+    <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="This is a Home Page" />
+        android:id="@+id/view"
+        android:layout_gravity="left|top"
+        >
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/list_near" />
+    </android.support.v4.widget.SwipeRefreshLayout>
+
 </FrameLayout>

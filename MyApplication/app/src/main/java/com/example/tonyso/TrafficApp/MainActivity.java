@@ -49,6 +49,8 @@ import com.example.tonyso.TrafficApp.location.GPSLocationFinder;
 import com.example.tonyso.TrafficApp.rss_xml_feed.RssReader;
 import com.example.tonyso.TrafficApp.utility.DateTime;
 import com.example.tonyso.TrafficApp.utility.LanguageSelector;
+import com.example.tonyso.TrafficApp.utility.ShareStorage;
+import com.example.tonyso.TrafficApp.utility.StoreObject;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -56,6 +58,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.model.LatLng;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.Locale;
@@ -473,10 +476,16 @@ public class MainActivity extends BaseActivity
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
-            Log.d(TAG, String.valueOf(mLastLocation.getLatitude()));
-            Log.d(TAG, String.valueOf(mLastLocation.getLongitude()));
-            Log.d(TAG, "Speed: " + mLastLocation.getSpeed());
-            Log.d(TAG + "getAccuracy: ", String.valueOf(mLastLocation.getAccuracy()));
+            //Log.d(TAG, String.valueOf(mLastLocation.getLatitude()));
+            //Log.d(TAG, String.valueOf(mLastLocation.getLongitude()));
+            //Log.d(TAG, "Speed: " + mLastLocation.getSpeed());
+            //Log.d(TAG + "getAccuracy: ", String.valueOf(mLastLocation.getAccuracy()));
+            LatLng latLng = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
+
+            ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                    new StoreObject<Object>(false, "lat", latLng.latitude), ShareStorage.SP.ProtectedData, this);
+            ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                    new StoreObject<Object>(false, "lng", latLng.longitude), ShareStorage.SP.ProtectedData, this);
 
             if (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH)) {
                 gpsLocationFinder.convertLatLongToAddress(mLastLocation,ENG);

@@ -130,7 +130,27 @@ public class SettingsActivity extends BaseActivity {
         }
 
         private void setDefaultNearLocationPreference() {
+            int km = ShareStorage.getInteger(MyApplication.KEY_NEAR_IN_KM, ShareStorage.SP.PrivateData,getActivity());
+            System.out.println("The km is " + km);
+            Log.e("length", "" + distancePref.getEntries().length);
 
+            distancePref.setValueIndex((km - 1));
+            distancePref.setSummary(km + " " + getString(R.string.km));
+
+            distancePref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    Log.e("object", "Object Value=" + newValue.toString());
+                    ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                            new StoreObject<Object>(true, MyApplication.KEY_NEAR_IN_KM,
+                                    Integer.parseInt((String) newValue)), ShareStorage.SP.PrivateData, getActivity());
+
+                    int newKm = Integer.parseInt(newValue.toString());
+                    distancePref.setValueIndex(newKm-1);
+                    distancePref.setSummary(newKm + " " + getString(R.string.km));
+                    return true;
+                }
+            });
         }
 
         private void setDefaultUserPreference() {

@@ -34,6 +34,14 @@
         <item>2</item>
         <item>3</item>
     </string-array>
+
+    <string-array name="distance_options_entries">
+        <item>1 km</item>
+        <item>2 km</item>
+        <item>3 km</item>
+    </string-array>
+
+
     <string name="rss_Weather">Weather</string>
     <string name="rss_Location">Location：</string>
     <string name="rss_Temperature">Temperature</string>
@@ -50,7 +58,7 @@
     <string name="alert_box_title_language_choice">Language</string>
     <string name="Language">Language</string>
     <string name="language_alert">You have already chosen %s. Please choose again.</string>
-    <string name="language_alert_zh">你已經選擇 繁體中文 了. 請重新選擇。</string>
+    <string name="language_alert_zh" translatable="false">你已經選擇 繁體中文 了. 請重新選擇。</string>
     <string name="language_choice">language</string>
     <string-array name="language_options">
         <item>English</item>
@@ -143,5 +151,5 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="km">km</string>
-    <string name="nearKm">Near Distance in Km</string>
+    <string name="nearKm">Set Near Distance in Km</string>
 </resources>
