@@ -1,6 +1,5 @@
 package com.example.tonyso.TrafficApp.fragment;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.MainActivity;
@@ -22,7 +20,6 @@ import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
 import com.example.tonyso.TrafficApp.location.LatLngConverter;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.utility.ShareStorage;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.text.DecimalFormat;
@@ -78,12 +75,19 @@ public class Tab_Home_Fragment extends BaseFragment {
         swipeRefreshLayout.setOnRefreshListener(mOnRefreshListener);
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        swipeRefreshLayout.setOnRefreshListener(null);
+    }
+
     private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
             List<RouteCCTV> cctvs = getNearCCTVLocation();
+            homeAdapter = new HomeAdapter();
             SortedList<RouteCCTV> sortedList = getSortedList(cctvs);
-            homeAdapter = new HomeAdapter(sortedList);
+            homeAdapter.setSortedList(sortedList);
             recyclerView.setAdapter(homeAdapter);
             swipeRefreshLayout.setRefreshing(false);
         }
@@ -96,19 +100,9 @@ public class Tab_Home_Fragment extends BaseFragment {
             @Override
             public void run() {
                 swipeRefreshLayout.setRefreshing(true);
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 mOnRefreshListener.onRefresh();
             }
         });
-    }
-
-    @Override
-    public Context getContext() {
-        return super.getContext();
     }
 
     public List<RouteCCTV> getNearCCTVLocation() {
@@ -131,7 +125,6 @@ public class Tab_Home_Fragment extends BaseFragment {
                 RouteCCTV cctv = list.get(index);
                 cctv.setDistance(String.valueOf(new DecimalFormat("#.##").format(distance)));
                 nearCCTVLocation.add(list.get(index));
-                //list.remove(index);
             }
         }
         return nearCCTVLocation;
@@ -148,22 +141,22 @@ public class Tab_Home_Fragment extends BaseFragment {
 
             @Override
             public void onInserted(int position, int count) {
-
+                homeAdapter.notifyItemRangeInserted(position, count);
             }
 
             @Override
             public void onRemoved(int position, int count) {
-
+                homeAdapter.notifyItemRangeRemoved(position, count);
             }
 
             @Override
             public void onMoved(int fromPosition, int toPosition) {
-
+                homeAdapter.notifyItemMoved(fromPosition, toPosition);
             }
 
             @Override
             public void onChanged(int position, int count) {
-
+                homeAdapter.notifyItemRangeChanged(position, count);
             }
 
             @Override
@@ -184,35 +177,35 @@ public class Tab_Home_Fragment extends BaseFragment {
 
 
     private class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder>{
+        private SortedList<RouteCCTV> sortedList;
 
-        SortedList<RouteCCTV>cctvList;
-
-        public HomeAdapter(SortedList<RouteCCTV> nearCCTVLocation) {
-            this.cctvList = nearCCTVLocation;
-
+        public HomeAdapter() {
         }
 
         @Override
         public HomeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_sugggest_cctv_list,parent,false);
-            HomeViewHolder homeViewHolder = new HomeViewHolder(view);
-            return homeViewHolder;
+            return new HomeViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(HomeViewHolder holder, int position) {
-            String url = TRAFFIC_URL + cctvList.get(position).getRef_key() + ".JPG";
+            String url = TRAFFIC_URL + sortedList.get(position).getRef_key() + ".JPG";
             imageLoader.displayImage(url, holder.cctvImage, displayImageOptions);
-            holder.title.setText(cctvList.get(position).getDescription()[1]);
-            holder.distance.setText(String.format("%s:%s %s",
+            holder.title.setText(sortedList.get(position).getDescription()[1]);
+            holder.distance.setText(String.format("%s %s %s",
                     getResources().getString(R.string.distance),
-                    cctvList.get(position).getDistance(),
+                    sortedList.get(position).getDistance(),
                     getResources().getString(R.string.km)));
         }
 
         @Override
         public int getItemCount() {
-            return cctvList.size();
+            return sortedList.size();
+        }
+
+        public void setSortedList(SortedList<RouteCCTV> sortedList) {
+            this.sortedList = sortedList;
         }
     }
 

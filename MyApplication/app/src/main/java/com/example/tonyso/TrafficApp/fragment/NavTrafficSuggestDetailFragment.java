@@ -174,6 +174,7 @@ public class NavTrafficSuggestDetailFragment extends BaseDialogFragment {
     private void setTabFragmentPagerAdapter() {
         fragments = getFragments();
         TabFragmentPagerAdapter mSectionsPagerAdapter = new TabFragmentPagerAdapter(getChildFragmentManager(), fragments);
+        viewPager.setOffscreenPageLimit(mSectionsPagerAdapter.getCount());
         viewPager.setAdapter(mSectionsPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
         setupTabLayoutIcon(tabLayout);

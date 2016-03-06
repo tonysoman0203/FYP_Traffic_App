@@ -3,7 +3,6 @@
     <string name="app_name">交通實時通</string>
 
     <string name="Refresh">重新下載／更新</string>
-    <string name="Degree_ZH"> 度</string>
     <string name="action_settings">我的設定</string>
     <string name="date">日期 ：</string>
     <string name="rss_Location">現時位置： </string>
@@ -25,7 +24,6 @@
     <string name="nav_real_traffic">交通實況</string>
     <string name="nav_suggestion">路線建議</string>
     <string name="language_choice">語言</string>
-    <string name="DegreeSign">\u2103</string>
     <string name="pref_title_Language">語言</string>
     <string name="alert_box_title_language_choice">語言</string>
     <string name="title_activity_settings">設定</string>
@@ -80,5 +78,12 @@
     <string name="title_activity_traffic_info_detail_scrolling">詳細實時資料</string>
     <string name="nav_map_default">正常</string>
     <string name="lastUpdatedTime">最後更新於：</string>
+    <string name="bookmark_delete">刪除書籤</string>
+    <string name="history_record_delete">刪除歷史記錄</string>
+    <string name="route_suggest_destination_set">設定為目的地</string>
+    <string name="route_suggest_origin_set">設定為起點</string>
+    <string name="route_suggest_btnSubmit">確定</string>
+    <string name="route_suggest_btnReset">重設</string>
+    <string name="popup_share">分享</string>
 
 </resources>

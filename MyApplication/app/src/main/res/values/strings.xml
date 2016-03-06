@@ -80,7 +80,7 @@
     <string name="date">Date : </string>
     <string name="HUMIDITY_TAG" translatable="false">Relative Humidity :</string>
     <string name="WEATHER_TAG" translatable="false">Air temperature : </string>
-    <string name="Degree"> degrees Celsius</string>
+    <string name="Degree" translatable="false"> degrees Celsius</string>
     <string name="DegreeSign" translatable="false">\u2103</string>
     <string name="WEATHER_TAG_ZH" translatable="false">氣 溫 ：</string>
     <string name="HUMIDITY_TAG_ZH" translatable="false">相 對 濕 度 ：</string>
@@ -148,8 +148,7 @@
     <string name="route_suggest_car">Car</string>
     <string name="route_suggest_cctv">CCTV</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- TODO: Near Distance Km -->
     <string name="km">km</string>
     <string name="nearKm">Set Near Distance in Km</string>
 </resources>
