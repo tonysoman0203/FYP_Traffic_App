@@ -17,7 +17,7 @@ import com.example.tonyso.TrafficApp.MainActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
-import com.example.tonyso.TrafficApp.location.LatLngConverter;
+import com.example.tonyso.TrafficApp.utility.LatLngConverter;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.utility.ShareStorage;
 import com.google.android.gms.maps.model.LatLng;

@@ -12,6 +12,7 @@ import com.example.tonyso.TrafficApp.fragment.NavTrafficSuggestFragment;
 import com.example.tonyso.TrafficApp.model.Place;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.utility.ErrorDialog;
+import com.example.tonyso.TrafficApp.utility.LatLngConverter;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;

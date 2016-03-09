@@ -45,9 +45,6 @@ public class NavSuggestMapFragment extends BaseFragment
     private View view;
     GoogleMap mMap;
 
-    private Place origin, destination;
-    public static boolean isPathReady;
-
     private String[] distance;
 
     public NavSuggestMapFragment() {
@@ -78,8 +75,8 @@ public class NavSuggestMapFragment extends BaseFragment
         super.onCreate(savedInstanceState);
         getInstance();
         if (getArguments() != null) {
-            origin = (Place) getArguments().getSerializable(ARG_PARAM1);
-            destination = (Place) getArguments().getSerializable(ARG_PARAM2);
+            Place origin = (Place) getArguments().getSerializable(ARG_PARAM1);
+            Place destination = (Place) getArguments().getSerializable(ARG_PARAM2);
             distance = getArguments().getStringArray(ARG_DIS);
             pathsInDouble = (ArrayList<Double[]>) getArguments().getSerializable(ARG_PATHS);
             cctvList = (ArrayList<RouteCCTV>)getArguments().getSerializable(ARG_CCTV);

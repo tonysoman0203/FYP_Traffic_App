@@ -17,6 +17,7 @@ import com.example.tonyso.TrafficApp.model.RouteCCTV;
 
 import java.util.ArrayList;
 
+import jp.wasabeef.recyclerview.animators.FadeInLeftAnimator;
 import jp.wasabeef.recyclerview.animators.SlideInDownAnimator;
 
 /**
@@ -36,10 +37,6 @@ public class NavTrafficSuggestCCTVFragment extends BaseFragment {
     private RecyclerView recyclerView;
     private View view;
     private ArrayList<RouteCCTV> list;
-
-    private Place origin;
-    private Place destination;
-    private String[] distanceAndDuration;
 
     public NavTrafficSuggestCCTVFragment() {
         // Required empty public constructor
@@ -67,9 +64,9 @@ public class NavTrafficSuggestCCTVFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         getInstance();
         if (getArguments() != null) {
-            origin = (Place) getArguments().getSerializable(ARG_PARAM1);
-            destination = (Place) getArguments().getSerializable(ARG_PARAM2);
-            distanceAndDuration = getArguments().getStringArray(ARG_PARAM3);
+            Place origin = (Place) getArguments().getSerializable(ARG_PARAM1);
+            Place destination = (Place) getArguments().getSerializable(ARG_PARAM2);
+            String[] distanceAndDuration = getArguments().getStringArray(ARG_PARAM3);
             list = (ArrayList<RouteCCTV>)getArguments().getSerializable(ARG_CCTV);
         }
     }
@@ -101,7 +98,7 @@ public class NavTrafficSuggestCCTVFragment extends BaseFragment {
     private void onViewInitialize(View view) {
         recyclerView = (RecyclerView) view.findViewById(R.id.cctvlist);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setItemAnimator(new SlideInDownAnimator());
+        recyclerView.setItemAnimator(new FadeInLeftAnimator());
         CCTVListAdapter cctvListAdapter = new CCTVListAdapter(list, getContext());
         cctvListAdapter.setImageLoader(getImageLoader());
         cctvListAdapter.setDisplayImageOptions(getImageOptions());

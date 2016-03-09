@@ -1,4 +1,4 @@
-package com.example.tonyso.TrafficApp.location;
+package com.example.tonyso.TrafficApp.utility;
 
 import com.google.android.gms.maps.model.LatLng;
 

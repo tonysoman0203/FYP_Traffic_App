@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -17,8 +18,10 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.tonyso.TrafficApp.adapter.InfoDetailAdapter;
 import com.example.tonyso.TrafficApp.fragment.Nav_TrafficFragment;
@@ -67,11 +70,10 @@ public class InfoDetailActivity extends AppCompatActivity
     CollapsingToolbarLayout collapsingToolbarLayout;
     //Variable
     ImageView imageRoute;
-    TextView txtSubtitle,title;
+    TextView txtSubtitle, title;
     String imageKey;
     Intent intent;
     RouteCCTV route;
-    Bitmap routeImg =null;
     //Instance
     LanguageSelector languageSelector;
     //Action
@@ -85,6 +87,8 @@ public class InfoDetailActivity extends AppCompatActivity
     FragmentManager fm;
     ImageLoader imageLoader;
     DisplayImageOptions displayImageOptions;
+
+
     // Bool to track whether the app is already resolving an error
     private boolean mResolvingError = false;
 
@@ -120,12 +124,12 @@ public class InfoDetailActivity extends AppCompatActivity
         mGoogleApiClient.connect();
     }
 
-    private void initLayoutComponents(){
+    private void initLayoutComponents() {
         setToolbar();
         //init ImageView
-        imageRoute = (ImageView)findViewById(R.id.header);
-        recyclerView = (RecyclerView)findViewById(R.id.content_traffic).findViewById(R.id.recyclerview);
-        coordinatorLayout = (CoordinatorLayout)findViewById(R.id.coordinate_layout);
+        imageRoute = (ImageView) findViewById(R.id.header);
+        recyclerView = (RecyclerView) findViewById(R.id.content_traffic).findViewById(R.id.recyclerview);
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinate_layout);
         infoDetailAdapter = new InfoDetailAdapter()
                 .setGoogleApiClient(mGoogleApiClient)
                 .setContext(this)
@@ -143,23 +147,30 @@ public class InfoDetailActivity extends AppCompatActivity
         fadeInAnimator.setMoveDuration(1000);
         recyclerView.setItemAnimator(fadeInAnimator);
         recyclerView.setAdapter(infoDetailAdapter);
-//
-//        Uri gmmIntentUri = Uri.parse("geo:" + sortedList.get(getAdapterPosition()).getLatlngs().latitude + "," + sortedList.get(getAdapterPosition()).getLatlngs().longitude + "?z=19");
-//        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-//        mapIntent.setPackage("com.google.android.apps.maps");
-//        context.startActivity(mapIntent);
+
     }
 
-    private void setToolbar(){
+    private void setToolbar() {
         //setting Toolbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //Combined Toolbar into CollapsingToolbar Layout
-        collapsingToolbarLayout = (CollapsingToolbarLayout)findViewById(R.id.toolbar_layout);
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
-        title = (TextView)findViewById(R.id.traffic_info_title);
-        txtSubtitle = (TextView)findViewById(R.id.traffic_info_subtitle);
+        title = (TextView) findViewById(R.id.traffic_info_title);
+        txtSubtitle = (TextView) findViewById(R.id.traffic_info_subtitle);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(InfoDetailActivity.this, "Show in Google Map ", Toast.LENGTH_SHORT).show();
+                Uri gmmIntentUrl = Uri.parse("geo:" + route.getLatLngs()[0] + "," + route.getLatLngs()[1] + "?z=19");
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUrl);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                startActivity(mapIntent);
+            }
+        });
 
         if (languageSelector.getLanguage().equals(MyApplication.Language.ZH_HANT)) {
             collapsingToolbarLayout.setTitle(route.getDescription()[1]);
@@ -172,7 +183,7 @@ public class InfoDetailActivity extends AppCompatActivity
         }
     }
 
-    private void getInstance(){
+    private void getInstance() {
         //Getting Instance and Cache
         languageSelector = LanguageSelector.getInstance(this);
         sqLiteHelper = new SQLiteHelper(this);
@@ -226,9 +237,9 @@ public class InfoDetailActivity extends AppCompatActivity
     }
 
     /**
-     *  Getting Data From Previous Fragment {{@link Nav_TrafficFragment}}
+     * Getting Data From Previous Fragment {{@link Nav_TrafficFragment}}
      */
-    private void getDataFromIntent(){
+    private void getDataFromIntent() {
         intent = getIntent();
         String intent_type = intent.getStringExtra("type");
         if (intent_type != null) {
