@@ -102,26 +102,13 @@ public class SettingsActivity extends BaseActivity {
             user_lang_pref = languageSelector.getLanguage();
             listPreference = (ListPreference) findPreference("LanguageList");
             distancePref = (ListPreference) findPreference("distance");
-            //  optOutPref.setTitle((String)ShareStorage.retrieveData("Optout", ShareStorage.DataType.STRING).getValue());
             listPreference.setTitle(getString(R.string.pref_title_Language));
-
-            /*listPreference.setTitle((CharSequence) ShareStorage.retrieveData("Language",
-                    ShareStorage.DataType.STRING, ShareStorage.SP.Locale, this.getActivity()).getValue());
-            ShareStorage.retrieveData("Language", ShareStorage.DataType.STRING, ShareStorage.SP.Locale, this.getActivity());
-            */
 
             listPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
-//                    String key = preference.getKey();
                     int valueIndex = Integer.parseInt((String) newValue);
-                    // if (listPreference.getEntry().toString().equals("English") || listPreference.getEntry().toString().equals(getString(R.string.English_In_Chinese))) {
                     changeLanguage(valueIndex, preference);
-                    // getActivity().recreate();
-                    //  } else {
-                    //     changeLanguage(valueIndex, preference);
-                    // getActivity().recreate();
-                    //}
                     return true;
                 }
             });
@@ -144,7 +131,7 @@ public class SettingsActivity extends BaseActivity {
                     ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
                             new StoreObject<Object>(true, MyApplication.KEY_NEAR_IN_KM,
                                     Integer.parseInt((String) newValue)), ShareStorage.SP.PrivateData, getActivity());
-
+                    MyApplication.KM_IN_NEAR = Integer.valueOf((String) newValue);
                     int newKm = Integer.parseInt(newValue.toString());
                     distancePref.setValueIndex(newKm-1);
                     distancePref.setSummary(newKm + " " + getString(R.string.km));
@@ -188,19 +175,13 @@ public class SettingsActivity extends BaseActivity {
         }
 
         private void setUserPreferenceLanguage(int valueIndex) {
+            Resources res = getResources();
             if (valueIndex == 0) {
-                //
-                Resources res = getResources();
-                // Change locale settings in the app.
                 DisplayMetrics dm = res.getDisplayMetrics();
                 android.content.res.Configuration conf = res.getConfiguration();
                 conf.locale = new Locale(MyApplication.Language.ENGLISH);
                 res.updateConfiguration(conf, dm);
-
             } else {
-                //
-                Resources res = getResources();
-                // Change locale settings in the app.
                 DisplayMetrics dm = res.getDisplayMetrics();
                 android.content.res.Configuration conf = res.getConfiguration();
                 conf.locale = new Locale(MyApplication.Language.ZH_HANT);
@@ -211,10 +192,7 @@ public class SettingsActivity extends BaseActivity {
         private void changeLanguage(int valueIndex, Preference pref) {
             ListPreference listPreference = (ListPreference) pref;
             CharSequence listDesc = listPreference.getEntry();
-
-
-            String trim = convertor(listDesc.toString());
-
+            String trim = languageConvertor(listDesc.toString());
             Log.e("Share Pref", user_lang_pref);
             Log.e("Value in List Pref", listDesc.toString());
             Log.e("Trim", trim);
@@ -224,7 +202,7 @@ public class SettingsActivity extends BaseActivity {
                         listPreference = (ListPreference) pref;
                         listDesc = listPreference.getEntries()[0];
                         Log.e("Value",listDesc.toString());
-                        trim = convertor(listDesc.toString());
+                        trim = languageConvertor(listDesc.toString());
                         if (trim.equals(user_lang_pref)) {
                             displaySnackBar(listDesc.toString());
                         }else{
@@ -246,7 +224,7 @@ public class SettingsActivity extends BaseActivity {
                             listPreference = (ListPreference) pref;
                             listDesc = listPreference.getEntries()[1];
                             Log.e("Value",listDesc.toString());
-                            trim = convertor(listDesc.toString());
+                            trim = languageConvertor(listDesc.toString());
                                 if (trim.equals(user_lang_pref)) {
                                     displaySnackBar(listDesc.toString());
                                 } else {
@@ -294,7 +272,7 @@ public class SettingsActivity extends BaseActivity {
             getActivity().finish();
         }
 
-        private String convertor(String s){
+        private String languageConvertor(String s) {
             if (s.equals(getString(R.string.English))) {
                 return MyApplication.Language.ENGLISH;
             } else {

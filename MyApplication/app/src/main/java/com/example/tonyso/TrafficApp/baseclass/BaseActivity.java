@@ -4,6 +4,7 @@ import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.rss_xml_feed.XMLReader;
@@ -26,6 +27,7 @@ import java.util.Locale;
  */
 public class BaseActivity extends AppCompatActivity {
 
+    private static final String TAG = BaseActivity.class.getCanonicalName();
     //String currLang;
     public static SQLiteDatabase sqLiteDatabase;
     public static SQLiteHelper sqLiteHelper;
@@ -71,8 +73,19 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     private void initNearLocationInKm(){
-        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
-                new StoreObject<>(false, MyApplication.KEY_NEAR_IN_KM, 2), ShareStorage.SP.PrivateData, getBaseContext());
+        int KM_IN_DEVICE = (Integer) ShareStorage.retrieveData(MyApplication.KEY_NEAR_IN_KM,
+                ShareStorage.DataType.INTEGER, ShareStorage.SP.PrivateData, getBaseContext()).getValue();
+        Log.d(TAG, "THE KM-IN_DEVICE = " + KM_IN_DEVICE);
+        int km;
+        if (KM_IN_DEVICE != 2) {
+            km = KM_IN_DEVICE;
+        } else {
+            km = 2;
+            ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                    new StoreObject<>(false, MyApplication.KEY_NEAR_IN_KM,
+                            km), ShareStorage.SP.PrivateData, getBaseContext());
+        }
+        MyApplication.KM_IN_NEAR = km;
     }
 
 

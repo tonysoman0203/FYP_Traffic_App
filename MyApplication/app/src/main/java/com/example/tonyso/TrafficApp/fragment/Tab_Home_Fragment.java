@@ -1,24 +1,31 @@
 package com.example.tonyso.TrafficApp.fragment;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.tonyso.TrafficApp.InfoDetailActivity;
 import com.example.tonyso.TrafficApp.MainActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
-import com.example.tonyso.TrafficApp.utility.LatLngConverter;
+import com.example.tonyso.TrafficApp.listener.OnItemClickListener;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
+import com.example.tonyso.TrafficApp.utility.LatLngConverter;
 import com.example.tonyso.TrafficApp.utility.ShareStorage;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -29,7 +36,7 @@ import java.util.List;
 /**
  * Created by TonySo on 11/1/16.
  */
-public class Tab_Home_Fragment extends BaseFragment {
+public class Tab_Home_Fragment extends BaseFragment implements OnItemClickListener {
 
     private static final String TAG = Tab_Home_Fragment.class.getSimpleName();
     RecyclerView recyclerView;
@@ -88,6 +95,7 @@ public class Tab_Home_Fragment extends BaseFragment {
             homeAdapter = new HomeAdapter();
             SortedList<RouteCCTV> sortedList = getSortedList(cctvs);
             homeAdapter.setSortedList(sortedList);
+            homeAdapter.setOnItemClickListener(Tab_Home_Fragment.this);
             recyclerView.setAdapter(homeAdapter);
             swipeRefreshLayout.setRefreshing(false);
         }
@@ -108,11 +116,11 @@ public class Tab_Home_Fragment extends BaseFragment {
     public List<RouteCCTV> getNearCCTVLocation() {
         List<RouteCCTV> nearCCTVLocation = new ArrayList<>();
         List<RouteCCTV> list = routeList;
-        int kmFromSp = ShareStorage.getInteger(MyApplication.KEY_NEAR_IN_KM, ShareStorage.SP.PrivateData, getContext());
-
+        int kmFromSp = MyApplication.KM_IN_NEAR;
+        Log.d(TAG, "KM In Share Pref. = " + kmFromSp);
         double lat = 0,lng = 0;
 
-        if (MainActivity.getmGoogleApiClient()!=null){
+        if (MainActivity.getmGoogleApiClient().isConnected()) {
             lat = Double.parseDouble(ShareStorage.retrieveData("lat", ShareStorage.SP.ProtectedData, getContext()));
             lng = Double.parseDouble(ShareStorage.retrieveData("lng", ShareStorage.SP.ProtectedData, getContext()));
         }
@@ -120,7 +128,7 @@ public class Tab_Home_Fragment extends BaseFragment {
 
         for(int index = 0;index<list.size();index++){
             LatLng target = new LatLng(list.get(index).getLatLngs()[0],list.get(index).getLatLngs()[1]);
-            double distance = LatLngConverter.getDistanceFromLatLngInKm(currentLocationInLatLng,target);
+            double distance = LatLngConverter.getDistanceFromLatLngInKm(currentLocationInLatLng, target);
             if (distance <= kmFromSp) {
                 RouteCCTV cctv = list.get(index);
                 cctv.setDistance(String.valueOf(new DecimalFormat("#.##").format(distance)));
@@ -175,17 +183,39 @@ public class Tab_Home_Fragment extends BaseFragment {
         return sortedList;
     }
 
+    @Override
+    public void onClick(int position, boolean isLongClick) {
+        if (!isLongClick) {
+            final Intent intent = new Intent(getActivity(), InfoDetailActivity.class);
+            final String title = (MyApplication.CURR_LANG.equals(MyApplication.Language.ZH_HANT)) ?
+                    homeAdapter.getSortedList().get(position).getDescription()[1] :
+                    homeAdapter.getSortedList().get(position).getDescription()[0];
+            Log.e(TAG, title);
+            intent.putExtra("key", title);
+            intent.putExtra(title, homeAdapter.getSortedList().get(position));
+            intent.putExtra("type", InfoDetailActivity.ADD_ROUTE_TYPE);
+            FragmentManager fragmentManager = getChildFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.addToBackStack(TAG).commit();
+            startActivity(intent);
+        }
+    }
 
     private class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder>{
         private SortedList<RouteCCTV> sortedList;
+        private OnItemClickListener onItemClickListener;
 
         public HomeAdapter() {
+        }
+
+        public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+            this.onItemClickListener = onItemClickListener;
         }
 
         @Override
         public HomeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_sugggest_cctv_list,parent,false);
-            return new HomeViewHolder(view);
+            return new HomeViewHolder(view, onItemClickListener);
         }
 
         @Override
@@ -207,17 +237,29 @@ public class Tab_Home_Fragment extends BaseFragment {
         public void setSortedList(SortedList<RouteCCTV> sortedList) {
             this.sortedList = sortedList;
         }
+
+        public SortedList<RouteCCTV> getSortedList() {
+            return sortedList;
+        }
     }
 
-    private class HomeViewHolder extends RecyclerView.ViewHolder {
+    private class HomeViewHolder extends RecyclerView.ViewHolder implements OnClickListener {
         ImageView cctvImage;
         TextView title, distance;
+        OnItemClickListener onItemClickListener;
 
-        public HomeViewHolder(View itemView) {
+        public HomeViewHolder(View itemView, OnItemClickListener onItemClickListener) {
             super(itemView);
             cctvImage = (ImageView) itemView.findViewById(R.id.cctv);
             title = (TextView) itemView.findViewById(R.id.txtCCTVName);
             distance = (TextView) itemView.findViewById(R.id.txtCCTVDistance);
+            this.onItemClickListener = onItemClickListener;
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            onItemClickListener.onClick(getAdapterPosition(), false);
         }
     }
 }

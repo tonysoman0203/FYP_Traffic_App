@@ -3,6 +3,7 @@ package com.example.tonyso.TrafficApp.utility;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
+import android.util.Log;
 
 import com.example.tonyso.TrafficApp.MyApplication;
 
@@ -61,6 +62,7 @@ public class ShareStorage {
             default:
                 break;
         }
+        Log.d(ShareStorage.class.getCanonicalName(), "Save 1 record into SP  with the value of " + storeObject.getValue().toString());
     }
 
     public static Boolean getBoolean(String key, String sp, Context context) {
@@ -90,8 +92,7 @@ public class ShareStorage {
 
     public static String retrieveData(String key, String sp, Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(sp, 0);
-        String string_value = decryption(sharedPreferences.getString(key, ""));
-        return string_value;
+        return decryption(sharedPreferences.getString(key, ""));
     }
 
     public static ArrayList<StoreObject<?>> retrieveDataArray(String Regexpattern, int datatype, String sp, Context context) {

@@ -158,7 +158,7 @@ public class MainActivity extends BaseActivity
         initToolBar();
         initNavigationDrawer();
         LabelFindViewById();
-        setMainFragment();
+
     }
 
     private void setMainFragment() {
@@ -251,7 +251,6 @@ public class MainActivity extends BaseActivity
     protected void onResume() {
         super.onResume();
         Log.i(MainActivity.class.getName(), "OnResume------@");
-        toolbar.setTitle(getString(R.string.app_name));
         setUpCountDownService();
 
         if (languageSelector.getLanguage().equals(MyApplication.Language.ZH_HANT)) {
@@ -263,7 +262,6 @@ public class MainActivity extends BaseActivity
         if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
             startLocationUpdates();
         }
-
     }
 
     /**
@@ -340,13 +338,6 @@ public class MainActivity extends BaseActivity
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(
@@ -371,9 +362,6 @@ public class MainActivity extends BaseActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         if (toggle.isDrawerIndicatorEnabled() &&
                 toggle.onOptionsItemSelected(item)) {
             return true;
@@ -427,8 +415,6 @@ public class MainActivity extends BaseActivity
                 startActivity(intent);
                 overridePendingTransition(R.anim.bs_list_layout_anim_in, R.anim.bs_list_item_in);
             }
-        } else if (id == R.id.nav_about) {
-
         } else if (id == R.id.nav_feedback) {
             FragmentManager fm = getSupportFragmentManager();
             FeedBackFragment fg = FeedBackFragment.newInstance("Feedback Form");
@@ -464,28 +450,19 @@ public class MainActivity extends BaseActivity
                 != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
-            //Log.d(TAG, String.valueOf(mLastLocation.getLatitude()));
-            //Log.d(TAG, String.valueOf(mLastLocation.getLongitude()));
-            //Log.d(TAG, "Speed: " + mLastLocation.getSpeed());
-            //Log.d(TAG + "getAccuracy: ", String.valueOf(mLastLocation.getAccuracy()));
             LatLng latLng = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
 
             ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
                     new StoreObject<Object>(false, "lat", latLng.latitude), ShareStorage.SP.ProtectedData, this);
             ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
                     new StoreObject<Object>(false, "lng", latLng.longitude), ShareStorage.SP.ProtectedData, this);
+
+            setMainFragment();
 
             if (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH)) {
                 gpsLocationFinder.convertLatLongToAddress(mLastLocation,ENG);

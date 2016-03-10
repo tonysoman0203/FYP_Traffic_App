@@ -52,7 +52,7 @@ public class CCTVListAdapter extends RecyclerView.Adapter<CCTVListAdapter.ViewHo
         String url = TRAFFIC_URL + routeCCTVList.get(position).getRef_key() + ".JPG";
         imageLoader.displayImage(url, holder.cctvImage, displayImageOptions);
         holder.title.setText(routeCCTVList.get(position).getDescription()[1]);
-        holder.distance.setText(String.format("%s:%s %s",
+        holder.distance.setText(String.format("%s %s %s",
                 getResources().getString(R.string.distance),
                 routeCCTVList.get(position).getDistance(),
                 getResources().getString(R.string.km)));

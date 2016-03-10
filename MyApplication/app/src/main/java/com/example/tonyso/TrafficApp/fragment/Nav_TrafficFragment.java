@@ -433,7 +433,7 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
                 imageLoader.displayImage(url, img, displayImageOptions);
             } else {
                 isImageLoaded = true;
-                markerSet.put(marker.getId(), isImageLoaded);
+                markerSet.put(marker.getId(), true);
                 imageLoader.displayImage(url, img, displayImageOptions, new CustomImageLoadingListener(marker));
             }
 

@@ -20,9 +20,9 @@
 
                 android:icon="@drawable/ic_settings_black_48dp"
                 android:title="@string/action_settings" />
-            <item android:id="@+id/nav_about"
-                android:icon="@drawable/ic_info_black_48dp"
-                android:title="@string/nav_about_us" />
+            <!--<item android:id="@+id/nav_about"-->
+            <!--android:icon="@drawable/ic_info_black_48dp"-->
+            <!--android:title="@string/nav_about_us" />-->
             <item android:id="@+id/nav_feedback"
 
                 android:icon="@drawable/ic_comment_black_48dp"
