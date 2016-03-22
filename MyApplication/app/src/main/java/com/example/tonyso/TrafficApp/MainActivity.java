@@ -44,6 +44,7 @@ import com.example.tonyso.TrafficApp.fragment.FeedBackFragment;
 import com.example.tonyso.TrafficApp.fragment.NavTrafficSuggestFragment;
 import com.example.tonyso.TrafficApp.fragment.Nav_TrafficFragment;
 import com.example.tonyso.TrafficApp.fragment.Tab_MainFragment;
+import com.example.tonyso.TrafficApp.gcm.GCMStartPreference;
 import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
 import com.example.tonyso.TrafficApp.location.GPSLocationFinder;
 import com.example.tonyso.TrafficApp.rss_xml_feed.RssReader;
@@ -111,6 +112,15 @@ public class MainActivity extends BaseActivity
             txtCurrTime.setText(currtime);
         }
     };
+    private boolean isReceiverRegistered;
+    private BroadcastReceiver mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean sentToken = Boolean.parseBoolean(ShareStorage.retrieveData(GCMStartPreference.SENT_TOKEN_TO_SERVER, "false", getBaseContext()));
+            Log.e(TAG,""+sentToken);
+        }
+    };
+
 
     public static void changeFragment(Fragment fragment, boolean doAddToBackStack) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -147,10 +157,11 @@ public class MainActivity extends BaseActivity
         myApplication = (MyApplication) getApplication();
         init();
 
-        boolean gplayStatus = checkPlayServices(this, PLAY_SERVICES_RESOLUTION_REQUEST);
-        if (gplayStatus) {
+        if (checkPlayServices(this, PLAY_SERVICES_RESOLUTION_REQUEST)) {
             buildGoogleApiClient();
             createLocationRequest();
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
         } else {
             Log.e(TAG, "Cannot Connect to Google Play Services");
         }
@@ -253,6 +264,9 @@ public class MainActivity extends BaseActivity
         Log.i(MainActivity.class.getName(), "OnResume------@");
         setUpCountDownService();
 
+
+        registerReceiver();
+
         if (languageSelector.getLanguage().equals(MyApplication.Language.ZH_HANT)) {
             txtCurrDate.setText(DateTime.initDate(ZH_HANT));
         } else {
@@ -319,13 +333,16 @@ public class MainActivity extends BaseActivity
 
     @Override
     protected void onPause() {
-        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+        isReceiverRegistered = false;
         stopService(broadCastTimerIntent);
         //stopService(ImageDownloadService);
         if (mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
             mGoogleApiClient.disconnect();
         }
+        super.onPause();
+
     }
 
     @Override
@@ -473,6 +490,14 @@ public class MainActivity extends BaseActivity
 
         if (mRequestingLocationUpdates) {
             startLocationUpdates();
+        }
+    }
+
+    private void registerReceiver(){
+        if(!isReceiverRegistered) {
+            LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                    new IntentFilter(GCMStartPreference.REGISTRATION_COMPLETE));
+            isReceiverRegistered = true;
         }
     }
 

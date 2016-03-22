@@ -72,6 +72,7 @@ public class BaseActivity extends AppCompatActivity {
         MyApplication.CURR_LANG = lang;
     }
 
+
     private void initNearLocationInKm(){
         int KM_IN_DEVICE = (Integer) ShareStorage.retrieveData(MyApplication.KEY_NEAR_IN_KM,
                 ShareStorage.DataType.INTEGER, ShareStorage.SP.PrivateData, getBaseContext()).getValue();
