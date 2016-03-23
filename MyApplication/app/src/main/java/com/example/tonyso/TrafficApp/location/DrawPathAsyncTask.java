@@ -138,6 +138,7 @@ public class DrawPathAsyncTask extends AsyncTask<Void, Void, List<Map<String, Ob
         RouteCCTV routeCCTV;
         for (LatLng latLng : paths) {
             for(int i = 0 ;i<cctvList.size();i++){
+                //find out the LatLng of the CCTVs in the whole route
                 LatLng lat = new LatLng(cctvList.get(i).getLatLngs()[0],cctvList.get(i).getLatLngs()[1]);
                 double diff = LatLngConverter.getDistanceFromLatLngInKm(latLng, lat);
                 Log.e(TAG, String.format("%.2f", diff));

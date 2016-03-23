@@ -23,6 +23,7 @@ public class MyApplication extends Application{
     public List<RouteSpeedMap> speedMaps;
     public String locate;
     StatusObserver timeStatusObserver;
+    public int _id;
 
 
     public MyApplication() {

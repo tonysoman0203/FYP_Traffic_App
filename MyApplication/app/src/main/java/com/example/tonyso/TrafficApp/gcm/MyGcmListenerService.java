@@ -28,6 +28,8 @@ import android.util.Log;
 
 import com.example.tonyso.TrafficApp.MainActivity;
 import com.example.tonyso.TrafficApp.R;
+import com.example.tonyso.TrafficApp.utility.ShareStorage;
+import com.example.tonyso.TrafficApp.utility.StoreObject;
 import com.google.android.gms.gcm.GcmListenerService;
 
 public class MyGcmListenerService extends GcmListenerService {
@@ -44,19 +46,35 @@ public class MyGcmListenerService extends GcmListenerService {
     // [START receive_message]
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        Log.e(TAG, "Received Msg From GCM +" + data.toString());
+        Log.e(TAG, "Received Msg From GCM : " + data.toString());
         String title = data.getString("title");
-        String $data = data.getString("success");
+        String $data = data.getString("message");
+        String flag = data.getString("flag");
+        String user_id = data.getString("user_id");
+        int id;
+        if (user_id == null) {
+            id = -1;
+        } else {
+            id = Integer.parseInt(data.getString("user_id"));
+        }
+
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Message: " + $data);
         Log.d(TAG, "title: " + title);
+        Log.d(TAG, "Flag: " + flag);
+        Log.d(TAG, "User ID = " + user_id);
 
         if (from.startsWith("/topics/")) {
             // message received from some topic.
-        } else {
+        } else if (flag != null && flag.equals("register")) {
             // normal downstream message.
+            ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                    new StoreObject<Object>(false, GCMStartPreference.TAG_ID, id), ShareStorage.SP.PrivateData, this);
+        } else if (flag != null && flag.equals("update")) {
+            // normal downstream message)
+            ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
+                    new StoreObject<Object>(false, GCMStartPreference.TAG_ID, id), ShareStorage.SP.PrivateData, this);
         }
-
         // [START_EXCLUDE]
         /**
          * Production applications would usually process the message here.
@@ -74,11 +92,6 @@ public class MyGcmListenerService extends GcmListenerService {
     }
     // [END receive_message]
 
-    /**
-     * Create and show a simple notification containing the received GCM message.
-     *
-     * @param message GCM message received.
-     */
     private void sendNotification(String title, String message) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

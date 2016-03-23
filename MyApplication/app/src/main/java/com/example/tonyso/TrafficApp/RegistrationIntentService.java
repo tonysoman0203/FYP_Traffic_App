@@ -21,7 +21,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -31,7 +30,8 @@ public class RegistrationIntentService extends IntentService {
 
     private static final String TAG = RegistrationIntentService.class.getCanonicalName();
     private static final String[] TOPICS = {"global"};
-
+    private boolean isTokenSendToServer = false;
+    private int clientId;
 
     public RegistrationIntentService() {
         super(TAG);
@@ -49,7 +49,7 @@ public class RegistrationIntentService extends IntentService {
                 Log.i(TAG, "GCM Registration Token: " + token);
 
                 //App Server註冊(回傳Token)
-                sendRegistrationToServer(token);
+                sendRegistrationToServer(token, getClientId());
                 //訂閱發怖主題
                 subscribeTopics(token);
                 // You should store a boolean that indicates whether the generated token has been
@@ -84,7 +84,7 @@ public class RegistrationIntentService extends IntentService {
         }
     }
 
-    private void sendRegistrationToServer(String token) {
+    private void sendRegistrationToServer(String token, int _id) {
         try {
             StringBuilder content = new StringBuilder();
             URL url = new URL("http://101.78.175.101:3480/php_gcm/registerGCM.php");
@@ -95,7 +95,8 @@ public class RegistrationIntentService extends IntentService {
             urlConnection.setDoInput(true);
             urlConnection.setDoOutput(true);
             Uri.Builder builder = new Uri.Builder()
-                    .appendQueryParameter("client_id", token);
+                    .appendQueryParameter("client_id", token)
+                    .appendQueryParameter("id", String.valueOf(_id));
             String query = builder.build().getEncodedQuery();
             Log.d(TAG, query);
             OutputStream os = urlConnection.getOutputStream();
@@ -114,11 +115,12 @@ public class RegistrationIntentService extends IntentService {
                 Log.d(TAG, "Received with " + content.append(line).append("\n").toString());
             }
             rd.close();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public int getClientId() {
+        return ShareStorage.getInteger(GCMStartPreference.TAG_ID, ShareStorage.SP.PrivateData, this);
+    }
 }
