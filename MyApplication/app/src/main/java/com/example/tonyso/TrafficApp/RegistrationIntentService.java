@@ -2,6 +2,7 @@ package com.example.tonyso.TrafficApp;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -12,21 +13,29 @@ import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Created by TonySo on 22/3/16.
  */
-public class RegistrationIntentService extends IntentService{
+public class RegistrationIntentService extends IntentService {
 
     private static final String TAG = RegistrationIntentService.class.getCanonicalName();
     private static final String[] TOPICS = {"global"};
 
 
-    public RegistrationIntentService(String name) {
-        super(name);
+    public RegistrationIntentService() {
+        super(TAG);
     }
-
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -35,7 +44,8 @@ public class RegistrationIntentService extends IntentService{
 
                 //向GCM註冊(產生Token)
                 InstanceID instanceID = InstanceID.getInstance(this);
-                String token = instanceID.getToken("Sender ID", GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+                String SENDER_ID = "649022348275";
+                String token = instanceID.getToken(SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
                 Log.i(TAG, "GCM Registration Token: " + token);
 
                 //App Server註冊(回傳Token)
@@ -75,7 +85,40 @@ public class RegistrationIntentService extends IntentService{
     }
 
     private void sendRegistrationToServer(String token) {
+        try {
+            StringBuilder content = new StringBuilder();
+            URL url = new URL("http://101.78.175.101:3480/php_gcm/registerGCM.php");
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setReadTimeout(10000);
+            urlConnection.setConnectTimeout(15000);
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setDoInput(true);
+            urlConnection.setDoOutput(true);
+            Uri.Builder builder = new Uri.Builder()
+                    .appendQueryParameter("client_id", token);
+            String query = builder.build().getEncodedQuery();
+            Log.d(TAG, query);
+            OutputStream os = urlConnection.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(os, "UTF-8"));
+            writer.write(query);
+            writer.flush();
+            writer.close();
+            os.close();
+            urlConnection.connect();
 
+            InputStream is = urlConnection.getInputStream();
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+            String line;
+            while ((line = rd.readLine()) != null) {
+                Log.d(TAG, "Received with " + content.append(line).append("\n").toString());
+            }
+            rd.close();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

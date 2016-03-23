@@ -5,6 +5,11 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <permission
+        android:name="com.example.tonyso.TrafficApp.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.example.tonyso.TrafficApp.permission.C2D_MESSAGE" />
+
     <!-- [START gcm_permission] -->
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -12,7 +17,7 @@
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the 'MyLocation' functionality. 
+         location permissions for the 'MyLocation' functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
@@ -75,6 +80,17 @@
             android:enabled="true"
             android:exported="true" />
 
+        <!-- START Added for GCM -->
+        <receiver
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="com.example.tonyso.TrafficApp" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".RegistrationIntentService"
             android:exported="false"/>
@@ -86,6 +102,7 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
+
         <service
             android:name=".gcm.MyInstanceIDListenerService"
             android:exported="false">
@@ -93,6 +110,9 @@
                 <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
         </service>
+
+        <!-- END Added for GCM -->
+
     </application>
 
 </manifest>
