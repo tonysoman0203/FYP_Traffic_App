@@ -1,7 +1,6 @@
 package com.example.tonyso.TrafficApp;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -37,7 +36,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
 import com.example.tonyso.TrafficApp.fragment.FeedBackFragment;
@@ -48,13 +46,13 @@ import com.example.tonyso.TrafficApp.gcm.GCMStartPreference;
 import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
 import com.example.tonyso.TrafficApp.location.GPSLocationFinder;
 import com.example.tonyso.TrafficApp.rss_xml_feed.RssReader;
+import com.example.tonyso.TrafficApp.utility.CommonUtil;
 import com.example.tonyso.TrafficApp.utility.DateTime;
 import com.example.tonyso.TrafficApp.utility.LanguageSelector;
 import com.example.tonyso.TrafficApp.utility.ShareStorage;
 import com.example.tonyso.TrafficApp.utility.StoreObject;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -157,7 +155,7 @@ public class MainActivity extends BaseActivity
         myApplication = (MyApplication) getApplication();
         init();
 
-        if (checkPlayServices(this, PLAY_SERVICES_RESOLUTION_REQUEST)) {
+        if (CommonUtil.checkPlayServices(this, PLAY_SERVICES_RESOLUTION_REQUEST)) {
             buildGoogleApiClient();
             createLocationRequest();
             Intent intent = new Intent(this, RegistrationIntentService.class);
@@ -276,27 +274,6 @@ public class MainActivity extends BaseActivity
         if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
             startLocationUpdates();
         }
-    }
-
-    /**
-     * Method to verify google play services on the device
-     */
-    public static boolean checkPlayServices(Activity context, int PLAY_SERVICES_RESOLUTION_REQUEST) {
-        int resultCode = GooglePlayServicesUtil
-                .isGooglePlayServicesAvailable(context);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, context,
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Toast.makeText(context,
-                        "This device is not supported.", Toast.LENGTH_LONG)
-                        .show();
-                context.finish();
-            }
-            return false;
-        }
-        return true;
     }
 
     @Override

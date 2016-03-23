@@ -28,7 +28,7 @@ import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
 import com.example.tonyso.TrafficApp.location.DrawPathAsyncTask;
 import com.example.tonyso.TrafficApp.location.GetLocationAsyncTask;
 import com.example.tonyso.TrafficApp.model.Place;
-import com.example.tonyso.TrafficApp.utility.Current;
+import com.example.tonyso.TrafficApp.utility.CommonUtil;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -176,10 +176,10 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
         imgCurrentLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                origin.setText(Current.getCurrentAddress(getContext()));
+                origin.setText(CommonUtil.getCurrentAddress(getContext()));
                 MarkerOptions markerOptions = new MarkerOptions()
-                        .title(Current.getCurrentAddress(getContext()).toString())
-                        .position(Current.getCurrentLocationByLatLng(getContext()));
+                        .title(CommonUtil.getCurrentAddress(getContext()).toString())
+                        .position(CommonUtil.getCurrentLocationByLatLng(getContext()));
                 mGoogleMap.addMarker(markerOptions);
             }
         });
@@ -193,10 +193,10 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
         snackbar.setAction(getString(R.string.route_suggestion_current), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                origin.setText(Current.getCurrentAddress(getContext()));
+                origin.setText(CommonUtil.getCurrentAddress(getContext()));
                 MarkerOptions markerOptions = new MarkerOptions()
-                        .title(Current.getCurrentAddress(getContext()).toString())
-                        .position(Current.getCurrentLocationByLatLng(getContext()));
+                        .title(CommonUtil.getCurrentAddress(getContext()).toString())
+                        .position(CommonUtil.getCurrentLocationByLatLng(getContext()));
                 mGoogleMap.addMarker(markerOptions);
                 animateDialogView(true);
             }
@@ -214,10 +214,10 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
         } else {
             place = new Place();
             place.setPlaceId("" + (place_ids++));
-            place.setName(Current.getCurrentLocationName(getContext()));
-            place.setAddress(Current.getCurrentAddress(getContext()));
-            place.setLatlngs(Current.getLatLngInDouble(getContext()));
-            place.setDistrict(Current.getCurrentDistrict(getContext()));
+            place.setName(CommonUtil.getCurrentLocationName(getContext()));
+            place.setAddress(CommonUtil.getCurrentAddress(getContext()));
+            place.setLatlngs(CommonUtil.getLatLngInDouble(getContext()));
+            place.setDistrict(CommonUtil.getCurrentDistrict(getContext()));
         }
         return place;
     }
@@ -231,10 +231,10 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
         snackbar.setAction(getString(R.string.route_suggestion_current), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                origin.setText(Current.getCurrentAddress(getContext()));
+                origin.setText(CommonUtil.getCurrentAddress(getContext()));
                 MarkerOptions markerOptions = new MarkerOptions()
-                        .title(Current.getCurrentAddress(getContext()).toString())
-                        .position(Current.getCurrentLocationByLatLng(getContext()));
+                        .title(CommonUtil.getCurrentAddress(getContext()).toString())
+                        .position(CommonUtil.getCurrentLocationByLatLng(getContext()));
                 mGoogleMap.addMarker(markerOptions);
                 animateDialogView(true);
             }
