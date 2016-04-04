@@ -7,23 +7,27 @@ import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.InflateException;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.tonyso.TrafficApp.adapter.InfoDetailAdapter;
+import com.example.tonyso.TrafficApp.baseclass.BaseDialogFragment;
 import com.example.tonyso.TrafficApp.fragment.Nav_TrafficFragment;
 import com.example.tonyso.TrafficApp.fragment.Tab_BookMarkFragment;
 import com.example.tonyso.TrafficApp.fragment.Tab_HistoryFragment;
@@ -43,7 +47,7 @@ import jp.wasabeef.recyclerview.animators.FadeInAnimator;
 
 //import android.support.v7.graphics.Palette;
 
-public class InfoDetailActivity extends AppCompatActivity
+public class InfoDetailActivity extends BaseDialogFragment
         implements GoogleApiClient.ConnectionCallbacks, OnConnectionFailedListener {
     //Constant
     public static final String TAG = InfoDetailActivity.class.getName();
@@ -91,19 +95,35 @@ public class InfoDetailActivity extends AppCompatActivity
 
     // Bool to track whether the app is already resolving an error
     private boolean mResolvingError = false;
+    private View view;
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(STATE_RESOLVING_ERROR, mResolvingError);
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        savedInstanceState.putBoolean(STATE_RESOLVING_ERROR, mResolvingError);
 
     }
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (view != null) {
+            ViewGroup parent = (ViewGroup) view.getParent();
+            if (parent != null)
+                parent.removeView(view);
+        }
+        try {
+            view = inflater.inflate(R.layout.fragment_nav_traffic_info_detail_main, container, false);
+        } catch (InflateException e) {
+            e.printStackTrace();
+        }
+        return view;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fm = getSupportFragmentManager();
-        setContentView(R.layout.fragment_nav_traffic_info_detail_main);
+        fm = getChildFragmentManager();
         mResolvingError = savedInstanceState != null
                 && savedInstanceState.getBoolean(STATE_RESOLVING_ERROR, false);
         buildGoogleApiClient();
@@ -115,7 +135,7 @@ public class InfoDetailActivity extends AppCompatActivity
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient
-                .Builder(this)
+                .Builder(this.getContext())
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
                 .addConnectionCallbacks(this)
@@ -127,9 +147,9 @@ public class InfoDetailActivity extends AppCompatActivity
     private void initLayoutComponents() {
         setToolbar();
         //init ImageView
-        imageRoute = (ImageView) findViewById(R.id.header);
-        recyclerView = (RecyclerView) findViewById(R.id.content_traffic).findViewById(R.id.recyclerview);
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinate_layout);
+        imageRoute = (ImageView) view.findViewById(R.id.header);
+        recyclerView = (RecyclerView) view.findViewById(R.id.content_traffic).findViewById(R.id.recyclerview);
+        coordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.coordinate_layout);
         infoDetailAdapter = new InfoDetailAdapter()
                 .setGoogleApiClient(mGoogleApiClient)
                 .setContext(this)
@@ -139,7 +159,7 @@ public class InfoDetailActivity extends AppCompatActivity
                 .setType(type)
                 .setTimedBookMark(bookMark)
                 .build();
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         recyclerView.setHasFixedSize(true);
         FadeInAnimator fadeInAnimator = new FadeInAnimator();
         fadeInAnimator.setAddDuration(1000);
@@ -152,9 +172,8 @@ public class InfoDetailActivity extends AppCompatActivity
 
     private void setToolbar() {
         //setting Toolbar
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+
         //Combined Toolbar into CollapsingToolbar Layout
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));

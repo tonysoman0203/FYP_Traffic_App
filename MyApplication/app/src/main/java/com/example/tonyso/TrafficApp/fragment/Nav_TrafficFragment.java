@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -74,8 +75,8 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
     Map<String, LatLng> regionMap = new HashMap<>();
     Hashtable<String, Boolean> markerSet = new Hashtable<>();
     Hashtable<String, RouteSpeedMap> speedMapSet = new Hashtable<>();
-    Snackbar snackbar;
-    CoordinatorLayout coordinatorLayout;
+    //Snackbar snackbar;
+    CoordinatorLayout coordinatorLayout, cood;
     String[] arr, latlng;
     boolean isTrafficOn;
     Toolbar toolbar;
@@ -85,6 +86,7 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
     private GoogleMap mMap;
     //Spinner Test
     private Spinner spinner;
+    private Snackbar snackbar;
 
     public Nav_TrafficFragment() {
 
@@ -128,7 +130,7 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
     @Override
     public void onDetach() {
         super.onDetach();
-        snackbar.dismiss();
+        //snackbar.dismiss();
         mapFragment.onDetach();
     }
 
@@ -148,17 +150,20 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
         mapFragment.getMapAsync(this);
         setHasOptionsMenu(true);
         this.coordinatorLayout = (CoordinatorLayout) getActivity().findViewById(R.id.coordinateLayoutMain);
+        cood = (CoordinatorLayout) view.findViewById(R.id.traffic_main);
         snackbar = Snackbar.make(coordinatorLayout, "Click on one Marker....", Snackbar.LENGTH_INDEFINITE);
         snackbar.show();
-        // Spinner to let user select different district to see RouteCCTV
+        //Spinner to let user select different district to see RouteCCTV
         spinner = (Spinner) view.findViewById(R.id.spinner);
     }
 
     private void setFragmentToolbar() {
+        CollapsingToolbarLayout collapsingToolbarLayout =
+                (CollapsingToolbarLayout) view.findViewById(R.id.collapsingToolbar);
+        collapsingToolbarLayout.setContentScrimColor(getResources().getColor(R.color.colorPrimary));
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         toolbar.setTitle(Title);
     }
-
 
 
     private void onSpinnerItemSelected() {

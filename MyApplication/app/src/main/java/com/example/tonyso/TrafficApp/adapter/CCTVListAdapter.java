@@ -45,7 +45,7 @@ public class CCTVListAdapter extends RecyclerView.Adapter<CCTVListAdapter.ViewHo
             public int compare(RouteCCTV o1, RouteCCTV o2) {
                 double p1 = Double.parseDouble(o1.getDistance());
                 double p2 = Double.parseDouble(o2.getDistance());
-                return (p1 < p2) ? 1 : 0;
+                return (p1 < p2) ? 0 : 1;
             }
 
             @Override
@@ -78,8 +78,8 @@ public class CCTVListAdapter extends RecyclerView.Adapter<CCTVListAdapter.ViewHo
                 return item1 == item2;
             }
         });
-
-        sortedList.addAll(routeCCTVList);
+        for (RouteCCTV i : routeCCTVList)
+            sortedList.add(i);
     }
 
 
