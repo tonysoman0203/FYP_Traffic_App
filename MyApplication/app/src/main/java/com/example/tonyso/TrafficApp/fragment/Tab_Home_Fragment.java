@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.tonyso.TrafficApp.InfoDetailActivity;
 import com.example.tonyso.TrafficApp.MainActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
@@ -186,14 +185,14 @@ public class Tab_Home_Fragment extends BaseFragment implements OnItemClickListen
     @Override
     public void onClick(int position, boolean isLongClick) {
         if (!isLongClick) {
-            final Intent intent = new Intent(getActivity(), InfoDetailActivity.class);
+            final Intent intent = new Intent(getActivity(), InfoDetailFragment.class);
             final String title = (MyApplication.CURR_LANG.equals(MyApplication.Language.ZH_HANT)) ?
                     homeAdapter.getSortedList().get(position).getDescription()[1] :
                     homeAdapter.getSortedList().get(position).getDescription()[0];
             Log.e(TAG, title);
             intent.putExtra("key", title);
             intent.putExtra(title, homeAdapter.getSortedList().get(position));
-            intent.putExtra("type", InfoDetailActivity.ADD_ROUTE_TYPE);
+            intent.putExtra("type", InfoDetailFragment.ADD_ROUTE_TYPE);
             FragmentManager fragmentManager = getChildFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.addToBackStack(TAG).commit();

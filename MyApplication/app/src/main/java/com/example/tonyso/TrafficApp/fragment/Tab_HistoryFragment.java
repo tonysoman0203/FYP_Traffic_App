@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.tonyso.TrafficApp.InfoDetailActivity;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.adapter.HistoryAdapter;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
@@ -176,9 +175,9 @@ public class Tab_HistoryFragment extends BaseFragment implements Observer, OnIte
                 setHistoryAdapter();
             }
         } else {
-            Intent intent = new Intent(getContext(), InfoDetailActivity.class);
+            Intent intent = new Intent(getContext(), InfoDetailFragment.class);
             intent.putExtra(INTENT_TAG_HISTORY_ITEM, historyAdapter.getmSortedList().get(position).get_id());
-            intent.putExtra("type", InfoDetailActivity.VIEW_HISTORY_RECORD);
+            intent.putExtra("type", InfoDetailFragment.VIEW_HISTORY_RECORD);
             startActivityForResult(intent, HISTORY_VIEW_RECORD_REQUEST_CODE);
         }
     }

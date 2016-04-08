@@ -16,7 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.tonyso.TrafficApp.InfoDetailActivity;
+import com.example.tonyso.TrafficApp.fragment.InfoDetailFragment;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.fragment.Tab_BookMarkFragment;
@@ -54,7 +54,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private static final int VERIFIY_INPUT_END_IS_BIGGER_THAN_FRONT_VALUE = 100002;
     private static final int VERIFIY_INPUT_FRONT_IS_BIGGER_THAN_END_VALUE = 100003;
     private static final int VERIFIY_INPUT_DATE_FRONT_IS_BIGGER_THAN_END_VALUE = 100004;
-    public InfoDetailActivity context;
+    public InfoDetailFragment context;
     OnSetTimeListener startTimeListener, endTImeListener;
     private int size;
     private CoordinatorLayout coordinatorLayout;
@@ -109,11 +109,11 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         return this;
     }
 
-    public InfoDetailActivity getContext() {
+    public InfoDetailFragment getContext() {
         return context;
     }
 
-    public InfoDetailAdapter setContext(InfoDetailActivity context) {
+    public InfoDetailAdapter setContext(InfoDetailFragment context) {
         this.context = context;
         return this;
     }
@@ -155,7 +155,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private void getObjectInstance() {
-        languageSelector = LanguageSelector.getInstance(context);
+        languageSelector = LanguageSelector.getInstance(context.getContext());
         calendar = new GregorianCalendar();
     }
 
@@ -212,7 +212,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void configNearItems(RecyclerView.ViewHolder holder, int pos) {
         RecyclerView recyclerView = ((NearPlaceViewHolder) holder).recyclerView;
         ProgressBar progressBar = ((NearPlaceViewHolder) holder).progressBar;
-        new FindNearLocationAsyncTask(this, context, recyclerView, progressBar, route.getLatLngs(), googleApiClient, route.getDescription()[0]).execute();
+        new FindNearLocationAsyncTask(this, context.getContext(), recyclerView, progressBar, route.getLatLngs(), googleApiClient, route.getDescription()[0]).execute();
     }
 
     private void configBookmarkItem(final RecyclerView.ViewHolder holder,int p) {
@@ -228,7 +228,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (type.equals(Tab_BookMarkFragment.TYPE_EDIT_BOOKMARK)) {
             ((AddBookMarkViewHolder) holder).startTimeWrapper.getEditText().setText(timedBookMark.getStartTime());
             ((AddBookMarkViewHolder) holder).TargetTimeWrapper.getEditText().setText(timedBookMark.getTargetTime());
-        } else if (type.equals(InfoDetailActivity.VIEW_HISTORY_RECORD)) {
+        } else if (type.equals(InfoDetailFragment.VIEW_HISTORY_RECORD)) {
             ((AddBookMarkViewHolder) holder).startTimeWrapper.getEditText().setText(timedBookMark.getStartTime());
             ((AddBookMarkViewHolder) holder).TargetTimeWrapper.getEditText().setText(timedBookMark.getTargetTime());
 
@@ -328,7 +328,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     break;
                 default:
                     if (type.equals("Add_ROUTE")) {
-                        SQLiteHelper sql = new SQLiteHelper(context);
+                        SQLiteHelper sql = new SQLiteHelper(context.getContext());
                         long success = sql.add_Bookmark(new TimedBookMark.Builder()
                                 .set_id(bookmark_id++)
                                 .setBkRouteName(route.getDescription())
@@ -347,7 +347,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                         }
                         break;
                     } else if (type.equals(Tab_BookMarkFragment.TYPE_EDIT_BOOKMARK)) {
-                        SQLiteHelper sql = new SQLiteHelper(context);
+                        SQLiteHelper sql = new SQLiteHelper(context.getContext());
                         long success = sql.editBookmark(new TimedBookMark.Builder()
                                 .set_id(timedBookMark.get_id())
                                 .setBkRouteName(route.getDescription())
@@ -361,8 +361,8 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                                 .setIsTimeOver(false).build());
                         if (success != -1) {
                             Snackbar.make(coordinatorLayout, "Editing Bookmark Success...", Snackbar.LENGTH_SHORT).show();
-                            context.setResult(Tab_BookMarkFragment.EDIT_BOOKMARK_RESULT_CODE);
-                            context.finish();
+                            //context.setResult(Tab_BookMarkFragment.EDIT_BOOKMARK_RESULT_CODE);
+                            context.dismiss();
                         } else {
                             Snackbar.make(coordinatorLayout, "Error Inserting Bookmark...", Snackbar.LENGTH_SHORT).show();
                         }
@@ -487,7 +487,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             super(v2);
             progressBar = (ProgressBar) v2.findViewById(R.id.progressBar);
             recyclerView = (RecyclerView) v2.findViewById(R.id.nearbyList);
-            recyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+            recyclerView.setLayoutManager(new LinearLayoutManager(context.getContext(), LinearLayoutManager.HORIZONTAL, false));
         }
     }
 }

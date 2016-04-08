@@ -40,7 +40,7 @@ import android.widget.TextView;
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
 import com.example.tonyso.TrafficApp.fragment.FeedBackFragment;
 import com.example.tonyso.TrafficApp.fragment.NavTrafficSuggestFragment;
-import com.example.tonyso.TrafficApp.fragment.Nav_TrafficFragment;
+import com.example.tonyso.TrafficApp.fragment.NavTrafficMonitorFragment;
 import com.example.tonyso.TrafficApp.fragment.Tab_MainFragment;
 import com.example.tonyso.TrafficApp.gcm.GCMStartPreference;
 import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
@@ -391,8 +391,8 @@ public class MainActivity extends BaseActivity
         } else if (id == R.id.nav_traffic) {
             tabLayout.setVisibility(View.GONE);
             fab.setVisibility(View.GONE);
-            Nav_TrafficFragment nav_trafficFragment =
-                    Nav_TrafficFragment.newInstance(this.getResources().getString(R.string.nav_real_traffic));
+            NavTrafficMonitorFragment nav_trafficFragment =
+                    NavTrafficMonitorFragment.newInstance(this.getResources().getString(R.string.nav_real_traffic));
             changeFragment(nav_trafficFragment, true);
             item.setChecked(true);
         } else if (id == R.id.nav_suggestion) {

@@ -55,7 +55,7 @@ public class MyGcmListenerService extends GcmListenerService {
         if (user_id == null) {
             id = -1;
         } else {
-            id = Integer.parseInt(data.getString("user_id"));
+            id = Integer.parseInt(data.getString("user_id").substring(1,2));
         }
 
         Log.d(TAG, "From: " + from);

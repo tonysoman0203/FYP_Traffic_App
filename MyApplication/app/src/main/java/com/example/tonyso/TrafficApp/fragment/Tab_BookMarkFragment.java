@@ -20,7 +20,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.BookMarkService;
-import com.example.tonyso.TrafficApp.InfoDetailActivity;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.adapter.BookMarkAdapter;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
@@ -240,7 +239,7 @@ public class Tab_BookMarkFragment extends BaseFragment
             bookMarkAdapter.removeSelectedItem(position);
             setDatasets();
         } else {
-            Intent editIntent = new Intent(getActivity(), InfoDetailActivity.class);
+            Intent editIntent = new Intent(getActivity(), InfoDetailFragment.class);
             editIntent.putExtra(SQLiteHelper.getKeyId(), bookmarklist.get(position).get_id());
             editIntent.putExtra("type", TYPE_EDIT_BOOKMARK);
             startActivityForResult(editIntent, Tab_BookMarkFragment.EDIT_BOOKMARK_REQUEST_CODE);

@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".fragment.Nav_TrafficFragment">
+    tools:context=".fragment.NavTrafficMonitorFragment">
 
                 <item android:id="@+id/nav_traffic_terrain"
                     android:icon="@drawable/ic_terrain_white_48dp"

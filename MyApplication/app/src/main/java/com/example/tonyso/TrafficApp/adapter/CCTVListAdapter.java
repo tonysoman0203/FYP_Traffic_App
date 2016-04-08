@@ -40,7 +40,7 @@ public class CCTVListAdapter extends RecyclerView.Adapter<CCTVListAdapter.ViewHo
     public CCTVListAdapter(List<RouteCCTV> routeCCTVList, Context context) {
         this.routeCCTVList = routeCCTVList;
         this.context = context;
-        sortedList = new SortedList<RouteCCTV>(RouteCCTV.class, new SortedList.Callback<RouteCCTV>() {
+        sortedList = new SortedList<>(RouteCCTV.class, new SortedList.Callback<RouteCCTV>() {
             @Override
             public int compare(RouteCCTV o1, RouteCCTV o2) {
                 double p1 = Double.parseDouble(o1.getDistance());

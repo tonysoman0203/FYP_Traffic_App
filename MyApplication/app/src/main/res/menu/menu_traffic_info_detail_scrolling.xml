@@ -1,4 +1,4 @@
 <menu xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".InfoDetailActivity">
+    tools:context=".fragment.InfoDetailFragment">
 
 </menu>

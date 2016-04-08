@@ -10,7 +10,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
 
-import com.example.tonyso.TrafficApp.InfoDetailActivity;
+import com.example.tonyso.TrafficApp.fragment.InfoDetailFragment;
 import com.example.tonyso.TrafficApp.utility.DateTime;
 
 import java.text.ParseException;
@@ -27,9 +27,9 @@ public class OnSetTimeListener implements View.OnFocusChangeListener,
     public int hour , minute;
     public String date;
     private EditText editText;
-    private InfoDetailActivity context;
+    private InfoDetailFragment context;
 
-    public OnSetTimeListener(EditText editText, InfoDetailActivity ctx) {
+    public OnSetTimeListener(EditText editText, InfoDetailFragment ctx) {
         this.editText = editText;
         this.editText.setOnFocusChangeListener(this);
         this.context = ctx;
@@ -41,7 +41,7 @@ public class OnSetTimeListener implements View.OnFocusChangeListener,
         if(hasFocus){
             editText.setInputType(InputType.TYPE_NULL);
             Calendar myCalendar = Calendar.getInstance();
-            new DatePickerDialog(context, this,
+            new DatePickerDialog(context.getContext(), this,
                     myCalendar.get(Calendar.YEAR),
                     myCalendar.get(Calendar.MONTH),
                     myCalendar.get(Calendar.DAY_OF_MONTH)).show();
@@ -59,7 +59,7 @@ public class OnSetTimeListener implements View.OnFocusChangeListener,
             Date currTime = DateTime.getCurrentDate();
             if (selectTime.before(currTime)) {
                 Snackbar.make(context.coordinatorLayout, "開始時間不可大於結束時間", Snackbar.LENGTH_LONG).show();
-                new TimePickerDialog(context, this, hour, this.minute, true).show();
+                new TimePickerDialog(context.getContext(), this, hour, this.minute, true).show();
             } else
                 this.editText.setText(String.format("%s %02d:%02d", date, hourOfDay, minute));
         } catch (ParseException e) {
@@ -74,6 +74,6 @@ public class OnSetTimeListener implements View.OnFocusChangeListener,
         Calendar myCalendar = Calendar.getInstance();
         int hour = myCalendar.get(Calendar.HOUR_OF_DAY);
         int minute = myCalendar.get(Calendar.MINUTE);
-        new TimePickerDialog(context, this, hour, minute, true).show();
+        new TimePickerDialog(context.getContext(), this, hour, minute, true).show();
     }
 }

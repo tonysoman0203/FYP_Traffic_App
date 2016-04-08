@@ -1,10 +1,9 @@
-package com.example.tonyso.TrafficApp;
+package com.example.tonyso.TrafficApp.fragment;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -19,18 +18,16 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.InflateException;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.tonyso.TrafficApp.MyApplication;
+import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.adapter.InfoDetailAdapter;
 import com.example.tonyso.TrafficApp.baseclass.BaseDialogFragment;
-import com.example.tonyso.TrafficApp.fragment.Nav_TrafficFragment;
-import com.example.tonyso.TrafficApp.fragment.Tab_BookMarkFragment;
-import com.example.tonyso.TrafficApp.fragment.Tab_HistoryFragment;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
 import com.example.tonyso.TrafficApp.utility.LanguageSelector;
@@ -47,10 +44,10 @@ import jp.wasabeef.recyclerview.animators.FadeInAnimator;
 
 //import android.support.v7.graphics.Palette;
 
-public class InfoDetailActivity extends BaseDialogFragment
+public class InfoDetailFragment extends BaseDialogFragment
         implements GoogleApiClient.ConnectionCallbacks, OnConnectionFailedListener {
     //Constant
-    public static final String TAG = InfoDetailActivity.class.getName();
+    public static final String TAG = InfoDetailFragment.class.getName();
     public static final String KEY = "key";
     public static final String ADD_ROUTE_TYPE = "Add_ROUTE";
     public static final String VIEW_HISTORY_RECORD = "View History";
@@ -67,6 +64,7 @@ public class InfoDetailActivity extends BaseDialogFragment
     private static final String EN = "EN";
     private static final String JPG = ".JPG";
     private static final String PNG = ".png";
+    private static String imgKey = "";
     public CoordinatorLayout coordinatorLayout;
     //UI Components.....
     Toolbar toolbar;
@@ -76,10 +74,8 @@ public class InfoDetailActivity extends BaseDialogFragment
     ImageView imageRoute;
     TextView txtSubtitle, title;
     String imageKey;
-    Intent intent;
+    Bundle intent;
     RouteCCTV route;
-    //Instance
-    LanguageSelector languageSelector;
     //Action
     RecyclerView recyclerView;
     InfoDetailAdapter infoDetailAdapter;
@@ -89,20 +85,32 @@ public class InfoDetailActivity extends BaseDialogFragment
 
     GoogleApiClient mGoogleApiClient;
     FragmentManager fm;
-    ImageLoader imageLoader;
-    DisplayImageOptions displayImageOptions;
 
 
     // Bool to track whether the app is already resolving an error
-    private boolean mResolvingError = false;
+    private static boolean mResolvingError = false;
     private View view;
+
+    public InfoDetailFragment() {}
+
+
+    public static InfoDetailFragment newInstance(String key, String type, RouteCCTV obj) {
+        InfoDetailFragment fragment = new InfoDetailFragment();
+        Bundle args = new Bundle();
+        args.putString(KEY, key);
+        args.putString("type",type);
+        args.putSerializable("route", obj);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        savedInstanceState.putBoolean(STATE_RESOLVING_ERROR, mResolvingError);
+        //savedInstanceState.putBoolean(STATE_RESOLVING_ERROR, mResolvingError);
 
     }
+
 
     @Nullable
     @Override
@@ -127,11 +135,18 @@ public class InfoDetailActivity extends BaseDialogFragment
         mResolvingError = savedInstanceState != null
                 && savedInstanceState.getBoolean(STATE_RESOLVING_ERROR, false);
         buildGoogleApiClient();
-        getInstance();
+        super.getInstance();
         getDataFromIntent();
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         initLayoutComponents();
         setImageHeader();
+
     }
+
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient
@@ -173,58 +188,38 @@ public class InfoDetailActivity extends BaseDialogFragment
     private void setToolbar() {
         //setting Toolbar
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getDialog().dismiss();
+            }
+        });
         //Combined Toolbar into CollapsingToolbar Layout
-        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
+        collapsingToolbarLayout = (CollapsingToolbarLayout)view.findViewById(R.id.toolbar_layout);
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
-        title = (TextView) findViewById(R.id.traffic_info_title);
-        txtSubtitle = (TextView) findViewById(R.id.traffic_info_subtitle);
-        fab = (FloatingActionButton) findViewById(R.id.fab);
+        //title = (TextView) view.findViewById(R.id.traffic_info_title);
+        //txtSubtitle = (TextView) view.findViewById(R.id.traffic_info_subtitle);
+       /*
+        fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(InfoDetailActivity.this, "Show in Google Map ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(InfoDetailFragment.this.getContext(), "Show in Google Map ", Toast.LENGTH_SHORT).show();
                 Uri gmmIntentUrl = Uri.parse("geo:" + route.getLatLngs()[0] + "," + route.getLatLngs()[1] + "?z=19");
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUrl);
                 mapIntent.setPackage("com.google.android.apps.maps");
                 startActivity(mapIntent);
             }
-        });
+        });*/
 
         if (languageSelector.getLanguage().equals(MyApplication.Language.ZH_HANT)) {
             collapsingToolbarLayout.setTitle(route.getDescription()[1]);
-            title.setText(route.getDescription()[1]);
-            txtSubtitle.setText(route.getRegion()[1]);
+        //    title.setText(route.getDescription()[1]);
+        //    txtSubtitle.setText(route.getRegion()[1]);
         } else {
             collapsingToolbarLayout.setTitle(route.getDescription()[0]);
-            title.setText(route.getDescription()[0]);
-            txtSubtitle.setText(route.getRegion()[0]);
-        }
-    }
-
-    private void getInstance() {
-        //Getting Instance and Cache
-        languageSelector = LanguageSelector.getInstance(this);
-        sqLiteHelper = new SQLiteHelper(this);
-        imageLoader = ImageLoader.getInstance();
-        displayImageOptions = new DisplayImageOptions.Builder()
-                .showStubImage(R.drawable.ic_launcher)        //    Display Stub Image
-                .showImageForEmptyUri(R.drawable.ic_launcher)    //    If Empty image found
-                .cacheInMemory()
-                .cacheOnDisc().bitmapConfig(Bitmap.Config.RGB_565)
-                .build();
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        int count = fm.getBackStackEntryCount();
-        Log.e(TAG, "On Back Stack Count:+ " + TAG + count);
-        if (count == 0) {
-            super.onBackPressed();
-            //additional code
-        } else {
-            fm.popBackStack();
+        //    title.setText(route.getDescription()[0]);
+        //    txtSubtitle.setText(route.getRegion()[0]);
         }
     }
 
@@ -243,29 +238,17 @@ public class InfoDetailActivity extends BaseDialogFragment
 
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                break;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     /**
-     * Getting Data From Previous Fragment {{@link Nav_TrafficFragment}}
+     * Getting Data From Previous Fragment {{@link NavTrafficMonitorFragment}}
      */
     private void getDataFromIntent() {
-        intent = getIntent();
-        String intent_type = intent.getStringExtra("type");
+        intent = this.getArguments();
+        String intent_type = intent.getString("type");
         if (intent_type != null) {
             switch (intent_type) {
                 case Tab_BookMarkFragment.TYPE_EDIT_BOOKMARK:
                     type = intent_type;
-                    bookMark = sqLiteHelper.getBookmark(intent.getIntExtra(SQLiteHelper.getKeyId(), -1));
+                    bookMark = sqLiteHelper.getBookmark(intent.getInt(SQLiteHelper.getKeyId(), -1));
                     if (bookMark != null) {
                         route = new RouteCCTV.Builder()
                                 .setId(bookMark.get_id())
@@ -279,7 +262,7 @@ public class InfoDetailActivity extends BaseDialogFragment
                     break;
                 case VIEW_HISTORY_RECORD:
                     type = intent_type;
-                    bookMark = sqLiteHelper.getBookmark(intent.getIntExtra(Tab_HistoryFragment.INTENT_TAG_HISTORY_ITEM, -1));
+                    bookMark = sqLiteHelper.getBookmark(intent.getInt(Tab_HistoryFragment.INTENT_TAG_HISTORY_ITEM, -1));
                     if (bookMark != null) {
                         route = new RouteCCTV.Builder()
                                 .setId(bookMark.get_id())
@@ -292,8 +275,8 @@ public class InfoDetailActivity extends BaseDialogFragment
                     }
                     break;
                 default:
-                    imageKey = intent.getStringExtra(KEY);
-                    route = (RouteCCTV) intent.getSerializableExtra(imageKey);
+                    imageKey = intent.getString(KEY);
+                    route = (RouteCCTV) intent.getSerializable("route");
                     break;
             }
         } else {
@@ -319,7 +302,7 @@ public class InfoDetailActivity extends BaseDialogFragment
         } else if (result.hasResolution()) {
             try {
                 mResolvingError = true;
-                result.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
+                result.startResolutionForResult(this.getActivity(), REQUEST_RESOLVE_ERROR);
             } catch (IntentSender.SendIntentException e) {
                 // There was an error with the resolution intent. Try again.
                 mGoogleApiClient.connect();
@@ -339,30 +322,17 @@ public class InfoDetailActivity extends BaseDialogFragment
         Bundle args = new Bundle();
         args.putInt(DIALOG_ERROR, errorCode);
         dialogFragment.setArguments(args);
-        dialogFragment.show(getSupportFragmentManager(), "errordialog");
+        dialogFragment.show(getChildFragmentManager(), "errordialog");
     }
 
     /* Called from ErrorDialogFragment when the dialog is dismissed. */
-    public void onDialogDismissed() {
+    public static void onDialogDismissed() {
         mResolvingError = false;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_RESOLVE_ERROR) {
-            mResolvingError = false;
-            if (resultCode == RESULT_OK) {
-                // Make sure the app is not already connected or attempting to connect
-                if (!mGoogleApiClient.isConnecting() &&
-                        !mGoogleApiClient.isConnected()) {
-                    mGoogleApiClient.connect();
-                }
-            }
-        }
-    }
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
         if (!mResolvingError) {  // more about this later
             mGoogleApiClient.connect();
@@ -370,7 +340,7 @@ public class InfoDetailActivity extends BaseDialogFragment
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         mGoogleApiClient.disconnect();
         super.onStop();
     }
@@ -390,7 +360,7 @@ public class InfoDetailActivity extends BaseDialogFragment
 
         @Override
         public void onDismiss(DialogInterface dialog) {
-            ((InfoDetailActivity) getActivity()).onDialogDismissed();
+            onDialogDismissed();
         }
     }
 

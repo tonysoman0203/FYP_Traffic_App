@@ -30,7 +30,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
-import com.example.tonyso.TrafficApp.InfoDetailActivity;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
 import com.example.tonyso.TrafficApp.baseclass.BaseFragment;
@@ -58,10 +57,10 @@ import java.util.Map;
  * A simple {@link Fragment} subclass.
  */
 
-public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallback,
+public class NavTrafficMonitorFragment extends BaseFragment implements OnMapReadyCallback,
         GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener {
 
-    private static final String TAG = Nav_TrafficFragment.class.getName();
+    private static final String TAG = NavTrafficMonitorFragment.class.getName();
     private static final String TRAFFIC_URL = "http://tdcctv.data.one.gov.hk/";
     private static final String TRAFFIC_SPEED_MAP = "http://resource.data.one.gov.hk/td/";
     private static final String TC = "TC";
@@ -88,12 +87,12 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
     private Spinner spinner;
     private Snackbar snackbar;
 
-    public Nav_TrafficFragment() {
+    public NavTrafficMonitorFragment() {
 
     }
 
-    public static Nav_TrafficFragment newInstance(String title) {
-        Nav_TrafficFragment baseFragment = new Nav_TrafficFragment();
+    public static NavTrafficMonitorFragment newInstance(String title) {
+        NavTrafficMonitorFragment baseFragment = new NavTrafficMonitorFragment();
         Bundle bundle = new Bundle();
         bundle.putString(ARG_Title, title);
         baseFragment.setArguments(bundle);
@@ -371,21 +370,19 @@ public class Nav_TrafficFragment extends BaseFragment implements OnMapReadyCallb
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Intent intent = new Intent(getActivity(), InfoDetailActivity.class);
                 final String title = m.getTitle();
-                Log.e(TAG, title);
-                intent.putExtra("key", title);
+                RouteCCTV obj = null;
                 if (roadCCTVMap.get(title) != null) {
-                    intent.putExtra(title, roadCCTVMap.get(title));
+                    obj=  roadCCTVMap.get(title);
                 } else {
-                    intent.putExtra(title, speedMapSet.get(title));
+                    obj =speedMapSet.get(title);
                 }
-                intent.putExtra("type", InfoDetailActivity.ADD_ROUTE_TYPE);
-                FragmentManager fragmentManager = getChildFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.addToBackStack(TAG).commit();
-                startActivity(intent);
-                }
+                Log.e(TAG, title);
+                InfoDetailFragment fragment = InfoDetailFragment.newInstance(title, InfoDetailFragment.ADD_ROUTE_TYPE, obj);
+                FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+                fragmentTransaction.add(fragment,InfoDetailFragment.TAG);
+                fragmentTransaction.commit();
+            }
         });
         snackbar.show();
         return true;
