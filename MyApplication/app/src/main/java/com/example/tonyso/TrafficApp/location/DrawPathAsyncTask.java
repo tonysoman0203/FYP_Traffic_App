@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
 import com.example.tonyso.TrafficApp.R;
@@ -130,7 +131,9 @@ public class DrawPathAsyncTask extends AsyncTask<Void, Void, List<Map<String, Ob
         progressDialog.hide();
         NavTrafficSuggestDetailFragment fragment = NavTrafficSuggestDetailFragment.newInstance(origin, destination, s);
         FragmentManager fm = navTrafficSuggestFragment.getChildFragmentManager();
-        fragment.show(fm, NavTrafficSuggestDetailFragment.TAG);
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.add(fragment, NavTrafficSuggestDetailFragment.TAG);
+        transaction.commit();
     }
 
     private List<Object> findCCTVInPaths(List<LatLng> paths) {

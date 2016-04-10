@@ -39,8 +39,8 @@ import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
 import com.example.tonyso.TrafficApp.fragment.FeedBackFragment;
-import com.example.tonyso.TrafficApp.fragment.NavTrafficSuggestFragment;
 import com.example.tonyso.TrafficApp.fragment.NavTrafficMonitorFragment;
+import com.example.tonyso.TrafficApp.fragment.NavTrafficSuggestFragment;
 import com.example.tonyso.TrafficApp.fragment.Tab_MainFragment;
 import com.example.tonyso.TrafficApp.gcm.GCMStartPreference;
 import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
@@ -168,6 +168,7 @@ public class MainActivity extends BaseActivity
         initNavigationDrawer();
         LabelFindViewById();
 
+
     }
 
     private void setMainFragment() {
@@ -207,6 +208,8 @@ public class MainActivity extends BaseActivity
                         .setAction("Action", null).show();
             }
         });
+
+        setMainFragment();
 
     }
 
@@ -456,7 +459,6 @@ public class MainActivity extends BaseActivity
             ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
                     new StoreObject<Object>(false, "lng", latLng.longitude), ShareStorage.SP.ProtectedData, this);
 
-            setMainFragment();
 
             if (languageSelector.getLanguage().equals(MyApplication.Language.ENGLISH)) {
                 gpsLocationFinder.convertLatLongToAddress(mLastLocation,ENG);

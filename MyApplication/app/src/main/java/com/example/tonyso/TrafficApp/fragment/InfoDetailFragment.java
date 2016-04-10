@@ -2,9 +2,7 @@ package com.example.tonyso.TrafficApp.fragment;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.IntentSender;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -22,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
@@ -30,15 +27,11 @@ import com.example.tonyso.TrafficApp.adapter.InfoDetailAdapter;
 import com.example.tonyso.TrafficApp.baseclass.BaseDialogFragment;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.TimedBookMark;
-import com.example.tonyso.TrafficApp.utility.LanguageSelector;
-import com.example.tonyso.TrafficApp.utility.SQLiteHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.places.Places;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import jp.wasabeef.recyclerview.animators.FadeInAnimator;
 
@@ -79,7 +72,6 @@ public class InfoDetailFragment extends BaseDialogFragment
     //Action
     RecyclerView recyclerView;
     InfoDetailAdapter infoDetailAdapter;
-    SQLiteHelper sqLiteHelper;
     TimedBookMark bookMark;
     String type = "Add_ROUTE";
 
@@ -93,6 +85,14 @@ public class InfoDetailFragment extends BaseDialogFragment
 
     public InfoDetailFragment() {}
 
+    public static InfoDetailFragment newInstance(int key, String type) {
+        InfoDetailFragment fragment = new InfoDetailFragment();
+        Bundle args = new Bundle();
+        args.putInt(KEY, key);
+        args.putString("type", type);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     public static InfoDetailFragment newInstance(String key, String type, RouteCCTV obj) {
         InfoDetailFragment fragment = new InfoDetailFragment();
@@ -198,7 +198,7 @@ public class InfoDetailFragment extends BaseDialogFragment
         collapsingToolbarLayout = (CollapsingToolbarLayout)view.findViewById(R.id.toolbar_layout);
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
         //title = (TextView) view.findViewById(R.id.traffic_info_title);
-        //txtSubtitle = (TextView) view.findViewById(R.id.traffic_info_subtitle);
+        //  txtSubtitle = (TextView) view.findViewById(R.id.txtsubTitle);
        /*
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -215,7 +215,7 @@ public class InfoDetailFragment extends BaseDialogFragment
         if (languageSelector.getLanguage().equals(MyApplication.Language.ZH_HANT)) {
             collapsingToolbarLayout.setTitle(route.getDescription()[1]);
         //    title.setText(route.getDescription()[1]);
-        //    txtSubtitle.setText(route.getRegion()[1]);
+            //   txtSubtitle.setText(route.getRegion()[1]);
         } else {
             collapsingToolbarLayout.setTitle(route.getDescription()[0]);
         //    title.setText(route.getDescription()[0]);
@@ -248,7 +248,8 @@ public class InfoDetailFragment extends BaseDialogFragment
             switch (intent_type) {
                 case Tab_BookMarkFragment.TYPE_EDIT_BOOKMARK:
                     type = intent_type;
-                    bookMark = sqLiteHelper.getBookmark(intent.getInt(SQLiteHelper.getKeyId(), -1));
+                    Log.d(TAG, "" + intent.getInt("key"));
+                    bookMark = sqLiteHelper.getBookmark(intent.getInt("key"));
                     if (bookMark != null) {
                         route = new RouteCCTV.Builder()
                                 .setId(bookMark.get_id())
@@ -262,7 +263,7 @@ public class InfoDetailFragment extends BaseDialogFragment
                     break;
                 case VIEW_HISTORY_RECORD:
                     type = intent_type;
-                    bookMark = sqLiteHelper.getBookmark(intent.getInt(Tab_HistoryFragment.INTENT_TAG_HISTORY_ITEM, -1));
+                    bookMark = sqLiteHelper.getBookmark(intent.getInt("key"));
                     if (bookMark != null) {
                         route = new RouteCCTV.Builder()
                                 .setId(bookMark.get_id())

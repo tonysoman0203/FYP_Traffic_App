@@ -1,10 +1,10 @@
 package com.example.tonyso.TrafficApp.fragment;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -175,10 +175,10 @@ public class Tab_HistoryFragment extends BaseFragment implements Observer, OnIte
                 setHistoryAdapter();
             }
         } else {
-            Intent intent = new Intent(getContext(), InfoDetailFragment.class);
-            intent.putExtra(INTENT_TAG_HISTORY_ITEM, historyAdapter.getmSortedList().get(position).get_id());
-            intent.putExtra("type", InfoDetailFragment.VIEW_HISTORY_RECORD);
-            startActivityForResult(intent, HISTORY_VIEW_RECORD_REQUEST_CODE);
+            InfoDetailFragment fragment = InfoDetailFragment.newInstance(historyAdapter.getmSortedList().get(position).get_id(), InfoDetailFragment.VIEW_HISTORY_RECORD);
+            FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+            fragmentTransaction.add(fragment, InfoDetailFragment.TAG);
+            fragmentTransaction.commit();
         }
     }
 }

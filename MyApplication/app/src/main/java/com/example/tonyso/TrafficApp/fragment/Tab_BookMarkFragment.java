@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -239,10 +240,11 @@ public class Tab_BookMarkFragment extends BaseFragment
             bookMarkAdapter.removeSelectedItem(position);
             setDatasets();
         } else {
-            Intent editIntent = new Intent(getActivity(), InfoDetailFragment.class);
-            editIntent.putExtra(SQLiteHelper.getKeyId(), bookmarklist.get(position).get_id());
-            editIntent.putExtra("type", TYPE_EDIT_BOOKMARK);
-            startActivityForResult(editIntent, Tab_BookMarkFragment.EDIT_BOOKMARK_REQUEST_CODE);
+
+            InfoDetailFragment fragment = InfoDetailFragment.newInstance(bookmarklist.get(position).get_id(), Tab_BookMarkFragment.TYPE_EDIT_BOOKMARK);
+            FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+            fragmentTransaction.add(fragment, InfoDetailFragment.TAG);
+            fragmentTransaction.commit();
         }
     }
 

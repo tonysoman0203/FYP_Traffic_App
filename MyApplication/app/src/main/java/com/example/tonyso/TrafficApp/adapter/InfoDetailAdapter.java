@@ -16,9 +16,9 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.tonyso.TrafficApp.fragment.InfoDetailFragment;
 import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
+import com.example.tonyso.TrafficApp.fragment.InfoDetailFragment;
 import com.example.tonyso.TrafficApp.fragment.Tab_BookMarkFragment;
 import com.example.tonyso.TrafficApp.listener.OnInfoDetailMenuClickListener;
 import com.example.tonyso.TrafficApp.listener.OnSetTimeListener;
@@ -362,7 +362,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                         if (success != -1) {
                             Snackbar.make(coordinatorLayout, "Editing Bookmark Success...", Snackbar.LENGTH_SHORT).show();
                             //context.setResult(Tab_BookMarkFragment.EDIT_BOOKMARK_RESULT_CODE);
-                            context.dismiss();
+                            getContext().getChildFragmentManager().popBackStack();
                         } else {
                             Snackbar.make(coordinatorLayout, "Error Inserting Bookmark...", Snackbar.LENGTH_SHORT).show();
                         }

@@ -1,10 +1,8 @@
 package com.example.tonyso.TrafficApp.fragment;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.util.SortedList;
@@ -68,7 +66,7 @@ public class Tab_Home_Fragment extends BaseFragment implements OnItemClickListen
         View view = inflater.inflate(R.layout.fragment_tab_home, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.list_near);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setHasFixedSize(true);
+        //recyclerView.setHasFixedSize(true);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.view);
         swipeRefreshLayout.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE, Color.CYAN);
 
@@ -78,6 +76,11 @@ public class Tab_Home_Fragment extends BaseFragment implements OnItemClickListen
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        homeAdapter = new HomeAdapter();
+        SortedList<RouteCCTV> sortedList = getSortedList(getNearCCTVLocation());
+        homeAdapter.setSortedList(sortedList);
+        homeAdapter.setOnItemClickListener(Tab_Home_Fragment.this);
+        recyclerView.setAdapter(homeAdapter);
         swipeRefreshLayout.setOnRefreshListener(mOnRefreshListener);
     }
 
@@ -185,18 +188,17 @@ public class Tab_Home_Fragment extends BaseFragment implements OnItemClickListen
     @Override
     public void onClick(int position, boolean isLongClick) {
         if (!isLongClick) {
-            final Intent intent = new Intent(getActivity(), InfoDetailFragment.class);
+            // final Intent intent = new Intent(getActivity(), InfoDetailFragment.class);
             final String title = (MyApplication.CURR_LANG.equals(MyApplication.Language.ZH_HANT)) ?
                     homeAdapter.getSortedList().get(position).getDescription()[1] :
                     homeAdapter.getSortedList().get(position).getDescription()[0];
             Log.e(TAG, title);
-            intent.putExtra("key", title);
-            intent.putExtra(title, homeAdapter.getSortedList().get(position));
-            intent.putExtra("type", InfoDetailFragment.ADD_ROUTE_TYPE);
-            FragmentManager fragmentManager = getChildFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.addToBackStack(TAG).commit();
-            startActivity(intent);
+
+            InfoDetailFragment fragment = InfoDetailFragment.newInstance(title, InfoDetailFragment.ADD_ROUTE_TYPE, homeAdapter.getSortedList().get(position));
+            FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+            fragmentTransaction.add(fragment, InfoDetailFragment.TAG);
+            fragmentTransaction.commit();
+
         }
     }
 
@@ -205,6 +207,7 @@ public class Tab_Home_Fragment extends BaseFragment implements OnItemClickListen
         private OnItemClickListener onItemClickListener;
 
         public HomeAdapter() {
+
         }
 
         public void setOnItemClickListener(OnItemClickListener onItemClickListener) {

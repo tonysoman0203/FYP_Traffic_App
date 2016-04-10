@@ -121,7 +121,7 @@ public class SettingsActivity extends BaseActivity {
             System.out.println("The km is " + km);
             Log.e("length", "" + distancePref.getEntries().length);
 
-            distancePref.setValueIndex((km - 1));
+            distancePref.setValueIndex((km));
             distancePref.setSummary(km + " " + getString(R.string.km));
 
             distancePref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {

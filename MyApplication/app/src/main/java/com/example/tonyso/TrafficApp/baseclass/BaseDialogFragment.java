@@ -50,6 +50,7 @@ public class BaseDialogFragment extends DialogFragment {
                 getString(R.string.route_suggest_car),
                 getString(R.string.route_suggest_cctv)
         };
+        getInstance();
     }
 
     @Override

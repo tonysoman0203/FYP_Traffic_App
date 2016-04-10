@@ -41,12 +41,23 @@ public class BaseFragment extends Fragment {
     protected List<RouteCCTV> routeList;
     protected List<RouteSpeedMap> routeSpeedMap;
 
+    protected static String[] TABS_TITLES;
+
+    protected static final int[] drawableIcons = new int[]{
+            R.drawable.ic_directions_car_white_36dp,
+            R.drawable.ic_local_see_white_36dp
+    };
+
     protected StatusObserver observer;
 
     public void onAttach(Context context) {
         super.onAttach(context);
         region_arr = context.getResources().getStringArray(R.array.regions);
         region_latlng = context.getResources().getStringArray(R.array.region_LatLng);
+        TABS_TITLES = new String[]{
+                getString(R.string.route_suggest_car),
+                getString(R.string.route_suggest_cctv)
+        };
     }
 
     public String getTitle() {
