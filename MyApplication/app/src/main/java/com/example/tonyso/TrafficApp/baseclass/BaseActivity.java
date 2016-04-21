@@ -77,14 +77,14 @@ public class BaseActivity extends AppCompatActivity {
         int KM_IN_DEVICE = (Integer) ShareStorage.retrieveData(MyApplication.KEY_NEAR_IN_KM,
                 ShareStorage.DataType.INTEGER, ShareStorage.SP.PrivateData, getBaseContext()).getValue();
         Log.d(TAG, "THE KM-IN_DEVICE = " + KM_IN_DEVICE);
-        int km;
-        if (KM_IN_DEVICE == -1) {
+        int km = -1;
+        if (KM_IN_DEVICE != -1) {
+            km = KM_IN_DEVICE;
+        } else {
             km = 2;
             ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
                     new StoreObject<>(false, MyApplication.KEY_NEAR_IN_KM,
                             km), ShareStorage.SP.PrivateData, getBaseContext());
-        } else {
-            km = KM_IN_DEVICE;
         }
         MyApplication.KM_IN_NEAR = km;
     }

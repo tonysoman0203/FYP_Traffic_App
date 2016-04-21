@@ -51,12 +51,7 @@ public class MyGcmListenerService extends GcmListenerService {
         String $data = data.getString("message");
         String flag = data.getString("flag");
         String user_id = data.getString("user_id");
-        int id;
-        if (user_id == null) {
-            id = -1;
-        } else {
-            id = Integer.parseInt(data.getString("user_id").substring(1,2));
-        }
+        String date = data.getString("date");
 
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Message: " + $data);
@@ -69,13 +64,22 @@ public class MyGcmListenerService extends GcmListenerService {
         } else if (flag != null && flag.equals("register")) {
             // normal downstream message.
             ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
-                    new StoreObject<Object>(false, GCMStartPreference.TAG_ID, id), ShareStorage.SP.PrivateData, this);
+                    new StoreObject<Object>(false, GCMStartPreference.TAG_ID, Integer.parseInt(user_id)), ShareStorage.SP.PrivateData, this);
         } else if (flag != null && flag.equals("update")) {
             // normal downstream message)
             ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
-                    new StoreObject<Object>(false, GCMStartPreference.TAG_ID, id), ShareStorage.SP.PrivateData, this);
+                    new StoreObject<Object>(false, GCMStartPreference.TAG_ID, Integer.parseInt(user_id)), ShareStorage.SP.PrivateData, this);
         }
         // [START_EXCLUDE]
+        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,new StoreObject<Object>(false,
+                GCMStartPreference.FROM,title),ShareStorage.SP.PrivateData,this);
+        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,new StoreObject<Object>(false,
+                GCMStartPreference.TITLE,title),ShareStorage.SP.PrivateData,this);
+        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,new StoreObject<Object>(false,
+                GCMStartPreference.MESSAGE,$data),ShareStorage.SP.PrivateData,this);
+        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,new StoreObject<Object>(false,
+                GCMStartPreference.DATE,date),ShareStorage.SP.PrivateData,this);
+
         /**
          * Production applications would usually process the message here.
          * Eg: - Syncing with server.

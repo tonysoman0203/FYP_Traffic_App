@@ -73,10 +73,11 @@ public class ErrorDialog {
         public static final int CONNECTION_TIMEOUT = 10001;
     }
 
-    /*public static String getMessageByTag(String tag, Context context) {
-        String msg = (String) ShareStorage.retrieveData(tag, ShareStorage.DataType.STRING, ShareStorage.SP.Locale, context).getValue();
+    public static String getMessageByTag(String tag, Context context) {
+        String msg = (String) ShareStorage.retrieveData(tag,
+                ShareStorage.DataType.STRING, ShareStorage.SP.Locale, context).getValue();
         return msg;
-    }*/
+    }
 
     public static class Tag {
         public static final String PROCESSING_MSG = "processing_msg";

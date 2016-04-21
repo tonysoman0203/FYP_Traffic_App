@@ -85,5 +85,6 @@
     <string name="route_suggest_btnSubmit">確定</string>
     <string name="route_suggest_btnReset">重設</string>
     <string name="popup_share">分享</string>
+    <string name="mapview">MapView</string>
 
 </resources>

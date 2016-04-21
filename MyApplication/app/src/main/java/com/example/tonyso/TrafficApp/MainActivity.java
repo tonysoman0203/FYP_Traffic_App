@@ -200,14 +200,14 @@ public class MainActivity extends BaseActivity
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinateLayoutMain);
 
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        //fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
 
         setMainFragment();
 
@@ -292,7 +292,7 @@ public class MainActivity extends BaseActivity
 //
 //            }
             tabLayout.setVisibility(View.VISIBLE);
-                fab.setVisibility(View.VISIBLE);
+                //fab.setVisibility(View.VISIBLE);
                 toolbar.setTitle(getString(R.string.app_name));
             navigationView.getMenu().getItem(0).setChecked(true);
             fragmentManager.popBackStack();
@@ -387,20 +387,20 @@ public class MainActivity extends BaseActivity
         Intent intent;
         if (id == R.id.nav_home) {
             tabLayout.setVisibility(View.VISIBLE);
-            fab.setVisibility(View.VISIBLE);
+            //fab.setVisibility(View.VISIBLE);
             setMainFragment();
             toolbar.setTitle(getString(R.string.app_name));
             //fragmentManager.beginTransaction().replace(R.id.flcontent,tab_mainFragment ).commit();
         } else if (id == R.id.nav_traffic) {
             tabLayout.setVisibility(View.GONE);
-            fab.setVisibility(View.GONE);
+            //fab.setVisibility(View.GONE);
             NavTrafficMonitorFragment nav_trafficFragment =
                     NavTrafficMonitorFragment.newInstance(this.getResources().getString(R.string.nav_real_traffic));
             changeFragment(nav_trafficFragment, true);
             item.setChecked(true);
         } else if (id == R.id.nav_suggestion) {
             tabLayout.setVisibility(View.GONE);
-            fab.setVisibility(View.GONE);
+            //fab.setVisibility(View.GONE);
             NavTrafficSuggestFragment frag = NavTrafficSuggestFragment.newInstance(getString(R.string.title_routeSuggest));
             changeFragment(frag, true);
             item.setChecked(true);

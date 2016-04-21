@@ -92,15 +92,16 @@ public class NavTrafficSuggestCCTVFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        onViewInitialize(view);
+        onViewInitialize(view,savedInstanceState);
     }
 
-    private void onViewInitialize(View view) {
+    private void onViewInitialize(View view,Bundle saved) {
         recyclerView = (RecyclerView) view.findViewById(R.id.cctvlist);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setItemAnimator(new FadeInLeftAnimator());
-        CCTVListAdapter cctvListAdapter = new CCTVListAdapter(list, getContext());
+        CCTVListAdapter cctvListAdapter = new CCTVListAdapter(list,this);
         cctvListAdapter.setImageLoader(getImageLoader());
+        cctvListAdapter.setSavedInstanceState(saved);
         cctvListAdapter.setDisplayImageOptions(getImageOptions());
         recyclerView.setAdapter(cctvListAdapter);
     }

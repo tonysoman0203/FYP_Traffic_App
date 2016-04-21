@@ -151,4 +151,5 @@
     <!-- TODO: Near Distance Km -->
     <string name="km">km</string>
     <string name="nearKm">Set Near Distance in Km</string>
+    <string name="mapview">MapView</string>
 </resources>

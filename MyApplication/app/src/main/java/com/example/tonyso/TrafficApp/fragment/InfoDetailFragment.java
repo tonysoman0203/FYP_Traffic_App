@@ -163,7 +163,7 @@ public class InfoDetailFragment extends BaseDialogFragment
         setToolbar();
         //init ImageView
         imageRoute = (ImageView) view.findViewById(R.id.header);
-        recyclerView = (RecyclerView) view.findViewById(R.id.content_traffic).findViewById(R.id.recyclerview);
+        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview);
         coordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.coordinate_layout);
         infoDetailAdapter = new InfoDetailAdapter()
                 .setGoogleApiClient(mGoogleApiClient)

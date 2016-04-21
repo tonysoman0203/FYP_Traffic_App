@@ -96,6 +96,14 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        snackbar.dismiss();
+    }
+
+
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         if (view != null) {
@@ -252,6 +260,12 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
         super.onDetach();
         snackbar.dismiss();
         mapFragment.onDetach();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        snackbar.dismiss();
     }
 
     @Override

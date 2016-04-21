@@ -8,25 +8,20 @@
     android:layout_height="wrap_content"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:orientation="horizontal"
+        android:layout_height="200dp">
 
-        <ImageView
-            android:layout_width="160dp"
-            android:layout_height="140dp"
-            android:id="@+id/cctv"
-            android:scaleType="fitXY"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true" />
 
         <LinearLayout
             android:orientation="vertical"
-            android:layout_width="match_parent"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toStartOf="@+id/cctv"
-            android:layout_alignBottom="@+id/cctv">
+            android:layout_alignBottom="@+id/cctv"
+            android:id="@+id/linearLayout3">
 
             <TextView
                 android:layout_width="match_parent"
@@ -37,7 +32,8 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/cctv"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:layout_margin="10dp" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -47,8 +43,58 @@
                 android:id="@+id/txtCCTVDistance"
                 android:layout_below="@+id/txtCCTVName"
                 android:layout_alignParentStart="true"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:layout_margin="10dp" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/mapview"
+                    android:id="@+id/textView"
+                    android:layout_marginLeft="15dp" />
+
+                <com.kyleduo.switchbutton.SwitchButton
+                    android:id="@+id/sb_text"
+                    style="@style/SwitchButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16dp"
+                    app:kswTextOff="Off"
+                    app:kswTextOn="On"
+                    android:layout_marginLeft="15dp" />
+            </LinearLayout>
+
+
         </LinearLayout>
-    </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:id="@+id/cctv"
+                android:scaleType="fitXY"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true" />
+
+            <com.google.android.gms.maps.MapView android:id="@+id/mapview"
+                android:layout_width="match_parent"
+                android:visibility="invisible"
+                android:layout_height="200dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignStart="@+id/cctv" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
 
 </android.support.v7.widget.CardView>

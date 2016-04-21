@@ -57,11 +57,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:clipToPadding="false"
+        android:layout_height="match_parent" >
 
-    <include
-        android:id="@+id/content_traffic"
-        layout="@layout/content_traffic_info_detail_recyclerview" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
+        </FrameLayout>
 
 
 </android.support.design.widget.CoordinatorLayout>

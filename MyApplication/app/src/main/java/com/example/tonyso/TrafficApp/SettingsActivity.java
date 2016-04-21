@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
+import com.example.tonyso.TrafficApp.utility.ErrorDialog;
 import com.example.tonyso.TrafficApp.utility.LanguageSelector;
 import com.example.tonyso.TrafficApp.utility.ShareStorage;
 import com.example.tonyso.TrafficApp.utility.StoreObject;
@@ -121,7 +122,16 @@ public class SettingsActivity extends BaseActivity {
             System.out.println("The km is " + km);
             Log.e("length", "" + distancePref.getEntries().length);
 
-            distancePref.setValueIndex((km));
+            if (km == 1){
+                distancePref.setValueIndex(0);
+            }else if (km ==2){
+                distancePref.setValueIndex(1);
+            }else if (km == 3){
+                distancePref.setValueIndex(2);
+            }else{
+                ErrorDialog errorDialog = ErrorDialog.getInstance(getActivity());
+                errorDialog.displayAlertDialog("Distance cannot be -1");
+            }
             distancePref.setSummary(km + " " + getString(R.string.km));
 
             distancePref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {

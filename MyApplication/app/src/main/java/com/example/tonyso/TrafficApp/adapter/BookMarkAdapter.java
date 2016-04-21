@@ -82,7 +82,7 @@ public class BookMarkAdapter extends RecyclerView.Adapter<BookMarkAdapter.ViewHo
         sortedList = new SortedList<TimedBookMark>(TimedBookMark.class, new SortedList.Callback<TimedBookMark>() {
             @Override
             public int compare(TimedBookMark o1, TimedBookMark o2) {
-                return (o1.getRemainTime() < o2.getRemainTime()) ? -1 : 1;
+                return (o1.getRemainTime() < o2.getRemainTime()) ? -14 : 1;
             }
 
             @Override
