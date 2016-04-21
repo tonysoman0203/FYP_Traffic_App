@@ -9,5 +9,11 @@
         app:showAsAction="ifRoom|withText"
         />
 
+    <item
+        android:id="@+id/notification"
+        android:icon="@drawable/ic_info_white_24dp"
+        android:orderInCategory="100"
+        android:title="Notification"
+        app:showAsAction="ifRoom|withText" />
 
 </menu>

@@ -71,14 +71,30 @@ public class MyGcmListenerService extends GcmListenerService {
                     new StoreObject<Object>(false, GCMStartPreference.TAG_ID, Integer.parseInt(user_id)), ShareStorage.SP.PrivateData, this);
         }
         // [START_EXCLUDE]
+        Integer index = ShareStorage.getInteger(GCMStartPreference.ID, ShareStorage.SP.PrivateData, this);
+
+        if (index == -1) {
+            index = 0;
+        } else {
+            index = ShareStorage.getInteger(GCMStartPreference.ID, ShareStorage.SP.PrivateData, this);
+        }
+        System.err.println(index);
+
+
+
         ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,new StoreObject<Object>(false,
-                GCMStartPreference.FROM,title),ShareStorage.SP.PrivateData,this);
+                GCMStartPreference.FROM + index, from), ShareStorage.SP.PrivateData, this);
         ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,new StoreObject<Object>(false,
-                GCMStartPreference.TITLE,title),ShareStorage.SP.PrivateData,this);
+                GCMStartPreference.TITLE + index, title), ShareStorage.SP.PrivateData, this);
         ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,new StoreObject<Object>(false,
-                GCMStartPreference.MESSAGE,$data),ShareStorage.SP.PrivateData,this);
+                GCMStartPreference.MESSAGE + index, $data), ShareStorage.SP.PrivateData, this);
         ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,new StoreObject<Object>(false,
-                GCMStartPreference.DATE,date),ShareStorage.SP.PrivateData,this);
+                GCMStartPreference.DATE + index, date), ShareStorage.SP.PrivateData, this);
+
+
+        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE, new StoreObject<Object>(false, GCMStartPreference.ID, index), ShareStorage.SP.PrivateData, this);
+        index = index + 1;
+        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE, new StoreObject<Object>(false, GCMStartPreference.ID, index), ShareStorage.SP.PrivateData, this);
 
         /**
          * Production applications would usually process the message here.

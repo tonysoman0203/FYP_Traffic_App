@@ -86,5 +86,6 @@
     <string name="route_suggest_btnReset">重設</string>
     <string name="popup_share">分享</string>
     <string name="mapview">MapView</string>
+    <string name="Notification_Title">通訊中心</string>
 
 </resources>

@@ -41,6 +41,7 @@ import com.example.tonyso.TrafficApp.baseclass.BaseActivity;
 import com.example.tonyso.TrafficApp.fragment.FeedBackFragment;
 import com.example.tonyso.TrafficApp.fragment.NavTrafficMonitorFragment;
 import com.example.tonyso.TrafficApp.fragment.NavTrafficSuggestFragment;
+import com.example.tonyso.TrafficApp.fragment.NotificationListFragment;
 import com.example.tonyso.TrafficApp.fragment.Tab_MainFragment;
 import com.example.tonyso.TrafficApp.gcm.GCMStartPreference;
 import com.example.tonyso.TrafficApp.listener.WeatherRefreshListener;
@@ -372,6 +373,11 @@ public class MainActivity extends BaseActivity
             // Handle home button in non-drawer mode
             case android.R.id.home:
                 onBackPressed();
+                return true;
+            case R.id.notification:
+                FragmentManager fm = getSupportFragmentManager();
+                NotificationListFragment f = NotificationListFragment.newInstance();
+                f.show(fm, NotificationListFragment.class.getCanonicalName());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

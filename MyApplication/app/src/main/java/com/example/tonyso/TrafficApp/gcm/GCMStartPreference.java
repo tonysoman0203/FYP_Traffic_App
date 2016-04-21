@@ -12,4 +12,5 @@ public class GCMStartPreference {
     public static final String MESSAGE = "message";
     public static final String DATE = "date";
 
+    public static final String ID = "ID";
 }
