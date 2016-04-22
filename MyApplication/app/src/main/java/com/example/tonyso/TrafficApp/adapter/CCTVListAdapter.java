@@ -1,9 +1,7 @@
 package com.example.tonyso.TrafficApp.adapter;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.tonyso.TrafficApp.MyApplication;
@@ -63,7 +60,7 @@ public class CCTVListAdapter extends RecyclerView.Adapter<CCTVListAdapter.ViewHo
             public int compare(RouteCCTV o1, RouteCCTV o2) {
                 double p1 = Double.parseDouble(o1.getDistance());
                 double p2 = Double.parseDouble(o2.getDistance());
-                return (p1 < p2) ? 0 : 1;
+                return (p1 < p2) ? -1 : 1;
             }
 
             @Override

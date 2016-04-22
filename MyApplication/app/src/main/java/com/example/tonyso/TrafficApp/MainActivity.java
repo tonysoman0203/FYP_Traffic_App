@@ -19,7 +19,6 @@ import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -366,10 +365,10 @@ public class MainActivity extends BaseActivity
         }
         int id = item.getItemId();
         switch (id) {
-            case R.id.action_search:
-                Snackbar.make(coordinatorLayout, "Search button click"
-                        , Snackbar.LENGTH_LONG).show();
-                break;
+//            case R.id.action_search:
+//                Snackbar.make(coordinatorLayout, "Search button click"
+//                        , Snackbar.LENGTH_LONG).show();
+//                break;
             // Handle home button in non-drawer mode
             case android.R.id.home:
                 onBackPressed();
@@ -382,7 +381,6 @@ public class MainActivity extends BaseActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
