@@ -27,15 +27,20 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.tonyso.TrafficApp.MainActivity;
+import com.example.tonyso.TrafficApp.MyApplication;
 import com.example.tonyso.TrafficApp.R;
+import com.example.tonyso.TrafficApp.model.NotifyMsg;
 import com.example.tonyso.TrafficApp.utility.ShareStorage;
 import com.example.tonyso.TrafficApp.utility.StoreObject;
 import com.google.android.gms.gcm.GcmListenerService;
 
+import java.util.Observable;
+import java.util.Observer;
+
 public class MyGcmListenerService extends GcmListenerService {
 
     private static final String TAG = "MyGcmListenerService";
-
+    public static Integer index =0;
     /**
      * Called when message is received.
      *
@@ -53,6 +58,15 @@ public class MyGcmListenerService extends GcmListenerService {
         String user_id = data.getString("user_id");
         String date = data.getString("date");
 
+        Integer id = 0;
+
+        if (user_id==null){
+            id = 0;
+        }else{
+            id = Integer.parseInt(user_id);
+        }
+        MyApplication myApplication = (MyApplication) getApplication();
+
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Message: " + $data);
         Log.d(TAG, "title: " + title);
@@ -64,23 +78,23 @@ public class MyGcmListenerService extends GcmListenerService {
         } else if (flag != null && flag.equals("register")) {
             // normal downstream message.
             ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
-                    new StoreObject<Object>(false, GCMStartPreference.TAG_ID, Integer.parseInt(user_id)), ShareStorage.SP.PrivateData, this);
+                    new StoreObject<Object>(false, GCMStartPreference.TAG_ID, id), ShareStorage.SP.PrivateData, this);
         } else if (flag != null && flag.equals("update")) {
             // normal downstream message)
             ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,
-                    new StoreObject<Object>(false, GCMStartPreference.TAG_ID, Integer.parseInt(user_id)), ShareStorage.SP.PrivateData, this);
+                    new StoreObject<Object>(false, GCMStartPreference.TAG_ID, id), ShareStorage.SP.PrivateData, this);
         }
         // [START_EXCLUDE]
-        Integer index = ShareStorage.getInteger(GCMStartPreference.ID, ShareStorage.SP.PrivateData, this);
 
-        if (index == -1) {
-            index = 0;
-        } else {
-            index = ShareStorage.getInteger(GCMStartPreference.ID, ShareStorage.SP.PrivateData, this);
-        }
-        System.err.println(index);
+        NotifyMsg notifyMsg = new NotifyMsg().setDate(date)
+                .setFrom(from)
+                .setId(Integer.parseInt(user_id))
+                .setMessage($data)
+                .setTitle(title);
+        MyApplication.notifyMsgList.add(notifyMsg);
 
 
+        Log.e(TAG,"Size:"+MyApplication.notifyMsgList.size());
 
         ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,new StoreObject<Object>(false,
                 GCMStartPreference.FROM + index, from), ShareStorage.SP.PrivateData, this);
@@ -91,10 +105,8 @@ public class MyGcmListenerService extends GcmListenerService {
         ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE,new StoreObject<Object>(false,
                 GCMStartPreference.DATE + index, date), ShareStorage.SP.PrivateData, this);
 
+        index++;
 
-        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE, new StoreObject<Object>(false, GCMStartPreference.ID, index), ShareStorage.SP.PrivateData, this);
-        index = index + 1;
-        ShareStorage.saveData(ShareStorage.StorageType.SHARED_PREFERENCE, new StoreObject<Object>(false, GCMStartPreference.ID, index), ShareStorage.SP.PrivateData, this);
 
         /**
          * Production applications would usually process the message here.
@@ -137,4 +149,6 @@ public class MyGcmListenerService extends GcmListenerService {
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder);
     }
+
+
 }

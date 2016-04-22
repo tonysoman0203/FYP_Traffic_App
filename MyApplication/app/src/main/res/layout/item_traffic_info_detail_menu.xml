@@ -1,57 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:layout_height="70dp"
     android:layout_marginTop="30dp"
-    android:layout_marginBottom="30dp">
-
-    <!--<LinearLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:id="@+id/linearLayout2"-->
-    <!--android:layout_marginTop="0dp"-->
-    <!--android:layout_alignParentTop="true"-->
-    <!--android:layout_alignParentStart="true">-->
-
-    <!--<Button-->
-    <!--style="@style/PopupButtonStyle"-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:background="@android:color/transparent"-->
-    <!--android:text="@string/popup_near"-->
-    <!--android:drawableTop="@drawable/ic_near_me_black_36dp"-->
-    <!--android:id="@+id/btnNear"-->
-    <!--android:backgroundTint="@color/colorPrimary"-->
-    <!--android:layout_weight="1" />-->
-
-    <!--<Button-->
-    <!--style="@style/PopupButtonStyle"-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:id="@+id/btnBookmark"-->
-    <!--android:background="@android:color/transparent"-->
-    <!--android:text="@string/popup_add_bookMark"-->
-    <!--android:drawableTop="@drawable/ic_bookmark_black_36dp"-->
-    <!--android:backgroundTint="@color/colorPrimary"-->
-    <!--android:layout_alignTop="@+id/btnRouteMore"-->
-    <!--android:layout_toRightOf="@+id/map_snapshot_title"-->
-    <!--android:layout_toEndOf="@+id/map_snapshot_title"-->
-    <!--android:layout_weight="1" />-->
-
-    <!--<Button-->
-    <!--style="@style/PopupButtonStyle"-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:id="@+id/btnShare"-->
-    <!--android:backgroundTint="@color/colorPrimary"-->
-    <!--android:background="@android:color/transparent"-->
-    <!--android:text="@string/popup_share"-->
-    <!--android:drawableTop="@drawable/ic_share_black_36dp"-->
-    <!--android:layout_alignTop="@+id/btnRouteMore"-->
-    <!--android:layout_toRightOf="@+id/map_snapshot_title"-->
-    <!--android:layout_toEndOf="@+id/map_snapshot_title"-->
-    <!--android:layout_weight="1" />-->
+    android:layout_marginBottom="30dp"
+android:orientation="horizontal"
+    >
 
     <LinearLayout
         android:orientation="vertical"

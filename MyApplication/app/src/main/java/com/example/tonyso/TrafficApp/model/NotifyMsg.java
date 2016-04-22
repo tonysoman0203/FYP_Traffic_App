@@ -3,14 +3,14 @@ package com.example.tonyso.TrafficApp.model;
 /**
  * Created by TonySo on 21/4/16.
  */
-public class Notification {
+public class NotifyMsg {
     private Integer id;
     private String title;
     private String Message;
     private String From;
     private String date;
 
-    public Notification(Integer id, String title, String message, String from, String date) {
+    public NotifyMsg(Integer id, String title, String message, String from, String date) {
         this.id = id;
         this.title = title;
         Message = message;
@@ -18,11 +18,16 @@ public class Notification {
         this.date = date;
     }
 
+    public NotifyMsg() {
+
+    }
+
+
     public Integer getId() {
         return id;
     }
 
-    public Notification setId(Integer id) {
+    public NotifyMsg setId(Integer id) {
         this.id = id;
         return this;
     }
@@ -31,7 +36,7 @@ public class Notification {
         return title;
     }
 
-    public Notification setTitle(String title) {
+    public NotifyMsg setTitle(String title) {
         this.title = title;
         return this;
     }
@@ -40,7 +45,7 @@ public class Notification {
         return Message;
     }
 
-    public Notification setMessage(String message) {
+    public NotifyMsg setMessage(String message) {
         Message = message;
         return this;
     }
@@ -49,7 +54,7 @@ public class Notification {
         return From;
     }
 
-    public Notification setFrom(String from) {
+    public NotifyMsg setFrom(String from) {
         From = from;
         return this;
     }
@@ -58,7 +63,7 @@ public class Notification {
         return date;
     }
 
-    public Notification setDate(String date) {
+    public NotifyMsg setDate(String date) {
         this.date = date;
         return this;
     }

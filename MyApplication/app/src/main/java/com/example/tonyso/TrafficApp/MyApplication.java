@@ -3,9 +3,11 @@ package com.example.tonyso.TrafficApp;
 import android.app.Application;
 
 import com.example.tonyso.TrafficApp.listener.StatusObserver;
+import com.example.tonyso.TrafficApp.model.NotifyMsg;
 import com.example.tonyso.TrafficApp.model.RouteCCTV;
 import com.example.tonyso.TrafficApp.model.RouteSpeedMap;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,6 +27,7 @@ public class MyApplication extends Application{
     StatusObserver timeStatusObserver;
     public int _id;
 
+    public static List<NotifyMsg> notifyMsgList = new ArrayList<>();
 
     public MyApplication() {
     }

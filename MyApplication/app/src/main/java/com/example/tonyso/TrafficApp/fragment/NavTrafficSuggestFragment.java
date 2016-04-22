@@ -331,7 +331,7 @@ public class NavTrafficSuggestFragment extends BaseFragment implements
     private void animateDialogView(final boolean status) {
         //move map Fragment under input dialog view
         mapFragment.getView().animate()
-                .translationY((status) ? 500 : 0)
+                .translationY((status) ? 600 : 0)
                 .setDuration(1000)
                 .setListener(new Animator.AnimatorListener() {
                     @Override

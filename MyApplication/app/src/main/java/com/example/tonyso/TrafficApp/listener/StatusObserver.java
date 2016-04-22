@@ -10,6 +10,7 @@ import java.util.Observable;
 public class StatusObserver extends Observable {
     private boolean isTimeOverChanged = false;
     private boolean isPathReady = false;
+    private boolean isDataSetChanged = false;
 
     public StatusObserver() {
         Log.d(StatusObserver.class.getName(), "Building Status Observer....");
@@ -24,6 +25,13 @@ public class StatusObserver extends Observable {
         setChanged();
         notifyObservers();
     }
+
+    public void setDataSetChanged(boolean state) {
+        this.isDataSetChanged = state;
+        setChanged();
+        notifyObservers();
+    }
+
 
     public boolean isPathReady() {
         return isPathReady;
