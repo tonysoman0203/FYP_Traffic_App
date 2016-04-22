@@ -80,9 +80,16 @@ public class DrawPathAsyncTask extends AsyncTask<Void, Void, List<Map<String, Ob
     protected void onPreExecute() {
         super.onPreExecute();
 //        if (swipe == null) {
-            progressDialog.setIndeterminate(true);
-            progressDialog.setMessage("Fetching Routes......");
-            progressDialog.show();
+            try{
+                progressDialog =  new ProgressDialog(context);
+                progressDialog.setIndeterminate(true);
+                progressDialog.setMessage("Fetching Routes......");
+                progressDialog.show();
+            }catch (Exception e){
+                ErrorDialog errorDialog = ErrorDialog.getInstance(context);
+                errorDialog.displayAlertDialog(e.getMessage());
+            }
+
 //        } else {
 //            swipe.setRefreshing(true);
 //        }

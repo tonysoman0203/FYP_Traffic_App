@@ -2,9 +2,7 @@ package com.example.tonyso.TrafficApp.fragment;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.IntentSender;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -177,7 +175,7 @@ public class InfoDetailFragment extends BaseDialogFragment
                 .setTimedBookMark(bookMark)
                 .build();
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
-        //recyclerView.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(true);
         FadeInAnimator fadeInAnimator = new FadeInAnimator();
         fadeInAnimator.setAddDuration(1000);
         fadeInAnimator.setChangeDuration(1000);
@@ -201,27 +199,27 @@ public class InfoDetailFragment extends BaseDialogFragment
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
         //title = (TextView) view.findViewById(R.id.traffic_info_title);
         //  txtSubtitle = (TextView) view.findViewById(R.id.txtsubTitle);
-
+       /*
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(InfoDetailFragment.this.getContext(), "Show in Google Map ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(InfoDetailFragment.this.getContext(), "Show in Google Map ", Toast.LENGTH_SHORT).show();
                 Uri gmmIntentUrl = Uri.parse("geo:" + route.getLatLngs()[0] + "," + route.getLatLngs()[1] + "?z=19");
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUrl);
                 mapIntent.setPackage("com.google.android.apps.maps");
                 startActivity(mapIntent);
             }
-        });
+        });*/
 
         if (languageSelector.getLanguage().equals(MyApplication.Language.ZH_HANT)) {
             collapsingToolbarLayout.setTitle(route.getDescription()[1]);
-        //    title.setText(route.getDescription()[1]);
+            //    title.setText(route.getDescription()[1]);
             //   txtSubtitle.setText(route.getRegion()[1]);
         } else {
             collapsingToolbarLayout.setTitle(route.getDescription()[0]);
-        //    title.setText(route.getDescription()[0]);
-        //    txtSubtitle.setText(route.getRegion()[0]);
+            //    title.setText(route.getDescription()[0]);
+            //    txtSubtitle.setText(route.getRegion()[0]);
         }
     }
 
@@ -368,3 +366,4 @@ public class InfoDetailFragment extends BaseDialogFragment
     }
 
 }
+

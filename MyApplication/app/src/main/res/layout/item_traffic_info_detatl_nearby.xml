@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_margin="0dp"
     android:layout_height="match_parent">
 
     <ProgressBar
@@ -12,12 +11,12 @@
         android:id="@+id/progressBar" />
 
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/nearbyList"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/nearbyList"
+        android:layout_width="wrap_content"
+        android:layout_height="280dp">
 
-        </android.support.v7.widget.RecyclerView>
+    </android.support.v7.widget.RecyclerView>
 
 
 </LinearLayout>

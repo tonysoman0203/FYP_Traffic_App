@@ -63,7 +63,7 @@ public class MyGcmListenerService extends GcmListenerService {
         if (user_id==null){
             id = 0;
         }else{
-            id = Integer.parseInt(user_id);
+            id = Integer.parseInt(user_id.substring(1,2));
         }
         MyApplication myApplication = (MyApplication) getApplication();
 
@@ -88,7 +88,7 @@ public class MyGcmListenerService extends GcmListenerService {
 
         NotifyMsg notifyMsg = new NotifyMsg().setDate(date)
                 .setFrom(from)
-                .setId(Integer.parseInt(user_id))
+                .setId(id)
                 .setMessage($data)
                 .setTitle(title);
         MyApplication.notifyMsgList.add(notifyMsg);

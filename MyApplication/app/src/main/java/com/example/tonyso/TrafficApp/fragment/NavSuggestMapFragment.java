@@ -15,6 +15,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -160,6 +161,7 @@ public class NavSuggestMapFragment extends BaseFragment
 
         for(int i = 0;i<cctvList.size();i++){
             MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
             markerOptions.title(cctvList.get(i).getDescription()[1]);
             markerOptions.position(new LatLng(cctvList.get(i).getLatLngs()[0],cctvList.get(i).getLatLngs()[1]));
             mMap.addMarker(markerOptions);

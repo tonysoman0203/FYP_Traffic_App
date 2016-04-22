@@ -191,7 +191,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 viewHolder = new AddBookMarkViewHolder(bk);
                 break;
         }
-        return viewHolder;
+            return viewHolder;
     }
 
     @Override
@@ -289,7 +289,7 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     @Override
     public void onRecyclerViewIndex(int tag,int pos) {
-        //Snackbar.make(coordinatorLayout,"Button click : "+tag,Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(coordinatorLayout,"Button click : "+tag,Snackbar.LENGTH_SHORT).show();
         switch (tag){
             case 1:
                 this.notifyItemMoved(pos, TYPE_NEAR_ITEM);
@@ -297,11 +297,11 @@ public class InfoDetailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             case 2:
                 this.notifyItemMoved(pos, TYPE_BOOKMARK_ITEM);
                 break;
-            case 3:
-                Intent sendIntent = new Intent();
+            case 3 :
+             Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, "Traffic Condition @ "+route.getDescription()[1]);
-                sendIntent.setType("text/plain");
+              sendIntent.putExtra(Intent.EXTRA_TEXT, "Traffic Condition @ "+route.getDescription()[1]);
+                   sendIntent.setType("text/plain");
                 context.startActivity(Intent.createChooser(sendIntent, "share via..."));
             default:break;
         }
